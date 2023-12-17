@@ -1,3 +1,4 @@
+using Core.DTOs.SpecificationDTOs;
 using Core.Interfaces;
 using Infrastructure.Persistence.AppData;
 using Microsoft.AspNetCore.Mvc;
@@ -18,8 +19,8 @@ public class ProductsController : ControllerBase
 
 
     [HttpGet]
-    public async Task<IActionResult> GetProducts(){
-        var result = await productsService.GetProducts();
+    public async Task<IActionResult> GetProducts([FromQuery]SpecificationParameters specsParams){
+        var result = await productsService.GetProducts(specsParams);
         return Ok(result);
     }
 }
