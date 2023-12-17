@@ -1,6 +1,5 @@
 using Core.DTOs.SpecificationDTOs;
-using Core.Interfaces;
-using Infrastructure.Persistence.AppData;
+using Core.Interfaces.IDomainServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

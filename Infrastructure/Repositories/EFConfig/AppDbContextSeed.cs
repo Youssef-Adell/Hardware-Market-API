@@ -1,11 +1,11 @@
 using Core.Entities.ProductAggregate;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Persistence.AppData;
+namespace Infrastructure.Repositories.EFConfig;
 
-public class AppDbContextSeed
+public static class AppDbContextSeed
 {
-    public static async Task SeedAsync(AppDbContext appDbContext)
+    public static async Task SeedAsync(this AppDbContext appDbContext)
     {
             if (!await appDbContext.ProductBrands.AnyAsync())
             {

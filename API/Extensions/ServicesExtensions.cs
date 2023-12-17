@@ -1,7 +1,8 @@
-using Core.Interfaces;
-using Infrastructure.Mapper;
-using Infrastructure.Persistence.AppData;
-using Infrastructure.Services;
+using Core.DomainServices;
+using Core.Interfaces.IDomainServices;
+using Core.Interfaces.IRepositories;
+using Infrastructure.Repositories;
+using Infrastructure.Repositories.EFConfig;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Extensions;
@@ -22,6 +23,7 @@ public static class ServicesExtensions
 
     public static void AddApplicationServices(this IServiceCollection services)
     {
+        services.AddScoped<IProductsRepository, ProductsRepository>();
         services.AddScoped<IProductsService, ProductsService>();
     }
 }

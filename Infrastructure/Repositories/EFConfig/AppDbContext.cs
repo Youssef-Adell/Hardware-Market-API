@@ -2,7 +2,7 @@ using System.Reflection;
 using Core.Entities.ProductAggregate;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Persistence.AppData;
+namespace Infrastructure.Repositories.EFConfig;
 
 public class AppDbContext : DbContext
 {

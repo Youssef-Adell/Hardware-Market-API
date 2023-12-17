@@ -2,7 +2,7 @@ using Core.Entities.ProductAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistence.AppData.Config;
+namespace Infrastructure.Repositories.EFConfig.EntitiesConfig;
 
 public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {

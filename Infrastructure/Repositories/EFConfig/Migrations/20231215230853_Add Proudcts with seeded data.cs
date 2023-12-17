@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Infrastructure.Persistence.Migrations
+namespace Infrastructure.EFConfig.Migrations
 {
     /// <inheritdoc />
     public partial class AddProudctswithseededdata : Migration
