@@ -2,32 +2,19 @@ namespace Core.DTOs.SpecificationDTOs;
 
 public class SpecificationParameters
 {
-    private const int MaxPageSize = 10;
+    private const int MaxPageSize = 50;
     private int _page = 1;
-    private int _pageSize = MaxPageSize;
+    private int _pageSize = 10;
 
     public int Page
     {
-        get
-        {
-            return _page;
-        }
-        set
-        {
-            if (value > 0)
-                _page = value;
-        }
+        get => _page;
+        set => _page = (value > 0) ? value : _page;
     }
     public int PageSize
     {
-        get
-        {
-            return _pageSize;
-        }
-        set
-        {
-            _pageSize = (value <= MaxPageSize && value > 0) ?  value: MaxPageSize;
-        }
+        get => _pageSize;
+        set => _pageSize = (value <= MaxPageSize && value > 0) ? value : MaxPageSize;
     }
 
 }
