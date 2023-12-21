@@ -5,15 +5,15 @@
 namespace Infrastructure.Repositories.EFConfig.Migrations
 {
     /// <inheritdoc />
-    public partial class AddAverageRatingPropertyinProductEntityandmarkitasComputedSqlColumn : Migration
+    public partial class ChangetypeofAverageRatingPropertyofProductEntityandMarkitasComputedSqlColumn : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<double>(
+            migrationBuilder.AddColumn<float>(
                 name: "AverageRating",
                 table: "Products",
-                type: "float",
+                type: "real",
                 nullable: false,
                 computedColumnSql: "dbo.CalculateProductRate([Id])");
         }

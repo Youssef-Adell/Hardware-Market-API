@@ -9,5 +9,5 @@ public class ProductForListDto
     public string? Brand { get; init; }
     public string Category { get; init; }
     public bool InStock { get; init; }
-    public double AverageRating { get; set; }
+    public float AverageRating { get; set; }
 }

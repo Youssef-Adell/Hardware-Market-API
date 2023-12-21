@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Repositories.EFConfig.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231221060858_Add AverageRating Property in Product Entity and mark it as ComputedSqlColumn")]
-    partial class AddAverageRatingPropertyinProductEntityandmarkitasComputedSqlColumn
+    [Migration("20231221064925_Change type of AverageRating Property of Product Entity and Mark it as ComputedSqlColumn")]
+    partial class ChangetypeofAverageRatingPropertyofProductEntityandMarkitasComputedSqlColumn
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,9 +33,9 @@ namespace Infrastructure.Repositories.EFConfig.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("AverageRating")
+                    b.Property<float>("AverageRating")
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("float")
+                        .HasColumnType("real")
                         .HasComputedColumnSql("dbo.CalculateProductRate([Id])");
 
                     b.Property<int?>("BrandId")

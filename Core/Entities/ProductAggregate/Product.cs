@@ -12,5 +12,5 @@ public class Product : EntityBase
     public int CategoryId { get; set; }
     public ProductCategory Category { get; set; }
     public List<ProductReview>? Reviews { get; set; }
-    public double AverageRating { get; set; }
+    public float AverageRating { get; set; }
 }
