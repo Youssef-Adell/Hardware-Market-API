@@ -1,8 +1,7 @@
 namespace Core.Entities.ProductAggregate;
 
-public class Product
+public class Product : EntityBase
 {
-    public int Id { get; set; }
     public string Name { get; set; }
     public List<string> ImageUrls { get; set; }
     public string? Description { get; set; }
@@ -22,5 +21,5 @@ public class Product
 
             return Math.Round(Reviews.Average(r => r.Stars), 1);
         }
-    } 
+    }
 }
