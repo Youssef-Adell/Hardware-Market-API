@@ -20,7 +20,7 @@ public class ProductsRepository : IProductsRepository
     {
         //query to filter the products
         var query = appDbContext.Products
-                            .Include(p => p.Brand).Include(p => p.Category).Include(p => p.Reviews);
+                            .Include(p => p.Brand).Include(p => p.Category);
 
         //Get a page of filtered products
         var pagedProductsData = await query

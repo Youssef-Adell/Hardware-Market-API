@@ -12,14 +12,5 @@ public class Product : EntityBase
     public int CategoryId { get; set; }
     public ProductCategory Category { get; set; }
     public List<ProductReview>? Reviews { get; set; }
-    public double AverageRating
-    {
-        get
-        {
-            if (Reviews == null || Reviews.Count == 0)
-                return 0;
-
-            return Math.Round(Reviews.Average(r => r.Stars), 1);
-        }
-    }
+    public double AverageRating { get; set; }
 }
