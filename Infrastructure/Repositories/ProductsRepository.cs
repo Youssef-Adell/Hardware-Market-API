@@ -20,18 +20,18 @@ public class ProductsRepository : IProductsRepository
     {
         //query to filter the products
         var query = appDbContext.Products
-                            .Include(p=>p.Brand).Include(p=>p.Category).Include(p=>p.Reviews);
+                            .Include(p => p.Brand).Include(p => p.Category).Include(p => p.Reviews);
 
         //Get a page of filtered products
         var pagedProductsData = await query
-                            .OrderBy(p=>p.Name)
-                            .Skip((specsParams.Page-1)*specsParams.PageSize)
-                            .Take(specsParams.PageSize)
+                            .Sort(specsParams.SortBy, specsParams.SortDirection)
+                            .Paginate(specsParams.Page, specsParams.PageSize)
                             .ToListAsync();
 
         //Get total count of filterd products
         var totalProductsCount = await query.CountAsync();
 
         //return page of products with pagination metadata
-       return new PagedResult<Product>(pagedProductsData, specsParams.Page, specsParams.PageSize, totalProductsCount);    }
+        return new PagedResult<Product>(pagedProductsData, specsParams.Page, specsParams.PageSize, totalProductsCount);
+    }
 }

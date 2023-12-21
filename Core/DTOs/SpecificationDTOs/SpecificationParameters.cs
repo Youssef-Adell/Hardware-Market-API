@@ -16,5 +16,6 @@ public class SpecificationParameters
         get => _pageSize;
         set => _pageSize = (value <= MaxPageSize && value > 0) ? value : MaxPageSize;
     }
-
+    public string? SortBy { get; set; }
+    public string? SortDirection { get; set; }
 }

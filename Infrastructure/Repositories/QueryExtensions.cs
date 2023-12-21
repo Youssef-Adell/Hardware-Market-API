@@ -11,4 +11,19 @@ public static class QueryExtensions
                     .Take(pageSize);
     }
 
+    public static IQueryable<T> Sort<T>(this IQueryable<T> query, string? property, string? direction)
+    {
+        if (!string.IsNullOrEmpty(direction) && direction.StartsWith("desc", StringComparison.InvariantCultureIgnoreCase))
+            direction = "desc";
+        else
+            direction = "asc";
+
+        if (!string.IsNullOrEmpty(property))
+        {
+            return query.OrderBy($"{property} {direction}");
+        }
+
+        return query.OrderBy($"Id {direction}");
+    }
+
 }
