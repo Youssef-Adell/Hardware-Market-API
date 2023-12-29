@@ -1,5 +1,6 @@
 using System.Linq.Dynamic.Core;
 using Core.Entities;
+using Core.Exceptions;
 
 namespace Infrastructure.Repositories;
 
@@ -20,7 +21,14 @@ public static class QueryExtensions
 
         if (!string.IsNullOrEmpty(property))
         {
-            return query.OrderBy($"{property} {direction}");
+            try
+            {
+                return query.OrderBy($"{property} {direction}");
+            }
+            catch
+            {
+                throw new BadRequestException($"Invalid query parameters, no property called {property} to sort by it.");
+            }
         }
 
         return query.OrderBy($"Id {direction}"); // now we ensure that all types T is entity and has property called Id thanks to EntityBase
