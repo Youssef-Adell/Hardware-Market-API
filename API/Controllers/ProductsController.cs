@@ -18,7 +18,8 @@ public class ProductsController : ControllerBase
 
 
     [HttpGet]
-    public async Task<IActionResult> GetProducts([FromQuery]SpecificationParameters specsParams){
+    public async Task<IActionResult> GetProducts([FromQuery] ProductsSpecificationParameters specsParams)
+    {
         var result = await productsService.GetProducts(specsParams);
         return Ok(result);
     }

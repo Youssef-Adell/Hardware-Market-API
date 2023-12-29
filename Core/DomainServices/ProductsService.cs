@@ -17,8 +17,8 @@ public class ProductsService : IProductsService
         this.mapper = mapper;
         this.productsRepository = productsRepository;
     }
-    public async Task<PagedResult<ProductForListDto>> GetProducts(SpecificationParameters specsParams)
-    {   
+    public async Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams)
+    {
         var pageOfProductEntities = await productsRepository.GetProductsWithSpecsAsync(specsParams);
 
         //Map page of product entities to page of product dtos

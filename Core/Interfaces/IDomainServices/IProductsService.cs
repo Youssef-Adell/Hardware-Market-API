@@ -5,5 +5,5 @@ namespace Core.Interfaces.IDomainServices;
 
 public interface IProductsService
 {
-    Task<PagedResult<ProductForListDto>> GetProducts(SpecificationParameters specsParams);
+    Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams);
 }
