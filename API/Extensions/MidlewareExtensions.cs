@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Core.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
+using Serilog;
 
 namespace API.Extensions;
 
@@ -14,6 +15,8 @@ public static class MidlewareExtensions
             altPipelineBuilder.Run(async (context) =>
             {
                 var errorFeature = context.Features.Get<IExceptionHandlerFeature>();
+
+                Log.Logger.Error("{@error}", errorFeature.Error);
 
                 if (errorFeature != null)
                 {
