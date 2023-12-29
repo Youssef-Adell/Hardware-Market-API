@@ -14,7 +14,8 @@ builder.Services.AddApplicationServices();
 var app = builder.Build();
 
 // Apply Migrations that hasn't been applied and seed data
-using (var scope = app.Services.CreateScope()){
+using (var scope = app.Services.CreateScope())
+{
     var services = scope.ServiceProvider;
     try
     {
@@ -30,6 +31,8 @@ using (var scope = app.Services.CreateScope()){
 }
 
 // Configure the HTTP request pipeline.
+app.ConfigureExceptionHandlerMiddleware();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
