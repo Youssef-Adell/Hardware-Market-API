@@ -8,9 +8,10 @@ public class PagedResult<T>
     public PagedResult(IList<T> data, int currentPage, int pageSize, int totalItems)
     {
         Data = data;
-        Metadata = new PageMetadata{
-            CurrentPage = currentPage,
-            PageSize = pageSize,
+        Metadata = new PageMetadata
+        {
+            Page = currentPage,
+            PageSize = data.Count,
             TotalItems = totalItems,
             TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
         };
@@ -22,11 +23,11 @@ public class PagedResult<T>
 
 public class PageMetadata
 {
-    public int CurrentPage { get; set; }
+    public int Page { get; set; }
     public int PageSize { get; set; }
     public int TotalItems { get; set; }
     public int TotalPages { get; set; }
-    
-    public bool HasPrevious => CurrentPage > 1;
-    public bool HasNext => CurrentPage < TotalPages;
+
+    public bool HasPrevious => Page > 1;
+    public bool HasNext => Page < TotalPages;
 }
