@@ -33,7 +33,13 @@ public static class MidlewareExtensions
 
                     // Build Response Body
                     var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                    var bodyInJson = JsonSerializer.Serialize(new ErrorResponse(context.Response.StatusCode, errorFeature.Error.Message), jsonOptions);
+                    var bodyInJson = JsonSerializer.Serialize(
+                        new ErrorResponse(
+                            context.Response.StatusCode,
+                            context.Response.StatusCode == StatusCodes.Status500InternalServerError ? "Internal server error, check log for details." : errorFeature.Error.Message
+                        ),
+                        jsonOptions
+                    );
                     await context.Response.WriteAsync(bodyInJson);
                 }
 
