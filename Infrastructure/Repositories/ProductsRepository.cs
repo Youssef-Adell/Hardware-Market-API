@@ -21,7 +21,9 @@ public class ProductsRepository : IProductsRepository
         //query to filter the products
         var query = appDbContext.Products.Include(p => p.Brand).Include(p => p.Category)
                             //search (Short Circuit if no value in search)
-                            .Where(p => string.IsNullOrEmpty(specsParams.Search) || p.Name.ToLower().Contains(specsParams.Search.ToLower()));
+                            .Where(p => string.IsNullOrEmpty(specsParams.Search) || p.Name.ToLower().Contains(specsParams.Search.ToLower()))
+                            //filter
+                            .Where(p => p.Price >= specsParams.MinPrice && p.Price <= specsParams.MaxPrice);
 
         //Get a page of filtered products
         var pagedProductsData = await query
