@@ -1,4 +1,6 @@
 using System.Text.Json;
+using API.Errors;
+using Azure;
 using Core.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
@@ -30,9 +32,9 @@ public static class MidlewareExtensions
                     };
 
                     // Build Response Body
-                    await context.Response.WriteAsync(
-                        JsonSerializer.Serialize(new { Error = errorFeature.Error.Message })
-                    );
+                    var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                    var bodyInJson = JsonSerializer.Serialize(new ErrorResponse(context.Response.StatusCode, errorFeature.Error.Message), jsonOptions);
+                    await context.Response.WriteAsync(bodyInJson);
                 }
 
             });
