@@ -2,6 +2,7 @@ using AutoMapper;
 using Core.DTOs.ProductDTOs;
 using Core.DTOs.SpecificationDTOs;
 using Core.Entities.ProductAggregate;
+using Core.Exceptions;
 using Core.Interfaces.IDomainServices;
 using Core.Interfaces.IRepositories;
 
@@ -25,6 +26,19 @@ public class ProductsService : IProductsService
         var pageOfProductDtos = mapper.Map<PagedResult<Product>, PagedResult<ProductForListDto>>(pageOfProductEntities);
 
         return pageOfProductDtos;
+    }
+
+    public async Task<ProductDetailsDto> GetProduct(int categoryId, int productId)
+    {
+        var productEntity = await productsRepository.GetProduct(categoryId, productId);
+
+        if (productEntity is null)
+            throw new NotFoundException($"The product with id: {productId} not found.");
+
+        //Map product entitiy tp product dto
+        var productDto = mapper.Map<Product, ProductDetailsDto>(productEntity);
+
+        return productDto;
     }
 
 }

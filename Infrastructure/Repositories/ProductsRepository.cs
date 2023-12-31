@@ -40,4 +40,12 @@ public class ProductsRepository : IProductsRepository
         //return page of products with pagination metadata
         return new PagedResult<Product>(pagedProductsData, specsParams.Page, specsParams.PageSize, totalProductsCount);
     }
+
+    public Task<Product?> GetProduct(int categoryId, int productId)
+    {
+        var product = appDbContext.Products
+                            .Include(p => p.Brand).Include(p => p.Category)
+                            .FirstOrDefaultAsync(p => p.Id == productId && p.CategoryId == categoryId);
+        return product;
+    }
 }

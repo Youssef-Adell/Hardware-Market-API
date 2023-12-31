@@ -23,4 +23,11 @@ public class ProductsController : ControllerBase
         var result = await productsService.GetProductsForCategory(categoryId, specsParams);
         return Ok(result);
     }
+
+    [HttpGet("{productId:int}")]
+    public async Task<IActionResult> GetProductsForCategory(int categoryId, int productId)
+    {
+        var result = await productsService.GetProduct(categoryId, productId);
+        return Ok(result);
+    }
 }
