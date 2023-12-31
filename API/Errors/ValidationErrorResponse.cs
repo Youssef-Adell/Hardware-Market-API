@@ -3,11 +3,11 @@ namespace API.Errors;
 public class ValidationErrorResponse : ErrorResponse
 {
 
-    public ValidationErrorResponse(IEnumerable<string> errors) : base(400, "One or more validation errors occurred.")
+    public ValidationErrorResponse(IEnumerable<string> details) : base(400, "One or more validation errors occurred.")
     {
-        Errors = errors;
+        Details = details;
     }
 
-    public IEnumerable<string> Errors { get; init; }
+    public IEnumerable<string> Details { get; init; }
 
 }

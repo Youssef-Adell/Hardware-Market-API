@@ -16,7 +16,7 @@ public static class ServicesExtensions
     public static void AddWebServices(this IServiceCollection services)
     {
         services.AddControllers();
-        //Modify the default behaviour of APIControllerAttribute and return a customized error response of the default one
+        //Modify the default behaviour of APIControllerAttribute and return a customized error response instead of the default one
         services.Configure<ApiBehaviorOptions>(options =>
         {
             options.InvalidModelStateResponseFactory = actionContext =>
@@ -24,11 +24,11 @@ public static class ServicesExtensions
                 var validationErrors = actionContext.ModelState.Values
                     .Where(stateEntry => stateEntry.Errors.Count > 0)
                     .SelectMany(stateEntry => stateEntry.Errors)
-                    .Select(modelError => modelError.ErrorMessage);
+                    .Select(error => error.ErrorMessage);
 
-                var errorResponse = new ValidationErrorResponse(errors: validationErrors);
+                var response = new ValidationErrorResponse(details: validationErrors);
 
-                return new BadRequestObjectResult(errorResponse);
+                return new BadRequestObjectResult(response);
             };
         });
 
