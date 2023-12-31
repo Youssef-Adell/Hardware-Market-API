@@ -45,6 +45,7 @@ public static class ServicesExtensions
     public static void AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IProductsRepository, ProductsRepository>();
+        services.AddScoped<ICategoriesRepository, CategoriesRepository>();
         services.AddScoped<IProductsService, ProductsService>();
     }
 }
