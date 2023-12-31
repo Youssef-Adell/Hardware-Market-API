@@ -16,7 +16,7 @@ public class ProductsRepository : IProductsRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<PagedResult<Product>> GetProductsForCategoryAsync(int categoryId, ProductsSpecificationParameters specsParams)
+    public async Task<PagedResult<Product>> GetProductsForCategory(int categoryId, ProductsSpecificationParameters specsParams)
     {
         //build a query of filtered products
         var query = appDbContext.Products.Include(p => p.Brand).Include(p => p.Category)
