@@ -16,10 +16,11 @@ public class ProductsRepository : IProductsRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<PagedResult<Product>> GetProductsWithSpecsAsync(ProductsSpecificationParameters specsParams)
+    public async Task<PagedResult<Product>> GetProductsForCategoryAsync(int categoryId, ProductsSpecificationParameters specsParams)
     {
         //build a query of filtered products
         var query = appDbContext.Products.Include(p => p.Brand).Include(p => p.Category)
+                            .Where(p => p.CategoryId == categoryId)
                             //search (Short Circuit if no value in search)
                             .Where(p => string.IsNullOrEmpty(specsParams.Search) || p.Name.ToLower().Contains(specsParams.Search.ToLower()))
                             //filter (Short circuit if no value for categoryId & brandId)

@@ -17,9 +17,9 @@ public class ProductsService : IProductsService
         this.mapper = mapper;
         this.productsRepository = productsRepository;
     }
-    public async Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams)
+    public async Task<PagedResult<ProductForListDto>> GetProductsForCategory(int categoryId, ProductsSpecificationParameters specsParams)
     {
-        var pageOfProductEntities = await productsRepository.GetProductsWithSpecsAsync(specsParams);
+        var pageOfProductEntities = await productsRepository.GetProductsForCategoryAsync(categoryId, specsParams);
 
         //Map page of product entities to page of product dtos
         var pageOfProductDtos = mapper.Map<PagedResult<Product>, PagedResult<ProductForListDto>>(pageOfProductEntities);

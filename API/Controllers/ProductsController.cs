@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/categories/{categoryId}/products")]
 public class ProductsController : ControllerBase
 {
     private readonly IProductsService productsService;
@@ -18,9 +18,9 @@ public class ProductsController : ControllerBase
 
 
     [HttpGet]
-    public async Task<IActionResult> GetProducts([FromQuery] ProductsSpecificationParameters specsParams)
+    public async Task<IActionResult> GetProductsForCategory(int categoryId, [FromQuery] ProductsSpecificationParameters specsParams)
     {
-        var result = await productsService.GetProducts(specsParams);
+        var result = await productsService.GetProductsForCategory(categoryId, specsParams);
         return Ok(result);
     }
 }

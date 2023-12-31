@@ -5,5 +5,5 @@ namespace Core.Interfaces.IRepositories;
 
 public interface IProductsRepository
 {
-    Task<PagedResult<Product>> GetProductsWithSpecsAsync(ProductsSpecificationParameters specsParams);
+    Task<PagedResult<Product>> GetProductsForCategoryAsync(int categoryId, ProductsSpecificationParameters specsParams);
 }
