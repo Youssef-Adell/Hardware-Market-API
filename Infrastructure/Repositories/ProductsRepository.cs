@@ -18,17 +18,19 @@ public class ProductsRepository : IProductsRepository
 
     public async Task<PagedResult<Product>> GetProductsWithSpecsAsync(ProductsSpecificationParameters specsParams)
     {
-        //query to filter the products
+        //build a query of filtered products
         var query = appDbContext.Products.Include(p => p.Brand).Include(p => p.Category)
                             //search (Short Circuit if no value in search)
                             .Where(p => string.IsNullOrEmpty(specsParams.Search) || p.Name.ToLower().Contains(specsParams.Search.ToLower()))
-                            //filter
-                            .Where(p => p.Price >= specsParams.MinPrice && p.Price <= specsParams.MaxPrice);
+                            //filter (Short circuit if no value for categoryId & brandId)
+                            .Where(p => p.Price >= specsParams.MinPrice && p.Price <= specsParams.MaxPrice)
+                            .Where(p => specsParams.BrandId == null || p.BrandId == specsParams.BrandId);
 
-        //Get a page of filtered products
+        //sort and paginate the above query then execute it
         var pagedProductsData = await query
                             .Sort(specsParams.SortBy, specsParams.SortDirection)
                             .Paginate(specsParams.Page, specsParams.PageSize)
+                            .AsNoTracking() //to enhance the performance
                             .ToListAsync();
 
         //Get total count of filterd products
