@@ -45,6 +45,7 @@ public class ProductsRepository : IProductsRepository
     {
         var product = appDbContext.Products
                             .Include(p => p.Brand).Include(p => p.Category)
+                            .AsNoTracking()
                             .FirstOrDefaultAsync(p => p.Id == productId && p.CategoryId == categoryId);
         return product;
     }
