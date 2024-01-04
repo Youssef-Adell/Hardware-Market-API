@@ -23,4 +23,13 @@ public class BrandsRepository : IBrandsRepository
         return brand;
     }
 
+    public async Task<IReadOnlyList<ProductBrand>> GetBrands()
+    {
+        var brands = await appDbContext.ProductBrands
+                        .AsNoTracking()
+                        .ToListAsync();
+
+        return brands;
+    }
+
 }

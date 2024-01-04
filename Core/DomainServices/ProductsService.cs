@@ -24,6 +24,23 @@ public class ProductsService : IProductsService
     }
     public async Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams)
     {
+        //check for category existence
+        if (specsParams.CategoryId != null)
+        {
+            var category = await categoriesRepository.GetCategory(specsParams.CategoryId.GetValueOrDefault());
+            if (category is null)
+                throw new BadRequestException($"No category with id: {specsParams.CategoryId} to filter by.");
+        }
+
+        //check for brands existence
+        if (specsParams.BrandId?.Any() ?? false)
+        {
+            var brandsIdsAvailable = (await brandsRepository.GetBrands()).Select(b => b.Id);
+            if (!specsParams.BrandId.All(id => brandsIdsAvailable.Contains(id)))
+                throw new BadRequestException($"No brands with these ids to filter by.");
+        }
+
+        //get the products
         var pageOfProductEntities = await productsRepository.GetProducts(specsParams);
 
         var pageOfProductDtos = mapper.Map<PagedResult<Product>, PagedResult<ProductForListDto>>(pageOfProductEntities);
