@@ -4,16 +4,19 @@ using Infrastructure.Repositories.EFConfig;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Infrastructure.EFConfig.Migrations
+namespace Infrastructure.Repositories.EFConfig.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240104151205_Mark ImageUrls as nullable in product entity")]
+    partial class MarkImageUrlsasnullableinproductentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,7 +66,7 @@ namespace Infrastructure.EFConfig.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Core.Entities.ProductAggregate.ProductBrand", b =>
@@ -84,7 +87,7 @@ namespace Infrastructure.EFConfig.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductBrands", (string)null);
+                    b.ToTable("ProductBrands");
                 });
 
             modelBuilder.Entity("Core.Entities.ProductAggregate.ProductCategory", b =>
@@ -105,7 +108,7 @@ namespace Infrastructure.EFConfig.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductCategories", (string)null);
+                    b.ToTable("ProductCategories");
                 });
 
             modelBuilder.Entity("Core.Entities.ProductAggregate.ProductReview", b =>
@@ -134,7 +137,7 @@ namespace Infrastructure.EFConfig.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductReveiews", (string)null);
+                    b.ToTable("ProductReveiews");
                 });
 
             modelBuilder.Entity("Core.Entities.ProductAggregate.Product", b =>

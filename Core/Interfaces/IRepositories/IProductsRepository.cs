@@ -7,4 +7,5 @@ public interface IProductsRepository
 {
     Task<PagedResult<Product>> GetProducts(ProductsSpecificationParameters specsParams);
     Task<Product?> GetProduct(int id);
+    Task AddProduct(Product product);
 }

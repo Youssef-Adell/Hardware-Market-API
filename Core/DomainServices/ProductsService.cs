@@ -10,8 +10,8 @@ namespace Core.DomainServices;
 
 public class ProductsService : IProductsService
 {
-    private IMapper mapper;
-    private IProductsRepository productsRepository;
+    private readonly IMapper mapper;
+    private readonly IProductsRepository productsRepository;
     private readonly ICategoriesRepository categoriesRepository;
 
     public ProductsService(IMapper mapper, IProductsRepository productsRepository, ICategoriesRepository categoriesRepository)
@@ -38,4 +38,12 @@ public class ProductsService : IProductsService
         return productDto;
     }
 
+    public async Task<int> AddProduct(ProductForAddingDto productForAddingDto)
+    {
+        var productEntity = mapper.Map<ProductForAddingDto, Product>(productForAddingDto);
+
+        await productsRepository.AddProduct(productEntity);
+
+        return productEntity.Id;
+    }
 }

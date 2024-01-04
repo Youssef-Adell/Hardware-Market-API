@@ -36,7 +36,7 @@ public static class MidlewareExtensions
                     var bodyInJson = JsonSerializer.Serialize(
                         new ErrorResponse(
                             context.Response.StatusCode,
-                            context.Response.StatusCode == StatusCodes.Status500InternalServerError ? "Internal server error, check log for details." : errorFeature.Error.Message
+                            context.Response.StatusCode == StatusCodes.Status500InternalServerError ? "Internal server error." : errorFeature.Error.Message
                         ),
                         jsonOptions
                     );

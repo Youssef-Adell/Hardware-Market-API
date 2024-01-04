@@ -7,4 +7,6 @@ public interface IProductsService
 {
     Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams);
     Task<ProductDetailsDto> GetProduct(int id);
+    Task<int> AddProduct(ProductForAddingDto productForAddingDto);
+
 }

@@ -24,41 +24,53 @@ public class MappingProfile : Profile
         .ForMember(d => d.InStock, options => options.MapFrom(s => s.Quantity > 0))
         .ForMember(d => d.ImageUrls, options => options.MapFrom<ImageUrlsResolver>());
 
+        CreateMap<ProductForAddingDto, Product>();
     }
 }
 
 
 // ---Resolvers---
-public class PreviewImageUrlResolver : IValueResolver<Product, ProductForListDto, string>
+public class PreviewImageUrlResolver : IValueResolver<Product, ProductForListDto, string?>
 {
     private readonly IConfiguration configration;
 
     public PreviewImageUrlResolver(IConfiguration configration) => this.configration = configration;
 
-    public string Resolve(Product source, ProductForListDto destination, string destMember, ResolutionContext context)
+    public string? Resolve(Product source, ProductForListDto destination, string? destMember, ResolutionContext context)
     {
-        var previewImagePath = source.ImageUrls.ElementAt(0);
+        var previewImagePath = source?.ImageUrls?.ElementAt(0);
         if (!string.IsNullOrEmpty(previewImagePath))
-            return $"{configration["ApiUrl"]}/{previewImagePath}";
+        {
+            var baseUri = new Uri(configration["ApiUrl"]);
+            var imageCompleteUrl = new Uri(baseUri, previewImagePath).ToString();
+            return imageCompleteUrl;
+        }
 
         return null;
     }
 }
 
-public class ImageUrlsResolver : IValueResolver<Product, ProductDetailsDto, List<string>>
+public class ImageUrlsResolver : IValueResolver<Product, ProductDetailsDto, List<string>?>
 {
     private readonly IConfiguration configration;
 
     public ImageUrlsResolver(IConfiguration configration) => this.configration = configration;
 
-    public List<string> Resolve(Product source, ProductDetailsDto destination, List<string> destMember, ResolutionContext context)
+    public List<string>? Resolve(Product source, ProductDetailsDto destination, List<string>? destMember, ResolutionContext context)
     {
-        List<string> imageUrls = new();
+        List<string>? imageUrls = new();
 
-        foreach (var imageUrl in source.ImageUrls)
+        source?.ImageUrls?.ForEach(imageUrl =>
+        {
             if (!string.IsNullOrEmpty(imageUrl))
-                imageUrls.Add($"{configration["ApiUrl"]}/{imageUrl}");
+            {
+                var baseUri = new Uri(configration["ApiUrl"]);
+                var imageCompleteUrl = new Uri(baseUri, imageUrl).ToString();
+                imageUrls.Add(imageCompleteUrl);
+            }
+        }
+        );
 
-        return imageUrls;
+        return imageUrls.Count > 0 ? imageUrls : null;
     }
 }

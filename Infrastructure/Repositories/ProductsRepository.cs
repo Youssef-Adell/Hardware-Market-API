@@ -49,4 +49,10 @@ public class ProductsRepository : IProductsRepository
                             .FirstOrDefaultAsync(p => p.Id == id);
         return product;
     }
+
+    public async Task AddProduct(Product product)
+    {
+        appDbContext.Products.Add(product);
+        await appDbContext.SaveChangesAsync();
+    }
 }

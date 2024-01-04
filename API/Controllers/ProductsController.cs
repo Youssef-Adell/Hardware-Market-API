@@ -1,7 +1,7 @@
+using Core.DTOs.ProductDTOs;
 using Core.DTOs.SpecificationDTOs;
 using Core.Interfaces.IDomainServices;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
@@ -29,5 +29,14 @@ public class ProductsController : ControllerBase
     {
         var result = await productsService.GetProduct(id);
         return Ok(result);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddProduct(ProductForAddingDto productForAddingDto)
+    {
+        var productId = await productsService.AddProduct(productForAddingDto);
+
+        //pass productId as a value for route data and pass null as a value for body cause we dont need to a body in the GetProduct Action
+        return CreatedAtAction(nameof(GetProduct), new { id = productId }, null);
     }
 }
