@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace Infrastructure.EFConfig.Migrations
+namespace Infrastructure.Repositories.EFConfig.Migrations
 {
     /// <inheritdoc />
-    public partial class AddProudctswithseededdata : Migration
+    public partial class initmigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -45,12 +45,13 @@ namespace Infrastructure.EFConfig.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageUrls = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrls = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<double>(type: "float", nullable: false),
-                    BrandId = table.Column<int>(type: "int", nullable: true),
-                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                    BrandId = table.Column<int>(type: "int", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    AverageRating = table.Column<float>(type: "real", nullable: false, computedColumnSql: "dbo.CalculateProductRate([Id])")
                 },
                 constraints: table =>
                 {
@@ -59,7 +60,8 @@ namespace Infrastructure.EFConfig.Migrations
                         name: "FK_Products_ProductBrands_BrandId",
                         column: x => x.BrandId,
                         principalTable: "ProductBrands",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Products_ProductCategories_CategoryId",
                         column: x => x.CategoryId,
@@ -69,21 +71,21 @@ namespace Infrastructure.EFConfig.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductReveiews",
+                name: "ProductReviews",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     CustomerEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Stars = table.Column<int>(type: "int", nullable: false),
+                    Stars = table.Column<float>(type: "real", nullable: false),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductReveiews", x => x.Id);
+                    table.PrimaryKey("PK_ProductReviews", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductReveiews_Products_ProductId",
+                        name: "FK_ProductReviews_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -91,8 +93,8 @@ namespace Infrastructure.EFConfig.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductReveiews_ProductId",
-                table: "ProductReveiews",
+                name: "IX_ProductReviews_ProductId",
+                table: "ProductReviews",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
@@ -110,7 +112,7 @@ namespace Infrastructure.EFConfig.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ProductReveiews");
+                name: "ProductReviews");
 
             migrationBuilder.DropTable(
                 name: "Products");

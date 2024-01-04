@@ -8,7 +8,7 @@ public class ProductDetailsDto
     public string? Description { get; set; }
     public int Quantity { get; set; }
     public double Price { get; init; }
-    public string? Brand { get; init; }
+    public string Brand { get; init; }
     public string Category { get; init; }
     public bool InStock { get; init; }
     public float AverageRating { get; set; }

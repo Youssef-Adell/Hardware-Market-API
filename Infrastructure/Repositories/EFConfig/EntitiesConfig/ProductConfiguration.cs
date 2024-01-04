@@ -10,7 +10,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
         builder.Property(p => p.AverageRating)
         // we solved the problem of calculated AverageRating by delegating the task to the DB but the issue is our app now is dependent on details at Db level so if we changed our DB we have to implement dbo.CalculateProductRate function in the new DB
-
         .HasComputedColumnSql("dbo.CalculateProductRate([Id])")
         //to stop returning this property in the OUTPUT Clause when inserting a new entity in the DB beacuse if we didnt it will rhrow an error while saving because this column is computedColumn and its value cannot be calculated and returned immediataly after saving unlike Id property
         .ValueGeneratedNever()
@@ -21,5 +20,24 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.AverageRating)
         .Metadata.SetAfterSaveBehavior(Microsoft.EntityFrameworkCore.Metadata.PropertySaveBehavior.Ignore);
     }
+
+    /*
+    - The sql function for AverageRating property to use it if you changed or dropped the Database
+    CREATE FUNCTION dbo.CalculateProductRate
+    (
+        @ProductId INT
+    )
+    RETURNS real
+    AS
+    BEGIN
+        DECLARE @AverageRating real;
+
+        SELECT @AverageRating = AVG(Stars)
+        FROM ProductReviews
+        WHERE ProductId = @ProductId;
+
+        RETURN ISNULL(@AverageRating, 0); -- Return 0 if there are no reviews for the product
+    END
+    */
 
 }
