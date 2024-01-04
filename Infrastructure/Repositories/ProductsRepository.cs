@@ -24,8 +24,8 @@ public class ProductsRepository : IProductsRepository
                             .Where(p => string.IsNullOrEmpty(specsParams.Search) || p.Name.ToLower().Contains(specsParams.Search.ToLower()))
                             //filter (Short circuit if no value for categoryId & brandId)
                             .Where(p => p.Price >= specsParams.MinPrice && p.Price <= specsParams.MaxPrice)
-                            .Where(p => specsParams.BrandId == null || p.BrandId == specsParams.BrandId)
-                            .Where(p => specsParams.CategoryId == null || p.CategoryId == specsParams.CategoryId);
+                            .Where(p => specsParams.CategoryId == null || specsParams.CategoryId == p.CategoryId)
+                            .Where(p => specsParams.BrandId == null || specsParams.BrandId.Contains(p.BrandId.GetValueOrDefault()));
 
         //sort and paginate the above query then execute it
         var pagedProductsData = await query
