@@ -27,7 +27,7 @@ public static class QueryExtensions
             }
             catch
             {
-                throw new BadRequestException($"Invalid query parameter, no property called {property} to sort by it.");
+                throw new BadRequestException($"No property called {property} to sort by it.");
             }
         }
 

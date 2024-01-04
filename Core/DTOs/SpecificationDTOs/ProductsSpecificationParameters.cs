@@ -8,6 +8,7 @@ public class ProductsSpecificationParameters : SpecificationParameters, IValidat
     public uint MinPrice { get; set; } = 0;
     public uint MaxPrice { get; set; } = int.MaxValue;
     public int? BrandId { get; set; } = null;
+    public int? CategoryId { get; set; } = null;
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

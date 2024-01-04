@@ -16,16 +16,16 @@ public class ProductsRepository : IProductsRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<PagedResult<Product>> GetProductsForCategory(int categoryId, ProductsSpecificationParameters specsParams)
+    public async Task<PagedResult<Product>> GetProducts(ProductsSpecificationParameters specsParams)
     {
         //build a query of filtered products
         var query = appDbContext.Products.Include(p => p.Brand).Include(p => p.Category)
-                            .Where(p => p.CategoryId == categoryId)
                             //search (Short Circuit if no value in search)
                             .Where(p => string.IsNullOrEmpty(specsParams.Search) || p.Name.ToLower().Contains(specsParams.Search.ToLower()))
                             //filter (Short circuit if no value for categoryId & brandId)
                             .Where(p => p.Price >= specsParams.MinPrice && p.Price <= specsParams.MaxPrice)
-                            .Where(p => specsParams.BrandId == null || p.BrandId == specsParams.BrandId);
+                            .Where(p => specsParams.BrandId == null || p.BrandId == specsParams.BrandId)
+                            .Where(p => specsParams.CategoryId == null || p.CategoryId == specsParams.CategoryId);
 
         //sort and paginate the above query then execute it
         var pagedProductsData = await query
@@ -41,12 +41,12 @@ public class ProductsRepository : IProductsRepository
         return new PagedResult<Product>(pagedProductsData, specsParams.Page, specsParams.PageSize, totalProductsCount);
     }
 
-    public Task<Product?> GetProduct(int categoryId, int productId)
+    public Task<Product?> GetProduct(int productId)
     {
         var product = appDbContext.Products
                             .Include(p => p.Brand).Include(p => p.Category)
                             .AsNoTracking()
-                            .FirstOrDefaultAsync(p => p.Id == productId && p.CategoryId == categoryId);
+                            .FirstOrDefaultAsync(p => p.Id == productId);
         return product;
     }
 }

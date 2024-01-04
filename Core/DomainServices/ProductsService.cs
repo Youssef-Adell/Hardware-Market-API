@@ -20,27 +20,17 @@ public class ProductsService : IProductsService
         this.productsRepository = productsRepository;
         this.categoriesRepository = categoriesRepository;
     }
-    public async Task<PagedResult<ProductForListDto>> GetProductsForCategory(int categoryId, ProductsSpecificationParameters specsParams)
+    public async Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams)
     {
-        //check for category existence
-        var category = await categoriesRepository.GetCategory(categoryId);
-        if (category is null)
-            throw new NotFoundException($"The category with id: {categoryId} not found.");
-
-        var pageOfProductEntities = await productsRepository.GetProductsForCategory(categoryId, specsParams);
+        var pageOfProductEntities = await productsRepository.GetProducts(specsParams);
 
         var pageOfProductDtos = mapper.Map<PagedResult<Product>, PagedResult<ProductForListDto>>(pageOfProductEntities);
         return pageOfProductDtos;
     }
 
-    public async Task<ProductDetailsDto> GetProduct(int categoryId, int productId)
+    public async Task<ProductDetailsDto> GetProduct(int productId)
     {
-        //check for category existence
-        var category = await categoriesRepository.GetCategory(categoryId);
-        if (category is null)
-            throw new NotFoundException($"The category with id: {categoryId} not found.");
-
-        var productEntity = await productsRepository.GetProduct(categoryId, productId);
+        var productEntity = await productsRepository.GetProduct(productId);
         if (productEntity is null)
             throw new NotFoundException($"The product with id: {productId} not found.");
 
