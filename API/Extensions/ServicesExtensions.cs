@@ -46,6 +46,7 @@ public static class ServicesExtensions
     {
         services.AddScoped<IProductsRepository, ProductsRepository>();
         services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+        services.AddScoped<IBrandsRepository, BrandsRepository>();
         services.AddScoped<IProductsService, ProductsService>();
     }
 }

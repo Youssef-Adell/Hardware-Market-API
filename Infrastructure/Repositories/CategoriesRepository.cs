@@ -14,11 +14,11 @@ public class CategoriesRepository : ICategoriesRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<ProductCategory?> GetCategory(int categoryId)
+    public async Task<ProductCategory?> GetCategory(int id)
     {
         var category = await appDbContext.ProductCategories
                         .AsNoTracking()
-                        .FirstOrDefaultAsync(c => c.Id == categoryId);
+                        .FirstOrDefaultAsync(c => c.Id == id);
 
         return category;
     }

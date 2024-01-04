@@ -13,12 +13,14 @@ public class ProductsService : IProductsService
     private readonly IMapper mapper;
     private readonly IProductsRepository productsRepository;
     private readonly ICategoriesRepository categoriesRepository;
+    private readonly IBrandsRepository brandsRepository;
 
-    public ProductsService(IMapper mapper, IProductsRepository productsRepository, ICategoriesRepository categoriesRepository)
+    public ProductsService(IMapper mapper, IProductsRepository productsRepository, ICategoriesRepository categoriesRepository, IBrandsRepository brandsRepository)
     {
         this.mapper = mapper;
         this.productsRepository = productsRepository;
         this.categoriesRepository = categoriesRepository;
+        this.brandsRepository = brandsRepository;
     }
     public async Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams)
     {
@@ -40,6 +42,17 @@ public class ProductsService : IProductsService
 
     public async Task<int> AddProduct(ProductForAddingDto productForAddingDto)
     {
+        //check for category existence
+        var category = await categoriesRepository.GetCategory(productForAddingDto.CategoryId);
+        if (category is null)
+            throw new BadRequestException($"No category with id: {productForAddingDto.CategoryId}.");
+
+        //check for brand existence
+        var brand = await brandsRepository.GetBrand(productForAddingDto.BrandId);
+        if (brand is null)
+            throw new BadRequestException($"No brand with id: {productForAddingDto.BrandId}.");
+
+        //create the product
         var productEntity = mapper.Map<ProductForAddingDto, Product>(productForAddingDto);
 
         await productsRepository.AddProduct(productEntity);

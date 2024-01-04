@@ -4,5 +4,5 @@ namespace Core.Interfaces.IRepositories;
 
 public interface ICategoriesRepository
 {
-    Task<ProductCategory?> GetCategory(int categoryId);
+    Task<ProductCategory?> GetCategory(int id);
 }
