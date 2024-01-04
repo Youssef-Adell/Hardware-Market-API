@@ -41,12 +41,12 @@ public class ProductsRepository : IProductsRepository
         return new PagedResult<Product>(pagedProductsData, specsParams.Page, specsParams.PageSize, totalProductsCount);
     }
 
-    public Task<Product?> GetProduct(int productId)
+    public Task<Product?> GetProduct(int id)
     {
         var product = appDbContext.Products
                             .Include(p => p.Brand).Include(p => p.Category)
                             .AsNoTracking()
-                            .FirstOrDefaultAsync(p => p.Id == productId);
+                            .FirstOrDefaultAsync(p => p.Id == id);
         return product;
     }
 }

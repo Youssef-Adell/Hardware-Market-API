@@ -24,10 +24,10 @@ public class ProductsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{productId:int}")]
-    public async Task<IActionResult> GetProduct(int productId)
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetProduct(int id)
     {
-        var result = await productsService.GetProduct(productId);
+        var result = await productsService.GetProduct(id);
         return Ok(result);
     }
 }

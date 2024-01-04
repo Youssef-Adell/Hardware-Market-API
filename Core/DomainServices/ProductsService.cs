@@ -28,11 +28,11 @@ public class ProductsService : IProductsService
         return pageOfProductDtos;
     }
 
-    public async Task<ProductDetailsDto> GetProduct(int productId)
+    public async Task<ProductDetailsDto> GetProduct(int id)
     {
-        var productEntity = await productsRepository.GetProduct(productId);
+        var productEntity = await productsRepository.GetProduct(id);
         if (productEntity is null)
-            throw new NotFoundException($"The product with id: {productId} not found.");
+            throw new NotFoundException($"The product with id: {id} not found.");
 
         var productDto = mapper.Map<Product, ProductDetailsDto>(productEntity);
         return productDto;
