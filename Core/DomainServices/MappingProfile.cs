@@ -22,7 +22,7 @@ public class MappingProfile : Profile
         .ForMember(d => d.Brand, options => options.MapFrom(s => s.Brand.Name))
         .ForMember(d => d.Category, options => options.MapFrom(s => s.Category.Name))
         .ForMember(d => d.InStock, options => options.MapFrom(s => s.Quantity > 0))
-        .ForMember(d => d.ImageUrls, options => options.MapFrom<ImageUrlsResolver>());
+        .ForMember(d => d.ImagesUrls, options => options.MapFrom<ImageUrlsResolver>());
 
         CreateMap<ProductForAddingDto, Product>();
     }
@@ -33,17 +33,17 @@ public class MappingProfile : Profile
 public class PreviewImageUrlResolver : IValueResolver<Product, ProductForListDto, string?>
 {
     private readonly IConfiguration configration;
-
     public PreviewImageUrlResolver(IConfiguration configration) => this.configration = configration;
 
     public string? Resolve(Product source, ProductForListDto destination, string? destMember, ResolutionContext context)
     {
-        var previewImagePath = source?.ImageUrls?.ElementAt(0);
-        if (!string.IsNullOrEmpty(previewImagePath))
+        //here we took the first image in the product images and return it to be assigned for the preiview image for the product which will be displayed in the list
+        var firstImagePath = source?.Images?.ElementAt(0)?.Path;
+        if (!string.IsNullOrEmpty(firstImagePath))
         {
-            var baseUri = new Uri(configration["ApiUrl"]);
-            var imageCompleteUrl = new Uri(baseUri, previewImagePath).ToString();
-            return imageCompleteUrl;
+            var hostUrl = new Uri(configration["ApiUrl"]);
+            var ImageUrl = new Uri(hostUrl, firstImagePath).ToString();
+            return ImageUrl;
         }
 
         return null;
@@ -53,24 +53,23 @@ public class PreviewImageUrlResolver : IValueResolver<Product, ProductForListDto
 public class ImageUrlsResolver : IValueResolver<Product, ProductDetailsDto, List<string>?>
 {
     private readonly IConfiguration configration;
-
     public ImageUrlsResolver(IConfiguration configration) => this.configration = configration;
 
     public List<string>? Resolve(Product source, ProductDetailsDto destination, List<string>? destMember, ResolutionContext context)
     {
         List<string>? imageUrls = new();
 
-        source?.ImageUrls?.ForEach(imageUrl =>
+        source?.Images?.ForEach(image =>
         {
-            if (!string.IsNullOrEmpty(imageUrl))
+            if (!string.IsNullOrEmpty(image?.Path))
             {
-                var baseUri = new Uri(configration["ApiUrl"]);
-                var imageCompleteUrl = new Uri(baseUri, imageUrl).ToString();
-                imageUrls.Add(imageCompleteUrl);
+                var hostUrl = new Uri(configration["ApiUrl"]);
+                var imageUrl = new Uri(hostUrl, image.Path).ToString();
+                imageUrls.Add(imageUrl);
             }
         }
         );
 
-        return imageUrls.Count > 0 ? imageUrls : null;
+        return imageUrls.Count != 0 ? imageUrls : null;
     }
 }

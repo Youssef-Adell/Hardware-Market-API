@@ -4,7 +4,7 @@ public class ProductDetailsDto
 {
     public int Id { get; init; }
     public string Name { get; init; }
-    public List<string>? ImageUrls { get; init; }
+    public List<string>? ImagesUrls { get; init; }
     public string? Description { get; set; }
     public int Quantity { get; set; }
     public double Price { get; init; }

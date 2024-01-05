@@ -29,19 +29,19 @@ public static class AppDbContextSeed
         if (!await appDbContext.Products.AnyAsync())
         {
             var list = new List<Product>();
-            list.Add(new Product() { Name = "Asus Vivobook 16x", ImageUrls = new List<string>() { "products/vivobook1.png", "products/vivobook2.png" }, Description = "Description 1", Quantity = 3, Price = 9.99, BrandId = 1, CategoryId = 1 });
-            list.Add(new Product() { Name = "Asus Tuf Gaming", ImageUrls = new List<string>() { "products/tuf1.png", "products/tuf2.png" }, Description = "Description 3", Quantity = 2, Price = 29.99, BrandId = 1, CategoryId = 1 });
-            list.Add(new Product() { Name = "Asus Rog", ImageUrls = new List<string>() { "products/rog1.png", "products/rog2.png" }, Description = "Description 3", Quantity = 2, Price = 29.99, BrandId = 1, CategoryId = 1 });
-            list.Add(new Product() { Name = "Dell Vostoro 3500", ImageUrls = new List<string>() { "products/vostoro1.png", "products/vostoro2.png" }, Description = "Description 2", Quantity = 3, Price = 19.99, BrandId = 2, CategoryId = 1 });
-            list.Add(new Product() { Name = "Dell Latitude", ImageUrls = new List<string>() { "products/latitiude1.png", "products/latitude2.png" }, Description = "Description 2", Quantity = 3, Price = 19.99, BrandId = 2, CategoryId = 1 });
-            list.Add(new Product() { Name = "HP Envy", ImageUrls = new List<string>() { "products/envy1.png", "products/envy2.png" }, Description = "Description 4", Quantity = 5, Price = 39.99, BrandId = 3, CategoryId = 1 });
+            list.Add(new Product() { Name = "Asus Vivobook 16x", Images = null, Description = "Description 1", Quantity = 3, Price = 9.99, BrandId = 1, CategoryId = 1 });
+            list.Add(new Product() { Name = "Asus Tuf Gaming", Images = null, Description = "Description 3", Quantity = 2, Price = 29.99, BrandId = 1, CategoryId = 1 });
+            list.Add(new Product() { Name = "Asus Rog", Images = null, Description = "Description 3", Quantity = 2, Price = 29.99, BrandId = 1, CategoryId = 1 });
+            list.Add(new Product() { Name = "Dell Vostoro 3500", Images = null, Description = "Description 2", Quantity = 3, Price = 19.99, BrandId = 2, CategoryId = 1 });
+            list.Add(new Product() { Name = "Dell Latitude", Images = null, Description = "Description 2", Quantity = 3, Price = 19.99, BrandId = 2, CategoryId = 1 });
+            list.Add(new Product() { Name = "HP Envy", Images = null, Description = "Description 4", Quantity = 5, Price = 39.99, BrandId = 3, CategoryId = 1 });
 
-            list.Add(new Product() { Name = "Asus Monitor", ImageUrls = null, Description = "Description 1", Quantity = 12, Price = 409.99, BrandId = 1, CategoryId = 2 });
-            list.Add(new Product() { Name = "Dell Monitor", ImageUrls = null, Description = "Description 1", Quantity = 5, Price = 49.99, BrandId = 2, CategoryId = 2 });
-            list.Add(new Product() { Name = "HP Monitor", ImageUrls = null, Description = "Description 1", Quantity = 7, Price = 49.99, BrandId = 3, CategoryId = 2 });
+            list.Add(new Product() { Name = "Asus Monitor", Images = null, Description = "Description 1", Quantity = 12, Price = 409.99, BrandId = 1, CategoryId = 2 });
+            list.Add(new Product() { Name = "Dell Monitor", Images = null, Description = "Description 1", Quantity = 5, Price = 49.99, BrandId = 2, CategoryId = 2 });
+            list.Add(new Product() { Name = "HP Monitor", Images = null, Description = "Description 1", Quantity = 7, Price = 49.99, BrandId = 3, CategoryId = 2 });
 
-            list.Add(new Product() { Name = "Logictech RGB Keyboard", ImageUrls = new List<string>() { "products/logi-keyboard1.png", "products/logi-keyboard2.png" }, Description = "Description 1", Quantity = 1, Price = 49.99, BrandId = 4, CategoryId = 3 });
-            list.Add(new Product() { Name = "Logictech RGB Mouse", ImageUrls = new List<string>() { "products/logi-mouse1.png", "products/logi-mouse2.png" }, Description = "Description 1", Quantity = 1, Price = 49.99, BrandId = 4, CategoryId = 3 });
+            list.Add(new Product() { Name = "Logictech RGB Keyboard", Images = null, Description = "Description 1", Quantity = 1, Price = 49.99, BrandId = 4, CategoryId = 3 });
+            list.Add(new Product() { Name = "Logictech RGB Mouse", Images = null, Description = "Description 1", Quantity = 1, Price = 49.99, BrandId = 4, CategoryId = 3 });
 
             appDbContext.Products.AddRange(list);
             await appDbContext.SaveChangesAsync();
