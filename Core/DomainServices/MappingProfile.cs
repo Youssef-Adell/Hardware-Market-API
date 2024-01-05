@@ -38,11 +38,11 @@ public class PreviewImageUrlResolver : IValueResolver<Product, ProductForListDto
     public string? Resolve(Product source, ProductForListDto destination, string? destMember, ResolutionContext context)
     {
         //here we took the first image in the product images and return it to be assigned for the preiview image for the product which will be displayed in the list
-        var firstImagePath = source?.Images?.ElementAt(0)?.Path;
-        if (!string.IsNullOrEmpty(firstImagePath))
+        var pathOfFirstImage = source?.Images?.FirstOrDefault()?.Path;
+        if (!string.IsNullOrEmpty(pathOfFirstImage))
         {
             var hostUrl = new Uri(configration["ApiUrl"]);
-            var ImageUrl = new Uri(hostUrl, firstImagePath).ToString();
+            var ImageUrl = new Uri(hostUrl, pathOfFirstImage).ToString();
             return ImageUrl;
         }
 

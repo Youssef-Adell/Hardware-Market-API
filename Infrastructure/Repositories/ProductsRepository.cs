@@ -19,7 +19,7 @@ public class ProductsRepository : IProductsRepository
     public async Task<PagedResult<Product>> GetProducts(ProductsSpecificationParameters specsParams)
     {
         //build a query of filtered products
-        var query = appDbContext.Products.Include(p => p.Brand).Include(p => p.Category)
+        var query = appDbContext.Products.Include(p => p.Brand).Include(p => p.Category).Include(p => p.Images)
                             //search (Short Circuit if no value in search)
                             .Where(p => string.IsNullOrEmpty(specsParams.Search) || p.Name.ToLower().Contains(specsParams.Search.ToLower()))
                             //filter (Short circuit if no value for categoryId & brandId)
@@ -44,7 +44,7 @@ public class ProductsRepository : IProductsRepository
     public Task<Product?> GetProduct(int id)
     {
         var product = appDbContext.Products
-                            .Include(p => p.Brand).Include(p => p.Category)
+                            .Include(p => p.Brand).Include(p => p.Category).Include(p => p.Images)
                             .AsNoTracking()
                             .FirstOrDefaultAsync(p => p.Id == id);
         return product;
