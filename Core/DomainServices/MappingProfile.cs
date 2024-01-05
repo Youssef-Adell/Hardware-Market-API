@@ -22,7 +22,7 @@ public class MappingProfile : Profile
         .ForMember(d => d.Brand, options => options.MapFrom(s => s.Brand.Name))
         .ForMember(d => d.Category, options => options.MapFrom(s => s.Category.Name))
         .ForMember(d => d.InStock, options => options.MapFrom(s => s.Quantity > 0))
-        .ForMember(d => d.ImagesUrls, options => options.MapFrom<ImageUrlsResolver>());
+        .ForMember(d => d.Images, options => options.MapFrom<ImagesUrlsResolver>());
 
         CreateMap<ProductForAddingDto, Product>();
     }
@@ -50,26 +50,24 @@ public class PreviewImageUrlResolver : IValueResolver<Product, ProductForListDto
     }
 }
 
-public class ImageUrlsResolver : IValueResolver<Product, ProductDetailsDto, List<string>?>
+public class ImagesUrlsResolver : IValueResolver<Product, ProductDetailsDto, List<ProductImageDto>?>
 {
     private readonly IConfiguration configration;
-    public ImageUrlsResolver(IConfiguration configration) => this.configration = configration;
+    public ImagesUrlsResolver(IConfiguration configration) => this.configration = configration;
 
-    public List<string>? Resolve(Product source, ProductDetailsDto destination, List<string>? destMember, ResolutionContext context)
+    public List<ProductImageDto>? Resolve(Product source, ProductDetailsDto destination, List<ProductImageDto>? destMember, ResolutionContext context)
     {
-        List<string>? imageUrls = new();
+        List<ProductImageDto>? imagesDtos = new();
 
         source?.Images?.ForEach(image =>
         {
-            if (!string.IsNullOrEmpty(image?.Path))
-            {
-                var hostUrl = new Uri(configration["ApiUrl"]);
-                var imageUrl = new Uri(hostUrl, image.Path).ToString();
-                imageUrls.Add(imageUrl);
-            }
+            var hostUrl = new Uri(configration["ApiUrl"]);
+            var imageUrl = new Uri(hostUrl, image.Path).ToString();
+
+            imagesDtos.Add(new ProductImageDto() { Id = image.Id, Url = imageUrl });
         }
         );
 
-        return imageUrls.Count != 0 ? imageUrls : null;
+        return imagesDtos.Count != 0 ? imagesDtos : null;
     }
 }
