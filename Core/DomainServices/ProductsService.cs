@@ -4,6 +4,7 @@ using Core.DTOs.SpecificationDTOs;
 using Core.Entities.ProductAggregate;
 using Core.Exceptions;
 using Core.Interfaces.IDomainServices;
+using Core.Interfaces.IExternalServices;
 using Core.Interfaces.IRepositories;
 
 namespace Core.DomainServices;
@@ -14,14 +15,17 @@ public class ProductsService : IProductsService
     private readonly IProductsRepository productsRepository;
     private readonly ICategoriesRepository categoriesRepository;
     private readonly IBrandsRepository brandsRepository;
+    private readonly IFileService fileService;
 
-    public ProductsService(IMapper mapper, IProductsRepository productsRepository, ICategoriesRepository categoriesRepository, IBrandsRepository brandsRepository)
+    public ProductsService(IMapper mapper, IProductsRepository productsRepository, ICategoriesRepository categoriesRepository, IBrandsRepository brandsRepository, IFileService fileService)
     {
         this.mapper = mapper;
         this.productsRepository = productsRepository;
         this.categoriesRepository = categoriesRepository;
         this.brandsRepository = brandsRepository;
+        this.fileService = fileService;
     }
+
     public async Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams)
     {
         //check for category existence
@@ -75,5 +79,46 @@ public class ProductsService : IProductsService
         await productsRepository.AddProduct(productEntity);
 
         return productEntity.Id;
+    }
+
+    public async Task AddImagesForProduct(int id, List<ImageFileDto> images)
+    {
+        //ensure that there are images uploaded
+        if (images is null || images.Count == 0)
+            throw new BadRequestException("No images uploaded.");
+
+        //ensure that all images has a valid size and image extension 
+        var isValidImages = images.All(image => IsValidImageSize(image.Data) && IsValidImageExtension(image.FileName));
+        if (!isValidImages)
+            throw new BadRequestException("One or more image has invalid image extension or exceded the maximum size allowed.");
+
+        //check for product existence
+        var product = await productsRepository.GetProduct(id);
+        if (product is null)
+            throw new NotFoundException($"The product with id: {id} not found.");
+
+        //save the images and assign them to the specified product 
+        foreach (var image in images)
+        {
+            var imagePathForDb = await fileService.SaveFile("Images/Products", image.FileName, image.Data);
+
+            if (!string.IsNullOrEmpty(imagePathForDb))
+                product?.Images?.Add(new ProductImage() { Path = imagePathForDb });
+        }
+
+        await productsRepository.UpdateProduct(product);
+    }
+
+    private bool IsValidImageSize(byte[] filedata)
+    {
+        const int maxImageSize = 2 * 1024 * 1024; // 5MB
+        return filedata.Length <= maxImageSize;
+    }
+    private bool IsValidImageExtension(string fileName)
+    {
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+        var fileExtension = Path.GetExtension(fileName);
+
+        return allowedExtensions.Contains(fileExtension);
     }
 }

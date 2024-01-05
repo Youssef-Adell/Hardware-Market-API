@@ -1,7 +1,9 @@
 using API.Errors;
 using Core.DomainServices;
 using Core.Interfaces.IDomainServices;
+using Core.Interfaces.IExternalServices;
 using Core.Interfaces.IRepositories;
+using Infrastructure.ExternalServices.FileService;
 using Infrastructure.Repositories;
 using Infrastructure.Repositories.EFConfig;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -48,5 +50,6 @@ public static class ServicesExtensions
         services.AddScoped<ICategoriesRepository, CategoriesRepository>();
         services.AddScoped<IBrandsRepository, BrandsRepository>();
         services.AddScoped<IProductsService, ProductsService>();
+        services.AddScoped<IFileService, DiskFileService>();
     }
 }

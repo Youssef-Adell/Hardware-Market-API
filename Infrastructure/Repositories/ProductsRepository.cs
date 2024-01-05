@@ -55,4 +55,12 @@ public class ProductsRepository : IProductsRepository
         appDbContext.Products.Add(product);
         await appDbContext.SaveChangesAsync();
     }
+
+    public async Task UpdateProduct(Product product)
+    {
+        appDbContext.Products.Update(product);
+
+        await appDbContext.SaveChangesAsync();
+    }
+
 }

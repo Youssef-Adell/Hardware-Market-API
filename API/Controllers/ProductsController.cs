@@ -1,6 +1,8 @@
+using System.ComponentModel.DataAnnotations;
 using Core.DTOs.ProductDTOs;
 using Core.DTOs.SpecificationDTOs;
 using Core.Interfaces.IDomainServices;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -36,7 +38,37 @@ public class ProductsController : ControllerBase
     {
         var productId = await productsService.AddProduct(productForAddingDto);
 
-        //pass productId as a value for route data and pass null as a value for body cause we dont need to a body in the GetProduct Action
+        //pass productId as a value for route data and pass null as a value for body cause we dont need a body in the GetProduct Action
         return CreatedAtAction(nameof(GetProduct), new { id = productId }, null);
+    }
+
+    [HttpPost("{id:int}/images")]
+    public async Task<IActionResult> AddImagesForProduct(int id, [Required] IFormFileCollection images)
+    {
+        var imagesDtos = new List<ImageFileDto>();
+
+        //i convert to dtos because i dont want the service layer to depend on IFormFileCollection which is conisderd infrastructure details
+        foreach (var image in images)
+        {
+            imagesDtos.Add(new ImageFileDto()
+            {
+                FileName = image.FileName,
+                Data = await ConvertFormFileToByteArray(image)
+            });
+        }
+
+        await productsService.AddImagesForProduct(id, imagesDtos);
+
+        return Created();
+    }
+
+    [NonAction]
+    private async Task<Byte[]> ConvertFormFileToByteArray(IFormFile formFile)
+    {
+        using (var memoryStream = new MemoryStream())
+        {
+            await formFile.CopyToAsync(memoryStream);
+            return memoryStream.ToArray();
+        }
     }
 }
