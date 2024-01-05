@@ -59,7 +59,7 @@ public class ProductsController : ControllerBase
 
         await productsService.AddImagesForProduct(id, imagesDtos);
 
-        return Created();
+        return NoContent();
     }
 
     [NonAction]
