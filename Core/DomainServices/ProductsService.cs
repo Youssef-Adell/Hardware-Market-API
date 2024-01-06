@@ -134,4 +134,20 @@ public class ProductsService : IProductsService
         return true;
     }
 
+    public async Task DeleteImageFromProduct(int id, int imageId)
+    {
+        //check for product existence
+        var product = await productsRepository.GetProduct(id);
+        if (product is null)
+            throw new NotFoundException($"The product with id: {id} not found.");
+
+        //check for image existence
+        var imageToDelete = product?.Images?.FirstOrDefault(i => i.Id == imageId);
+        if (imageToDelete is null)
+            throw new NotFoundException($"The image with id: {imageId} not found.");
+
+        await productsRepository.DeleteProductImage(imageToDelete);
+
+        fileService.DeleteFile(imageToDelete.Path);
+    }
 }

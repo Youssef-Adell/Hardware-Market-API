@@ -64,4 +64,13 @@ public class ProductsController : ControllerBase
             return memoryStream.ToArray();
         }
     }
+
+    [HttpDelete("{id:int}/images/imageId")]
+    public async Task<IActionResult> DeleteImageFromProduct(int id, int imageId)
+    {
+        await productsService.DeleteImageFromProduct(id, imageId);
+
+        return NoContent();
+    }
+
 }

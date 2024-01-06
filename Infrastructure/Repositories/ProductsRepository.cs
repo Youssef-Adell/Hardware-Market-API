@@ -63,4 +63,10 @@ public class ProductsRepository : IProductsRepository
         await appDbContext.SaveChangesAsync();
     }
 
+    public async Task DeleteProductImage(ProductImage productImage)
+    {
+        appDbContext.ProductImages.Entry(productImage).State = EntityState.Deleted;
+
+        await appDbContext.SaveChangesAsync();
+    }
 }
