@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Core.DTOs.ProductDTOs;
 using Core.DTOs.SpecificationDTOs;
 using Core.Interfaces.IDomainServices;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
