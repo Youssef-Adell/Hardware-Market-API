@@ -33,26 +33,16 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddProduct(ProductForAddingDto productToAdd)
+    public async Task<IActionResult> AddProduct([FromForm] ProductForAddingDto productToAdd, [Required] IFormFileCollection images)
     {
-        var productId = await productsService.AddProduct(productToAdd);
-
-        //pass productId as a value for route data and pass null as a value for body cause we dont need a body in the GetProduct Action
-        return CreatedAtAction(nameof(GetProduct), new { id = productId }, null);
-    }
-
-    [HttpPost("{id:int}/images")]
-    public async Task<IActionResult> AddImagesForProduct(int id, [Required] IFormFileCollection images)
-    {
-        var imagesAsByreArrays = new List<byte[]>();
-
         //Convert to list<byte[]> to make the service layer not depends on IFormFileCollection which is conisderd infrastructure details
+        var imagesAsByteArrays = new List<byte[]>();
         foreach (var image in images)
-            imagesAsByreArrays.Add(await ConvertFormFileToByteArray(image));
+            imagesAsByteArrays.Add(await ConvertFormFileToByteArray(image));
 
-        await productsService.AddImagesForProduct(id, imagesAsByreArrays);
+        var productId = await productsService.AddProduct(productToAdd, imagesAsByteArrays);
 
-        return NoContent();
+        return CreatedAtAction(nameof(GetProduct), new { id = productId }, null);
     }
 
     [NonAction]

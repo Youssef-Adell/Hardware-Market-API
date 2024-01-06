@@ -65,52 +65,35 @@ public class ProductsService : IProductsService
         return productDto;
     }
 
-    public async Task<int> AddProduct(ProductForAddingDto productToAdd)
+    public async Task<int> AddProduct(ProductForAddingDto product, List<byte[]> productImages)
     {
         //check for category existence
-        var category = await categoriesRepository.GetCategory(productToAdd.CategoryId);
+        var category = await categoriesRepository.GetCategory(product.CategoryId);
         if (category is null)
-            throw new BadRequestException($"No category with id: {productToAdd.CategoryId}.");
+            throw new BadRequestException($"No category with id: {product.CategoryId}.");
 
         //check for brand existence
-        var brand = await brandsRepository.GetBrand(productToAdd.BrandId);
+        var brand = await brandsRepository.GetBrand(product.BrandId);
         if (brand is null)
-            throw new BadRequestException($"No brand with id: {productToAdd.BrandId}.");
+            throw new BadRequestException($"No brand with id: {product.BrandId}.");
 
-        //create the product
-        var productEntity = mapper.Map<ProductForAddingDto, Product>(productToAdd);
+        //ensure that all images has a valid image type and doesnt exceed the maxSizeAllowed 
+        const int maxSizeAllowedForImage = 2 * 1024 * 1024; // 2MB
+        if (!await AreValidImageFiles(productImages, maxSizeAllowedForImage))
+            throw new BadRequestException($"One or more image has invalid type or exceded the maximum size allowed: {maxSizeAllowedForImage / (1024 * 1024)}MB.");
+
+        //save the images and get their relative paths
+        var imagesPaths = new List<string>();
+        foreach (var image in productImages)
+            imagesPaths.Add(await fileService.SaveFile("Images/Products", image));
+
+        //assign the images paths to the product then add it to the database
+        var productEntity = mapper.Map<ProductForAddingDto, Product>(product);
+        productEntity.Images = imagesPaths?.Select(path => new ProductImage { Path = path }).ToList();
 
         await productsRepository.AddProduct(productEntity);
 
         return productEntity.Id;
-    }
-
-    public async Task AddImagesForProduct(int id, IEnumerable<byte[]> images)
-    {
-        //ensure that there are images uploaded
-        if (images is null || !images.Any())
-            throw new BadRequestException("No images uploaded.");
-
-        //ensure that all images has a valid image type and doesnt exceed the maxSizeAllowed 
-        const int maxSizeAllowedForImage = 2 * 1024 * 1024; // 2MB
-        if (!await AreValidImageFiles(images, maxSizeAllowedForImage))
-            throw new BadRequestException($"One or more image has invalid type or exceded the maximum size allowed: {maxSizeAllowedForImage / (1024 * 1024)}MB.");
-
-        //check for product existence
-        var product = await productsRepository.GetProduct(id);
-        if (product is null)
-            throw new NotFoundException($"The product with id: {id} not found.");
-
-        //save the images and assign them to the specified product 
-        foreach (var image in images)
-        {
-            var imagePathForDb = await fileService.SaveFile("Images/Products", image);
-
-            if (!string.IsNullOrEmpty(imagePathForDb))
-                product?.Images?.Add(new ProductImage() { Path = imagePathForDb });
-        }
-
-        await productsRepository.UpdateProduct(product);
     }
 
     private async Task<bool> AreValidImageFiles(IEnumerable<byte[]> files, int maxSizeAllowedForImage)
