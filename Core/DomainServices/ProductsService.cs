@@ -85,10 +85,10 @@ public class ProductsService : IProductsService
         return productEntity.Id;
     }
 
-    public async Task AddImagesForProduct(int id, List<ImageFileDto> images)
+    public async Task AddImagesForProduct(int id, IEnumerable<byte[]> images)
     {
         //ensure that there are images uploaded
-        if (images is null || images.Count == 0)
+        if (images is null || !images.Any())
             throw new BadRequestException("No images uploaded.");
 
         //ensure that all images has a valid image type and doesnt exceed the maxSizeAllowed 
@@ -104,7 +104,7 @@ public class ProductsService : IProductsService
         //save the images and assign them to the specified product 
         foreach (var image in images)
         {
-            var imagePathForDb = await fileService.SaveFile("Images/Products", image.FileName, image.Data);
+            var imagePathForDb = await fileService.SaveFile("Images/Products", image);
 
             if (!string.IsNullOrEmpty(imagePathForDb))
                 product?.Images?.Add(new ProductImage() { Path = imagePathForDb });
@@ -113,18 +113,18 @@ public class ProductsService : IProductsService
         await productsRepository.UpdateProduct(product);
     }
 
-    private async Task<bool> AreValidImageFiles(IEnumerable<ImageFileDto> files, int maxSizeAllowedForImage)
+    private async Task<bool> AreValidImageFiles(IEnumerable<byte[]> files, int maxSizeAllowedForImage)
     {
         foreach (var file in files)
         {
             //check for the file size
-            if (file.Data.Length > maxSizeAllowedForImage)
+            if (file.Length > maxSizeAllowedForImage)
                 return false;
 
             //check for the file type
             using (var memoryStream = new MemoryStream())
             {
-                await memoryStream.WriteAsync(file.Data);
+                await memoryStream.WriteAsync(file);
                 var fileFormat = fileFormatInspector.DetermineFileFormat(memoryStream);
                 if (fileFormat is not Image)
                     return false;

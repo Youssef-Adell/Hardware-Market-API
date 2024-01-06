@@ -1,15 +1,31 @@
 using Core.Interfaces.IExternalServices;
+using FileSignatures;
 
 namespace Infrastructure.ExternalServices.FileService;
 
 public class DiskFileService : IFileService
 {
-    public async Task<string> SaveFile(string folderName, string fileName, byte[] fileData)
-    {
-        //create random name and add to it to the extension of the file
-        fileName = $"{Path.GetRandomFileName()}.{Path.GetExtension(fileName)}";
+    private readonly IFileFormatInspector fileFormatInspector;
 
-        //create the folder if it is not exist
+    public DiskFileService(IFileFormatInspector fileFormatInspector)
+    {
+        this.fileFormatInspector = fileFormatInspector;
+    }
+
+    public async Task<string> SaveFile(string folderName, byte[] file)
+    {
+        //get the actual extension of the file (note that we dont care about filename or the extension provided with it because it may be faked)
+        string? fileExtension;
+        using (var memoryStream = new MemoryStream())
+        {
+            await memoryStream.WriteAsync(file);
+            fileExtension = fileFormatInspector.DetermineFileFormat(memoryStream)?.Extension;
+        }
+
+        //Create random file name and add the extension to it
+        var fileName = $"{Path.GetRandomFileName()}.{fileExtension}";
+
+        //create the specified folder if it is not exist
         var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", folderName);
         if (!Path.Exists(folderPath))
             Directory.CreateDirectory(folderPath);
@@ -18,7 +34,7 @@ public class DiskFileService : IFileService
         var fullPath = Path.Combine(folderPath, fileName);
         using (var fileStream = File.Create(fullPath))
         {
-            await fileStream.WriteAsync(fileData);
+            await fileStream.WriteAsync(file);
         }
 
         var relativePath = Path.Combine(folderName, fileName);

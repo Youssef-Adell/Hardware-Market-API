@@ -45,13 +45,13 @@ public class ProductsController : ControllerBase
     [HttpPost("{id:int}/images")]
     public async Task<IActionResult> AddImagesForProduct(int id, [Required] IFormFileCollection images)
     {
-        var imagesDtos = new List<ImageFileDto>();
+        var imagesAsByreArrays = new List<byte[]>();
 
-        //Convert to dtos to make the service layer doesnt depend on IFormFileCollection which is conisderd infrastructure details
+        //Convert to list<byte[]> to make the service layer not depends on IFormFileCollection which is conisderd infrastructure details
         foreach (var image in images)
-            imagesDtos.Add(new ImageFileDto { FileName = image.FileName, Data = await ConvertFormFileToByteArray(image) });
+            imagesAsByreArrays.Add(await ConvertFormFileToByteArray(image));
 
-        await productsService.AddImagesForProduct(id, imagesDtos);
+        await productsService.AddImagesForProduct(id, imagesAsByreArrays);
 
         return NoContent();
     }

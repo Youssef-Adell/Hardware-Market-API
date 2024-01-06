@@ -2,5 +2,5 @@ namespace Core.Interfaces.IExternalServices;
 
 public interface IFileService
 {
-    Task<string> SaveFile(string folderName, string fileName, Byte[] fileData);
+    Task<string> SaveFile(string folderName, Byte[] file);
 }
