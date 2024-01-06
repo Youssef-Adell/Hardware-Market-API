@@ -6,6 +6,8 @@ using Core.Exceptions;
 using Core.Interfaces.IDomainServices;
 using Core.Interfaces.IExternalServices;
 using Core.Interfaces.IRepositories;
+using FileSignatures;
+using FileSignatures.Formats;
 
 namespace Core.DomainServices;
 
@@ -16,14 +18,16 @@ public class ProductsService : IProductsService
     private readonly ICategoriesRepository categoriesRepository;
     private readonly IBrandsRepository brandsRepository;
     private readonly IFileService fileService;
+    private readonly IFileFormatInspector fileFormatInspector;
 
-    public ProductsService(IMapper mapper, IProductsRepository productsRepository, ICategoriesRepository categoriesRepository, IBrandsRepository brandsRepository, IFileService fileService)
+    public ProductsService(IMapper mapper, IProductsRepository productsRepository, ICategoriesRepository categoriesRepository, IBrandsRepository brandsRepository, IFileService fileService, IFileFormatInspector fileFormatInspector)
     {
         this.mapper = mapper;
         this.productsRepository = productsRepository;
         this.categoriesRepository = categoriesRepository;
         this.brandsRepository = brandsRepository;
         this.fileService = fileService;
+        this.fileFormatInspector = fileFormatInspector;
     }
 
     public async Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams)
@@ -87,10 +91,10 @@ public class ProductsService : IProductsService
         if (images is null || images.Count == 0)
             throw new BadRequestException("No images uploaded.");
 
-        //ensure that all images has a valid size and image extension 
-        var isValidImages = images.All(image => IsValidImageSize(image.Data) && IsValidImageExtension(image.FileName));
-        if (!isValidImages)
-            throw new BadRequestException("One or more image has invalid image extension or exceded the maximum size allowed.");
+        //ensure that all images has a valid image type and doesnt exceed the maxSizeAllowed 
+        const int maxSizeAllowedForImage = 2 * 1024 * 1024; // 2MB
+        if (!await AreValidImageFiles(images, maxSizeAllowedForImage))
+            throw new BadRequestException($"One or more image has invalid type or exceded the maximum size allowed: {maxSizeAllowedForImage / (1024 * 1024)}MB.");
 
         //check for product existence
         var product = await productsRepository.GetProduct(id);
@@ -109,16 +113,25 @@ public class ProductsService : IProductsService
         await productsRepository.UpdateProduct(product);
     }
 
-    private bool IsValidImageSize(byte[] filedata)
+    private async Task<bool> AreValidImageFiles(IEnumerable<ImageFileDto> files, int maxSizeAllowedForImage)
     {
-        const int maxImageSize = 2 * 1024 * 1024; // 5MB
-        return filedata.Length <= maxImageSize;
-    }
-    private bool IsValidImageExtension(string fileName)
-    {
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
-        var fileExtension = Path.GetExtension(fileName);
+        foreach (var file in files)
+        {
+            //check for the file size
+            if (file.Data.Length > maxSizeAllowedForImage)
+                return false;
 
-        return allowedExtensions.Contains(fileExtension);
+            //check for the file type
+            using (var memoryStream = new MemoryStream())
+            {
+                await memoryStream.WriteAsync(file.Data);
+                var fileFormat = fileFormatInspector.DetermineFileFormat(memoryStream);
+                if (fileFormat is not Image)
+                    return false;
+            }
+        }
+
+        return true;
     }
+
 }

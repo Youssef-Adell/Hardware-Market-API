@@ -47,15 +47,9 @@ public class ProductsController : ControllerBase
     {
         var imagesDtos = new List<ImageFileDto>();
 
-        //i convert to dtos because i dont want the service layer to depend on IFormFileCollection which is conisderd infrastructure details
+        //Convert to dtos to make the service layer doesnt depend on IFormFileCollection which is conisderd infrastructure details
         foreach (var image in images)
-        {
-            imagesDtos.Add(new ImageFileDto()
-            {
-                FileName = image.FileName,
-                Data = await ConvertFormFileToByteArray(image)
-            });
-        }
+            imagesDtos.Add(new ImageFileDto { FileName = image.FileName, Data = await ConvertFormFileToByteArray(image) });
 
         await productsService.AddImagesForProduct(id, imagesDtos);
 

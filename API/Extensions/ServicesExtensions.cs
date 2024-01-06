@@ -3,6 +3,8 @@ using Core.DomainServices;
 using Core.Interfaces.IDomainServices;
 using Core.Interfaces.IExternalServices;
 using Core.Interfaces.IRepositories;
+using FileSignatures;
+using FileSignatures.Formats;
 using Infrastructure.ExternalServices.FileService;
 using Infrastructure.Repositories;
 using Infrastructure.Repositories.EFConfig;
@@ -39,9 +41,18 @@ public static class ServicesExtensions
     }
     public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
+        //database
         services.AddDbContext<AppDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("AppDb")));
+
+        //mapper
         services.AddAutoMapper(typeof(MappingProfile));
+
+        //logger
         Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(configuration).CreateLogger();
+
+        //Pacakage used to check the actual type of an uploaded file (docs: https://github.com/neilharvey/FileSignatures)
+        var recognisedFormats = FileFormatLocator.GetFormats().OfType<Image>();
+        services.AddSingleton<IFileFormatInspector>(new FileFormatInspector(recognisedFormats));
     }
 
     public static void AddApplicationServices(this IServiceCollection services)
