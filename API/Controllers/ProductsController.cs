@@ -55,10 +55,10 @@ public class ProductsController : ControllerBase
         }
     }
 
-    [HttpDelete("{id:int}/images/imageId")]
-    public async Task<IActionResult> DeleteImageFromProduct(int id, int imageId)
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteProduct(int id)
     {
-        await productsService.DeleteImageFromProduct(id, imageId);
+        await productsService.DeleteProduct(id);
 
         return NoContent();
     }

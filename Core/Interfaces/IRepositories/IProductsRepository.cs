@@ -9,5 +9,6 @@ public interface IProductsRepository
     Task<Product?> GetProduct(int id);
     Task AddProduct(Product product);
     Task UpdateProduct(Product product);
+    Task DeleteProduct(Product product);
     Task DeleteProductImage(ProductImage productImage);
 }

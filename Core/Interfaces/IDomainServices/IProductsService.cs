@@ -8,5 +8,5 @@ public interface IProductsService
     Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams);
     Task<ProductDetailsDto> GetProduct(int id);
     Task<int> AddProduct(ProductForAddingDto product, List<byte[]> productImages);
-    Task DeleteImageFromProduct(int id, int imageId);
+    Task DeleteProduct(int id);
 }
