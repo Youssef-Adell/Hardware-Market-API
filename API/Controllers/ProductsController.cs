@@ -33,9 +33,9 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddProduct(ProductForAddingDto productForAddingDto)
+    public async Task<IActionResult> AddProduct(ProductForAddingDto productToAdd)
     {
-        var productId = await productsService.AddProduct(productForAddingDto);
+        var productId = await productsService.AddProduct(productToAdd);
 
         //pass productId as a value for route data and pass null as a value for body cause we dont need a body in the GetProduct Action
         return CreatedAtAction(nameof(GetProduct), new { id = productId }, null);

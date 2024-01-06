@@ -65,20 +65,20 @@ public class ProductsService : IProductsService
         return productDto;
     }
 
-    public async Task<int> AddProduct(ProductForAddingDto productForAddingDto)
+    public async Task<int> AddProduct(ProductForAddingDto productToAdd)
     {
         //check for category existence
-        var category = await categoriesRepository.GetCategory(productForAddingDto.CategoryId);
+        var category = await categoriesRepository.GetCategory(productToAdd.CategoryId);
         if (category is null)
-            throw new BadRequestException($"No category with id: {productForAddingDto.CategoryId}.");
+            throw new BadRequestException($"No category with id: {productToAdd.CategoryId}.");
 
         //check for brand existence
-        var brand = await brandsRepository.GetBrand(productForAddingDto.BrandId);
+        var brand = await brandsRepository.GetBrand(productToAdd.BrandId);
         if (brand is null)
-            throw new BadRequestException($"No brand with id: {productForAddingDto.BrandId}.");
+            throw new BadRequestException($"No brand with id: {productToAdd.BrandId}.");
 
         //create the product
-        var productEntity = mapper.Map<ProductForAddingDto, Product>(productForAddingDto);
+        var productEntity = mapper.Map<ProductForAddingDto, Product>(productToAdd);
 
         await productsRepository.AddProduct(productEntity);
 
