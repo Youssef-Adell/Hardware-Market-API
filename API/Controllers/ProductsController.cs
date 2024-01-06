@@ -17,6 +17,22 @@ public class ProductsController : ControllerBase
         this.productsService = productsService;
     }
 
+    [NonAction]
+    private async Task<List<Byte[]>> ConvertFormFilesToByteArrays(IFormFileCollection formFiles)
+    {
+        var imagesAsBytes = new List<byte[]>();
+
+        foreach (var formFile in formFiles)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await formFile.CopyToAsync(memoryStream);
+                imagesAsBytes.Add(memoryStream.ToArray());
+            }
+        }
+
+        return imagesAsBytes;
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetProducts([FromQuery] ProductsSpecificationParameters specsParams)
@@ -36,23 +52,11 @@ public class ProductsController : ControllerBase
     public async Task<IActionResult> AddProduct([FromForm] ProductForAddingDto productToAdd, [Required] IFormFileCollection images)
     {
         //Convert to list<byte[]> to make the service layer not depends on IFormFileCollection which is conisderd infrastructure details
-        var imagesAsByteArrays = new List<byte[]>();
-        foreach (var image in images)
-            imagesAsByteArrays.Add(await ConvertFormFileToByteArray(image));
+        var productImagesAsBytes = await ConvertFormFilesToByteArrays(images);
 
-        var productId = await productsService.AddProduct(productToAdd, imagesAsByteArrays);
+        var productId = await productsService.AddProduct(productToAdd, productImagesAsBytes);
 
         return CreatedAtAction(nameof(GetProduct), new { id = productId }, null);
-    }
-
-    [NonAction]
-    private async Task<Byte[]> ConvertFormFileToByteArray(IFormFile formFile)
-    {
-        using (var memoryStream = new MemoryStream())
-        {
-            await formFile.CopyToAsync(memoryStream);
-            return memoryStream.ToArray();
-        }
     }
 
     [HttpDelete("{id:int}")]
