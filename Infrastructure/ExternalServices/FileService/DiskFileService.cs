@@ -1,5 +1,6 @@
 using Core.Interfaces.IExternalServices;
 using FileSignatures;
+using FileSignatures.Formats;
 
 namespace Infrastructure.ExternalServices.FileService;
 
@@ -49,6 +50,27 @@ public class DiskFileService : IFileService
 
         if (File.Exists(fullPath))
             File.Delete(fullPath);
+    }
+
+    public async Task<bool> IsFileOfTypeImage(byte[] file)
+    {
+        using (var memoryStream = new MemoryStream())
+        {
+            await memoryStream.WriteAsync(file);
+            var fileFormat = fileFormatInspector.DetermineFileFormat(memoryStream);
+            if (fileFormat is Image)
+                return true;
+        }
+
+        return false;
+    }
+
+    public bool IsFileSizeExceedsLimit(byte[] file, int sizeLimit)
+    {
+        if (file.Length > sizeLimit)
+            return true;
+
+        return false;
     }
 
 }
