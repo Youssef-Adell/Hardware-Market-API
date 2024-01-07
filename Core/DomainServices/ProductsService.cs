@@ -161,10 +161,10 @@ public class ProductsService : IProductsService
         foreach (var image in images)
         {
             if (!await fileService.IsFileOfTypeImage(image))
-                throw new BadRequestException($"One or more images has invalid format.");
+                throw new UnprocessableEntityException($"One or more images has invalid format.");
 
             if (fileService.IsFileSizeExceedsLimit(image, maxAllowedImageSize))
-                throw new BadRequestException($"One or more images exceed the maximum allowed size of {maxAllowedImageSize / 1024} KB.");
+                throw new UnprocessableEntityException($"One or more images exceed the maximum allowed size of {maxAllowedImageSize / 1024} KB.");
         }
     }
 
@@ -172,14 +172,14 @@ public class ProductsService : IProductsService
     {
         var category = await categoriesRepository.GetCategory(categoryId);
         if (category is null)
-            throw new BadRequestException($"No category with id: {categoryId}.");
+            throw new UnprocessableEntityException($"Invalid category id.");
     }
 
     private async Task ValidateBrand(int brandId)
     {
         var brand = await brandsRepository.GetBrand(brandId);
         if (brand is null)
-            throw new BadRequestException($"No brand with id: {brandId}.");
+            throw new UnprocessableEntityException($"Invalidd brand id.");
     }
 
 }
