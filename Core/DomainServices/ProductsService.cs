@@ -74,8 +74,9 @@ public class ProductsService : IProductsService
         var productEntity = mapper.Map<ProductForAddingDto, Product>(productToAdd);
         productEntity.Images = imagesPaths?.Select(path => new ProductImage { Path = path }).ToList();
 
-        await productsRepository.AddProduct(productEntity);
+        productsRepository.AddProduct(productEntity);
 
+        await productsRepository.SaveChanges();
         return productEntity.Id;
     }
 
@@ -96,12 +97,12 @@ public class ProductsService : IProductsService
         {
             var imagesToRemove = product.Images?.Where(image => updatedProduct.IdsOfImagesToRemove.Contains(image.Id)).ToList();
 
-            if (imagesToRemove != null)
-                foreach (var image in imagesToRemove)
-                {
-                    await productsRepository.DeleteProductImage(image);
-                    fileService.DeleteFile(image.Path);
-                }
+            imagesToRemove?.ForEach(image =>
+            {
+                productsRepository.DeleteProductImage(image);
+                fileService.DeleteFile(image.Path);
+            });
+
             /*
             imagesToRemove?.ForEach(async image =>
             {
@@ -115,8 +116,19 @@ public class ProductsService : IProductsService
             The ForEach method with an async lambda (the code above) doesn't wait for each iteration to complete before moving on to the next one.
             see https://go.microsoft.com/fwlink/?linkid=2097913 for more details.
 
-            so i used the normal foreach instead because it ensures that each deletion operation is awaited before moving on to the next one,
+            so i used the normal foreach below instead because it ensures that each deletion operation is awaited before moving on to the next one,
             preventing the concurrent use of the DbContext.
+
+            if (imagesToRemove != null)
+                foreach (var image in imagesToRemove)
+                {
+                    productsRepository.DeleteProductImage(image);
+                    fileService.DeleteFile(image.Path);
+                }
+
+            UPDATE:
+            i used first code again and it doesnt give any errors now because i made the DeleteProductImage sync
+            and extract the async saving intoa seperate method in the repo (to reduce the no of requests to the database)
             */
         }
 
@@ -127,7 +139,8 @@ public class ProductsService : IProductsService
         //to make it recognizable by the DB to perform the update
         productEntity.Id = productId;
 
-        await productsRepository.UpdateProduct(productEntity);
+        productsRepository.UpdateProduct(productEntity);
+        await productsRepository.SaveChanges();
     }
 
     public async Task DeleteProduct(int id)
@@ -136,7 +149,8 @@ public class ProductsService : IProductsService
         if (product is null)
             throw new NotFoundException($"The product with id: {id} not found.");
 
-        await productsRepository.DeleteProduct(product);
+        productsRepository.DeleteProduct(product);
+        await productsRepository.SaveChanges();
 
         product.Images?.ForEach(image => fileService.DeleteFile(image.Path));
     }

@@ -50,30 +50,28 @@ public class ProductsRepository : IProductsRepository
         return product;
     }
 
-    public async Task AddProduct(Product product)
+    public void AddProduct(Product product)
     {
         appDbContext.Products.Add(product);
-        await appDbContext.SaveChangesAsync();
     }
 
-    public async Task UpdateProduct(Product product)
+    public void UpdateProduct(Product product)
     {
         appDbContext.Products.Update(product);
-
-        await appDbContext.SaveChangesAsync();
     }
 
-    public async Task DeleteProduct(Product product)
+    public void DeleteProduct(Product product)
     {
         appDbContext.Products.Remove(product);
-
-        await appDbContext.SaveChangesAsync();
     }
 
-    public async Task DeleteProductImage(ProductImage productImage)
+    public void DeleteProductImage(ProductImage productImage)
     {
-        appDbContext.ProductImages.Entry(productImage).State = EntityState.Deleted;
+        appDbContext.ProductImages.Remove(productImage);
+    }
 
+    public async Task SaveChanges()
+    {
         await appDbContext.SaveChangesAsync();
     }
 }

@@ -17,23 +17,6 @@ public class ProductsController : ControllerBase
         this.productsService = productsService;
     }
 
-    [NonAction]
-    private async Task<List<Byte[]>> ConvertFormFilesToByteArrays(IFormFileCollection formFiles)
-    {
-        var imagesAsBytes = new List<byte[]>();
-
-        foreach (var formFile in formFiles)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await formFile.CopyToAsync(memoryStream);
-                imagesAsBytes.Add(memoryStream.ToArray());
-            }
-        }
-
-        return imagesAsBytes;
-    }
-
     [HttpGet]
     public async Task<IActionResult> GetProducts([FromQuery] ProductsSpecificationParameters specsParams)
     {
@@ -78,4 +61,20 @@ public class ProductsController : ControllerBase
         return NoContent();
     }
 
+    [NonAction]
+    private async Task<List<Byte[]>> ConvertFormFilesToByteArrays(IFormFileCollection formFiles)
+    {
+        var imagesAsBytes = new List<byte[]>();
+
+        foreach (var formFile in formFiles)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await formFile.CopyToAsync(memoryStream);
+                imagesAsBytes.Add(memoryStream.ToArray());
+            }
+        }
+
+        return imagesAsBytes;
+    }
 }

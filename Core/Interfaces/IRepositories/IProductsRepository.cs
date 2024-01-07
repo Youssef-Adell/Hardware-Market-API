@@ -7,8 +7,9 @@ public interface IProductsRepository
 {
     Task<PagedResult<Product>> GetProducts(ProductsSpecificationParameters specsParams);
     Task<Product?> GetProduct(int id);
-    Task AddProduct(Product product);
-    Task UpdateProduct(Product product);
-    Task DeleteProduct(Product product);
-    Task DeleteProductImage(ProductImage productImage);
+    void AddProduct(Product product);
+    void UpdateProduct(Product product);
+    void DeleteProduct(Product product);
+    void DeleteProductImage(ProductImage productImage);
+    Task SaveChanges();
 }
