@@ -25,6 +25,7 @@ public class MappingProfile : Profile
         .ForMember(d => d.Images, options => options.MapFrom<ImagesUrlsResolver>());
 
         CreateMap<ProductForAddingDto, Product>();
+        CreateMap<ProductForUpdatingDto, Product>();
     }
 }
 

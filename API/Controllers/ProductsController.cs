@@ -59,6 +59,17 @@ public class ProductsController : ControllerBase
         return CreatedAtAction(nameof(GetProduct), new { id = productId }, null);
     }
 
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductForUpdatingDto updatedProduct, [Required] IFormFileCollection imagesToAdd)
+    {
+        //Convert to list<byte[]> to make the service layer not depends on IFormFileCollection which is conisderd infrastructure details
+        var productImagesAsBytes = await ConvertFormFilesToByteArrays(imagesToAdd);
+
+        await productsService.UpdateProduct(id, updatedProduct, productImagesAsBytes);
+
+        return NoContent();
+    }
+
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteProduct(int id)
     {

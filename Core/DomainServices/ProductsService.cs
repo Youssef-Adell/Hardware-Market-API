@@ -117,6 +117,63 @@ public class ProductsService : IProductsService
         return true;
     }
 
+    public async Task UpdateProduct(int productId, ProductForUpdatingDto updatedProduct, List<byte[]> imagesToAdd)
+    {
+        //check for product existence
+        var product = await productsRepository.GetProduct(productId);
+        if (product is null)
+            throw new NotFoundException($"The product with id: {productId} not found.");
+
+        //ensure that all images has a valid image type and doesnt exceed the maxSizeAllowed 
+        const int maxSizeAllowedForImage = 2 * 1024 * 1024; // 2MB
+        if (!await AreValidImageFiles(imagesToAdd, maxSizeAllowedForImage))
+            throw new BadRequestException($"One or more image has invalid type or exceded the maximum size allowed: {maxSizeAllowedForImage / (1024 * 1024)}MB.");
+
+        //save the new images and get their relative paths
+        var imagesPaths = new List<string>();
+        foreach (var image in imagesToAdd)
+            imagesPaths.Add(await fileService.SaveFile("Images/Products", image));
+
+        //remove the images that selected to be removed
+        if (updatedProduct?.IdsOfImagesToRemove != null)
+        {
+            var imagesToRemove = product.Images?
+                                .Where(image => updatedProduct.IdsOfImagesToRemove.Contains(image.Id))
+                                .ToList();
+
+            /*
+            imagesToRemove?.ForEach(async image =>
+            {
+                await productsRepository.DeleteProductImage(image);
+                fileService.DeleteFile(image.Path);
+            });
+
+            the above code gives an exception says "A second operation was started on this context instance before a previous
+            operation completed and Entity Framework Core does not support multiple parallel operations being run on the same DbContext instance"
+            To address this issue, you should make sure that each operation using the DbContext is awaited before starting the next one.
+            The ForEach method with an async lambda (the code above) doesn't wait for each iteration to complete before moving on to the next one.
+            see https://go.microsoft.com/fwlink/?linkid=2097913 for more details.
+            
+            so i used the normal foreach instead because it ensures that each deletion operation is awaited before moving on to the next one,
+            preventing the concurrent use of the DbContext.
+            */
+            if (imagesToRemove != null)
+                foreach (var image in imagesToRemove)
+                {
+                    await productsRepository.DeleteProductImage(image);
+                    fileService.DeleteFile(image.Path);
+                }
+
+        }
+
+        //update the product
+        var productEntity = mapper.Map<ProductForUpdatingDto, Product>(updatedProduct);
+        productEntity.Id = productId;
+        productEntity.Images = imagesPaths?.Select(path => new ProductImage { Path = path }).ToList();
+
+        await productsRepository.UpdateProduct(productEntity);
+    }
+
     public async Task DeleteProduct(int id)
     {
         //check for product existence
