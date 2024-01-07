@@ -44,6 +44,15 @@ public class DiskFileService : IFileService
         return relativePath;
     }
 
+    public async Task<List<string>> SaveFiles(string folderName, List<byte[]> files)
+    {
+        var filesRelativePaths = new List<string>();
+        foreach (var file in files)
+            filesRelativePaths.Add(await SaveFile(folderName, file));
+
+        return filesRelativePaths;
+    }
+
     public void DeleteFile(string fileRelativePath)
     {
         var fullPath = Path.Combine(baseStoringPath, fileRelativePath);

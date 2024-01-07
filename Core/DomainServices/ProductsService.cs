@@ -62,35 +62,16 @@ public class ProductsService : IProductsService
         return productDto;
     }
 
-    public async Task<int> AddProduct(ProductForAddingDto product, List<byte[]> productImages)
+    public async Task<int> AddProduct(ProductForAddingDto productToAdd, List<byte[]> productImages)
     {
-        //check for category existence
-        var category = await categoriesRepository.GetCategory(product.CategoryId);
-        if (category is null)
-            throw new BadRequestException($"No category with id: {product.CategoryId}.");
+        await ValidateCategory(productToAdd.CategoryId);
+        await ValidateBrand(productToAdd.BrandId);
+        await ValidateUploadedImages(productImages);
 
-        //check for brand existence
-        var brand = await brandsRepository.GetBrand(product.BrandId);
-        if (brand is null)
-            throw new BadRequestException($"No brand with id: {product.BrandId}.");
+        var imagesPaths = await fileService.SaveFiles("Images/Products", productImages);
 
-        //ensure that all images has a valid image type and doesnt exceed the maxSizeAllowed 
-        foreach (var image in productImages)
-        {
-            if (!await fileService.IsFileOfTypeImage(image))
-                throw new BadRequestException($"One or more images has invalid format.");
-
-            if (fileService.IsFileSizeExceedsLimit(image, maxAllowedImageSize))
-                throw new BadRequestException($"One or more images exceed the maximum allowed size of {maxAllowedImageSize / 1024} KB.");
-        }
-
-        //save the images and get their relative paths
-        var imagesPaths = new List<string>();
-        foreach (var image in productImages)
-            imagesPaths.Add(await fileService.SaveFile("Images/Products", image));
-
-        //assign the images paths to the product then add it to the database
-        var productEntity = mapper.Map<ProductForAddingDto, Product>(product);
+        //map the dto to an entity then assign the paths of the uploaded images to it
+        var productEntity = mapper.Map<ProductForAddingDto, Product>(productToAdd);
         productEntity.Images = imagesPaths?.Select(path => new ProductImage { Path = path }).ToList();
 
         await productsRepository.AddProduct(productEntity);
@@ -100,33 +81,27 @@ public class ProductsService : IProductsService
 
     public async Task UpdateProduct(int productId, ProductForUpdatingDto updatedProduct, List<byte[]> imagesToAdd)
     {
-        //check for product existence
         var product = await productsRepository.GetProduct(productId);
         if (product is null)
             throw new NotFoundException($"The product with id: {productId} not found.");
 
-        //ensure that all images has a valid image type and doesnt exceed the maxSizeAllowed 
-        foreach (var image in imagesToAdd)
-        {
-            if (!await fileService.IsFileOfTypeImage(image))
-                throw new BadRequestException($"One or more images has invalid format.");
+        await ValidateCategory(updatedProduct.CategoryId);
+        await ValidateBrand(updatedProduct.BrandId);
+        await ValidateUploadedImages(imagesToAdd);
 
-            if (fileService.IsFileSizeExceedsLimit(image, maxAllowedImageSize))
-                throw new BadRequestException($"One or more images exceed the maximum allowed size of {maxAllowedImageSize / 1024} KB.");
-        }
-
-        //save the new images and get their relative paths
-        var imagesPaths = new List<string>();
-        foreach (var image in imagesToAdd)
-            imagesPaths.Add(await fileService.SaveFile("Images/Products", image));
+        var imagesPaths = await fileService.SaveFiles("Images/Products", imagesToAdd);
 
         //remove the images that selected to be removed
         if (updatedProduct?.IdsOfImagesToRemove != null)
         {
-            var imagesToRemove = product.Images?
-                                .Where(image => updatedProduct.IdsOfImagesToRemove.Contains(image.Id))
-                                .ToList();
+            var imagesToRemove = product.Images?.Where(image => updatedProduct.IdsOfImagesToRemove.Contains(image.Id)).ToList();
 
+            if (imagesToRemove != null)
+                foreach (var image in imagesToRemove)
+                {
+                    await productsRepository.DeleteProductImage(image);
+                    fileService.DeleteFile(image.Path);
+                }
             /*
             imagesToRemove?.ForEach(async image =>
             {
@@ -139,36 +114,58 @@ public class ProductsService : IProductsService
             To address this issue, you should make sure that each operation using the DbContext is awaited before starting the next one.
             The ForEach method with an async lambda (the code above) doesn't wait for each iteration to complete before moving on to the next one.
             see https://go.microsoft.com/fwlink/?linkid=2097913 for more details.
-            
+
             so i used the normal foreach instead because it ensures that each deletion operation is awaited before moving on to the next one,
             preventing the concurrent use of the DbContext.
             */
-            if (imagesToRemove != null)
-                foreach (var image in imagesToRemove)
-                {
-                    await productsRepository.DeleteProductImage(image);
-                    fileService.DeleteFile(image.Path);
-                }
         }
 
-        //update the product
+        //map the dto to an entity then assign the paths of the uploaded images to it
         var productEntity = mapper.Map<ProductForUpdatingDto, Product>(updatedProduct);
-        productEntity.Id = productId;
         productEntity.Images = imagesPaths?.Select(path => new ProductImage { Path = path }).ToList();
+
+        //to make it recognizable by the DB to perform the update
+        productEntity.Id = productId;
 
         await productsRepository.UpdateProduct(productEntity);
     }
 
     public async Task DeleteProduct(int id)
     {
-        //check for product existence
         var product = await productsRepository.GetProduct(id);
         if (product is null)
             throw new NotFoundException($"The product with id: {id} not found.");
 
         await productsRepository.DeleteProduct(product);
 
-        //delete the images from the storage
         product.Images?.ForEach(image => fileService.DeleteFile(image.Path));
     }
+
+    private async Task ValidateUploadedImages(List<byte[]> images)
+    {
+        //ensure that all images has a valid image type and doesnt exceed the maxSizeAllowed 
+        foreach (var image in images)
+        {
+            if (!await fileService.IsFileOfTypeImage(image))
+                throw new BadRequestException($"One or more images has invalid format.");
+
+            if (fileService.IsFileSizeExceedsLimit(image, maxAllowedImageSize))
+                throw new BadRequestException($"One or more images exceed the maximum allowed size of {maxAllowedImageSize / 1024} KB.");
+        }
+    }
+
+    private async Task ValidateCategory(int categoryId)
+    {
+        var category = await categoriesRepository.GetCategory(categoryId);
+        if (category is null)
+            throw new BadRequestException($"No category with id: {categoryId}.");
+    }
+
+    private async Task ValidateBrand(int brandId)
+    {
+        var brand = await brandsRepository.GetBrand(brandId);
+        if (brand is null)
+            throw new BadRequestException($"No brand with id: {brandId}.");
+    }
+
 }
