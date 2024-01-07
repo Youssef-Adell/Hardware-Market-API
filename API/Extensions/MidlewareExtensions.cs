@@ -18,7 +18,7 @@ public static class MidlewareExtensions
             {
                 var errorFeature = context.Features.Get<IExceptionHandlerFeature>();
 
-                Log.Logger.Error("{@error}", errorFeature.Error);
+                Log.Logger.Error("{@error}", errorFeature?.Error);
 
                 if (errorFeature != null)
                 {
@@ -27,7 +27,6 @@ public static class MidlewareExtensions
                     context.Response.StatusCode = errorFeature.Error switch
                     {
                         NotFoundException => StatusCodes.Status404NotFound,
-                        BadRequestException => StatusCodes.Status400BadRequest,
                         UnprocessableEntityException => StatusCodes.Status422UnprocessableEntity,
                         _ => StatusCodes.Status500InternalServerError
                     };

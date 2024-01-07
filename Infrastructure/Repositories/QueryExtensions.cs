@@ -27,7 +27,8 @@ public static class QueryExtensions
             }
             catch
             {
-                throw new BadRequestException($"No property called {property} to sort by it.");
+                //if the user enters invalid property to sort with, the excption will be thrown but i will suprress it using this catch
+                //then i will sort normally by id and ignore the propety he entered
             }
         }
 
