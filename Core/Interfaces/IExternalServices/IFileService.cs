@@ -6,5 +6,5 @@ public interface IFileService
     Task<List<string>> SaveFiles(string folderName, List<byte[]> files);
     void DeleteFile(string fileRelativePath);
     Task<bool> IsFileOfTypeImage(byte[] file);
-    bool IsFileSizeExceedsLimit(byte[] file, int sizeLimit);
+    bool IsFileSizeExceedsLimit(byte[] file, int sizeLimitInBytes);
 }

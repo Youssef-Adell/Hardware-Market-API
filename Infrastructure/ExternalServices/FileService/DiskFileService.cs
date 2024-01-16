@@ -1,6 +1,7 @@
 using Core.Interfaces.IExternalServices;
 using FileSignatures;
 using FileSignatures.Formats;
+using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.ExternalServices.FileService;
 
@@ -9,10 +10,10 @@ public class DiskFileService : IFileService
     private readonly IFileFormatInspector fileFormatInspector;
     private readonly string baseStoringPath;
 
-    public DiskFileService(IFileFormatInspector fileFormatInspector)
+    public DiskFileService(IFileFormatInspector fileFormatInspector, IConfiguration configuration)
     {
         this.fileFormatInspector = fileFormatInspector;
-        baseStoringPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+        baseStoringPath = Path.Combine(Directory.GetCurrentDirectory(), configuration["ResourcesSotrage:MainStoringFolder"]);
     }
 
     public async Task<string> SaveFile(string folderName, byte[] file)
@@ -26,7 +27,7 @@ public class DiskFileService : IFileService
         }
 
         //Create random file name and add the extension to it
-        var fileName = $"{Path.GetRandomFileName()}.{fileExtension}";
+        var fileName = $"{Guid.NewGuid()}.{fileExtension}";
 
         //create the specified folder if it is not exist
         var folderPath = Path.Combine(baseStoringPath, folderName);
@@ -74,9 +75,9 @@ public class DiskFileService : IFileService
         return false;
     }
 
-    public bool IsFileSizeExceedsLimit(byte[] file, int sizeLimit)
+    public bool IsFileSizeExceedsLimit(byte[] file, int sizeLimitInBytes)
     {
-        if (file.Length > sizeLimit)
+        if (file.Length > sizeLimitInBytes)
             return true;
 
         return false;

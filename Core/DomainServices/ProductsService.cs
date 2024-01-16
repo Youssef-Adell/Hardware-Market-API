@@ -6,25 +6,28 @@ using Core.Exceptions;
 using Core.Interfaces.IDomainServices;
 using Core.Interfaces.IExternalServices;
 using Core.Interfaces.IRepositories;
+using Microsoft.Extensions.Configuration;
 
 namespace Core.DomainServices;
 
 public class ProductsService : IProductsService
 {
-    private readonly int maxAllowedImageSize;
     private readonly IProductsRepository productsRepository;
     private readonly ICategoriesRepository categoriesRepository;
     private readonly IBrandsRepository brandsRepository;
     private readonly IFileService fileService;
     private readonly IMapper mapper;
-    public ProductsService(IProductsRepository productsRepository, ICategoriesRepository categoriesRepository, IBrandsRepository brandsRepository, IFileService fileService, IMapper mapper)
+    private readonly string productsImagesFolder;
+    private readonly int maxAllowedImageSizeInBytes;
+    public ProductsService(IProductsRepository productsRepository, ICategoriesRepository categoriesRepository, IBrandsRepository brandsRepository, IFileService fileService, IMapper mapper, IConfiguration configuration)
     {
-        maxAllowedImageSize = 2 * 1024 * 1024; //2MB
         this.productsRepository = productsRepository;
         this.categoriesRepository = categoriesRepository;
         this.brandsRepository = brandsRepository;
         this.fileService = fileService;
         this.mapper = mapper;
+        productsImagesFolder = configuration["ResourcesSotrage:ProductsImagesFolder"];
+        maxAllowedImageSizeInBytes =  int.Parse(configuration["ResourcesSotrage:MaxAllowedImageSizeInBytes"]);
     }
 
     public async Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams)
@@ -52,7 +55,7 @@ public class ProductsService : IProductsService
         await ValidateBrand(productToAdd.BrandId);
         await ValidateUploadedImages(productImages);
 
-        var imagesPaths = await fileService.SaveFiles("Images/Products", productImages);
+        var imagesPaths = await fileService.SaveFiles(productsImagesFolder, productImages);
 
         //map the dto to an entity then assign the paths of the uploaded images to it
         var productEntity = mapper.Map<ProductForAddingDto, Product>(productToAdd);
@@ -74,7 +77,7 @@ public class ProductsService : IProductsService
         await ValidateBrand(updatedProduct.BrandId);
         await ValidateUploadedImages(imagesToAdd);
 
-        var imagesPaths = await fileService.SaveFiles("Images/Products", imagesToAdd);
+        var imagesPaths = await fileService.SaveFiles(productsImagesFolder, imagesToAdd);
 
         //remove the images that selected to be removed
         if (updatedProduct?.IdsOfImagesToRemove != null)
@@ -147,8 +150,8 @@ public class ProductsService : IProductsService
             if (!await fileService.IsFileOfTypeImage(image))
                 throw new UnprocessableEntityException($"One or more images has invalid format.");
 
-            if (fileService.IsFileSizeExceedsLimit(image, maxAllowedImageSize))
-                throw new UnprocessableEntityException($"One or more images exceed the maximum allowed size of {maxAllowedImageSize / 1024} KB.");
+            if (fileService.IsFileSizeExceedsLimit(image, maxAllowedImageSizeInBytes))
+                throw new UnprocessableEntityException($"One or more images exceed the maximum allowed size of {maxAllowedImageSizeInBytes / 1024} KB.");
         }
     }
 
