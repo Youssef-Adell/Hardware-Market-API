@@ -26,8 +26,8 @@ public class ProductsService : IProductsService
         this.brandsRepository = brandsRepository;
         this.fileService = fileService;
         this.mapper = mapper;
-        productsImagesFolder = configuration["ResourcesSotrage:ProductsImagesFolder"];
-        maxAllowedImageSizeInBytes =  int.Parse(configuration["ResourcesSotrage:MaxAllowedImageSizeInBytes"]);
+        productsImagesFolder = configuration["ResourcesStorage:ProductsImagesFolder"];
+        maxAllowedImageSizeInBytes =  int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
     }
 
     public async Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams)

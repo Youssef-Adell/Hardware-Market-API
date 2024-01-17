@@ -13,7 +13,7 @@ public class DiskFileService : IFileService
     public DiskFileService(IFileFormatInspector fileFormatInspector, IConfiguration configuration)
     {
         this.fileFormatInspector = fileFormatInspector;
-        baseStoringPath = Path.Combine(Directory.GetCurrentDirectory(), configuration["ResourcesSotrage:MainStoringFolder"]);
+        baseStoringPath = Path.Combine(Directory.GetCurrentDirectory(), configuration["ResourcesStorage:MainStoringFolder"]);
     }
 
     public async Task<string> SaveFile(string folderName, byte[] file)

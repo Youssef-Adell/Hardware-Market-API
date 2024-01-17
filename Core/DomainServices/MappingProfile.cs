@@ -42,7 +42,7 @@ public class PreviewImageUrlResolver : IValueResolver<Product, ProductForListDto
         var pathOfFirstImage = source?.Images?.FirstOrDefault()?.Path;
         if (!string.IsNullOrEmpty(pathOfFirstImage))
         {
-            var hostUrl = new Uri(configration["ResourcesSotrage:HostUrl"]);
+            var hostUrl = new Uri(configration["ResourcesStorage:HostUrl"]);
             var ImageUrl = new Uri(hostUrl, pathOfFirstImage).ToString();
             return ImageUrl;
         }
@@ -62,7 +62,7 @@ public class ImagesUrlsResolver : IValueResolver<Product, ProductDetailsDto, Lis
 
         source?.Images?.ForEach(image =>
         {
-            var hostUrl = new Uri(configration["ResourcesSotrage:HostUrl"]);
+            var hostUrl = new Uri(configration["ResourcesStorage:HostUrl"]);
             var imageUrl = new Uri(hostUrl, image.Path).ToString();
 
             imagesDtos.Add(new ProductImageDto() { Id = image.Id, Url = imageUrl });
