@@ -55,6 +55,14 @@ public class CategoriesController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteCategory(int id)
+    {
+        await categoriesService.DeleteCategory(id);
+
+        return NoContent();
+    }
+
     private async Task<Byte[]> ConvertFormFileToByteArray(IFormFile formFile)
     {
         using (var memoryStream = new MemoryStream())

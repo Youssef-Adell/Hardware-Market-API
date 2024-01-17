@@ -86,6 +86,19 @@ public class CategoriesService : ICategoriesService
         await categoriesRepository.SaveChanges();
     }
 
+    public async Task DeleteCategory(int id)
+    {
+        //check category exsitence
+        var category = await categoriesRepository.GetCategory(id);
+        if (category is null)
+            throw new NotFoundException($"Category not found.");
+
+        categoriesRepository.DeleteCategory(category);
+        await categoriesRepository.SaveChanges();
+
+        fileService.DeleteFile(category.IconPath);
+    }
+
     private async Task ValidateUploadedIcon(byte[] icon)
     {
         //ensure that the uploaded image has a valid image type and doesnt exceed the maxSizeAllowed 

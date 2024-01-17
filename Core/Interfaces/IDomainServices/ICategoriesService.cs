@@ -8,4 +8,5 @@ public interface ICategoriesService
     Task<CategoryDto> GetCategory(int id);
     Task<int> AddCategory(CategoryForAddingDto categoryToAdd, byte[] categoryIcon);
     Task UpdateCategory(int categoryId, CategoryForUpdatingDto updatedCategory, byte[]? newCategoryIcon);
+    Task DeleteCategory(int id);
 }

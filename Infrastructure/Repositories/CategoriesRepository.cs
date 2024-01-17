@@ -24,7 +24,6 @@ public class CategoriesRepository : ICategoriesRepository
         return categories;
     }
 
-
     public async Task<ProductCategory?> GetCategory(int id)
     {
         var category = await appDbContext.ProductCategories
@@ -44,6 +43,10 @@ public class CategoriesRepository : ICategoriesRepository
         appDbContext.ProductCategories.Update(category);
     }
 
+    public void DeleteCategory(ProductCategory category)
+    {
+        appDbContext.ProductCategories.Remove(category);
+    }
     public async Task SaveChanges()
     {
         await appDbContext.SaveChangesAsync();
