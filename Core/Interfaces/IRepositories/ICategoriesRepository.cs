@@ -7,4 +7,6 @@ public interface ICategoriesRepository
 {
     Task<IReadOnlyCollection<ProductCategory>> GetCategories();
     Task<ProductCategory?> GetCategory(int id);
+    void AddCategory(ProductCategory category);
+    Task SaveChanges();
 }

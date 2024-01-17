@@ -29,7 +29,9 @@ public class MappingProfile : Profile
         CreateMap<ProductForUpdatingDto, Product>();
 
         CreateMap<ProductCategory, CategoryDto>()
-        .ForMember(d=>d.IconUrl, options=>options.MapFrom<IconUrlResolver>());
+        .ForMember(d => d.IconUrl, options => options.MapFrom<IconUrlResolver>());
+
+        CreateMap<CategoryForAddingDto, ProductCategory>();
     }
 }
 

@@ -34,4 +34,13 @@ public class CategoriesRepository : ICategoriesRepository
         return category;
     }
 
+    public void AddCategory(ProductCategory category)
+    {
+        appDbContext.ProductCategories.Add(category);
+    }
+
+    public async Task SaveChanges()
+    {
+        await appDbContext.SaveChangesAsync();
+    }
 }
