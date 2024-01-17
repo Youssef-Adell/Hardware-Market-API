@@ -5,7 +5,7 @@ public class PagedResult<T>
     public PagedResult()
     {
     }
-    public PagedResult(IList<T> data, int currentPage, int pageSize, int totalItems)
+    public PagedResult(IReadOnlyCollection<T> data, int currentPage, int pageSize, int totalItems)
     {
         Data = data;
         Metadata = new PageMetadata
@@ -17,7 +17,7 @@ public class PagedResult<T>
         };
     }
 
-    public IList<T> Data { get; init; }
+    public IReadOnlyCollection<T> Data { get; init; }
     public PageMetadata Metadata { get; set; }
 }
 

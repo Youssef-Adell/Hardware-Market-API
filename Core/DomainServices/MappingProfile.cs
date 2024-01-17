@@ -1,4 +1,5 @@
 using AutoMapper;
+using Core.DTOs.CategoryDTOs;
 using Core.DTOs.ProductDTOs;
 using Core.DTOs.SpecificationDTOs;
 using Core.Entities.ProductAggregate;
@@ -26,6 +27,9 @@ public class MappingProfile : Profile
 
         CreateMap<ProductForAddingDto, Product>();
         CreateMap<ProductForUpdatingDto, Product>();
+
+        CreateMap<ProductCategory, CategoryDto>()
+        .ForMember(d=>d.IconUrl, options=>options.MapFrom<IconUrlResolver>());
     }
 }
 
@@ -70,5 +74,23 @@ public class ImagesUrlsResolver : IValueResolver<Product, ProductDetailsDto, Lis
         );
 
         return imagesDtos.Count != 0 ? imagesDtos : null;
+    }
+}
+
+public class IconUrlResolver : IValueResolver<ProductCategory, CategoryDto, string?>
+{
+    private readonly IConfiguration configration;
+    public IconUrlResolver(IConfiguration configration) => this.configration = configration;
+
+    public string? Resolve(ProductCategory source, CategoryDto destination, string? destMember, ResolutionContext context)
+    {
+        if (!string.IsNullOrEmpty(source.IconPath))
+        {
+            var hostUrl = new Uri(configration["ResourcesStorage:HostUrl"]);
+            var iconUrl = new Uri(hostUrl, source.IconPath).ToString();
+            return iconUrl;
+        }
+
+        return null;
     }
 }

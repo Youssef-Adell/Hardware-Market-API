@@ -1,3 +1,4 @@
+using Core.DTOs.CategoryDTOs;
 using Core.Entities.ProductAggregate;
 using Core.Interfaces.IRepositories;
 using Infrastructure.Repositories.EFConfig;
@@ -13,6 +14,16 @@ public class CategoriesRepository : ICategoriesRepository
     {
         this.appDbContext = appDbContext;
     }
+
+    public async Task<IReadOnlyCollection<ProductCategory>> GetCategories()
+    {
+        var categories = await appDbContext.ProductCategories
+                            .AsNoTracking()
+                            .ToListAsync();
+
+        return categories;
+    }
+
 
     public async Task<ProductCategory?> GetCategory(int id)
     {

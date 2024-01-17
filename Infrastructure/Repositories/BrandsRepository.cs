@@ -14,16 +14,7 @@ public class BrandsRepository : IBrandsRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<ProductBrand?> GetBrand(int id)
-    {
-        var brand = await appDbContext.ProductBrands
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(c => c.Id == id);
-
-        return brand;
-    }
-
-    public async Task<IReadOnlyList<ProductBrand>> GetBrands()
+    public async Task<IReadOnlyCollection<ProductBrand>> GetBrands()
     {
         var brands = await appDbContext.ProductBrands
                         .AsNoTracking()
@@ -32,4 +23,12 @@ public class BrandsRepository : IBrandsRepository
         return brands;
     }
 
+    public async Task<ProductBrand?> GetBrand(int id)
+    {
+        var brand = await appDbContext.ProductBrands
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(c => c.Id == id);
+
+        return brand;
+    }
 }
