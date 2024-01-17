@@ -10,19 +10,19 @@ public static class AppDbContextSeed
         if (!await appDbContext.ProductBrands.AnyAsync())
         {
             var list = new List<ProductBrand>();
-            list.Add(new ProductBrand() { Name = "Asus", LogoUrl = "brands/asus.png" });
-            list.Add(new ProductBrand() { Name = "Dell", LogoUrl = "brands/dell.png" });
-            list.Add(new ProductBrand() { Name = "HP", LogoUrl = "brands/hp.png" });
-            list.Add(new ProductBrand() { Name = "Logitech", LogoUrl = "brands/logitech.png" });
+            list.Add(new ProductBrand() { Name = "Asus", LogoPath = "brands/asus.png" });
+            list.Add(new ProductBrand() { Name = "Dell", LogoPath = "brands/dell.png" });
+            list.Add(new ProductBrand() { Name = "HP", LogoPath = "brands/hp.png" });
+            list.Add(new ProductBrand() { Name = "Logitech", LogoPath = "brands/logitech.png" });
             appDbContext.ProductBrands.AddRange(list);
             await appDbContext.SaveChangesAsync();
         }
         if (!await appDbContext.ProductCategories.AnyAsync())
         {
             var list = new List<ProductCategory>();
-            list.Add(new ProductCategory() { Name = "Laptops", IconUrl = "categories/laptops.png" });
-            list.Add(new ProductCategory() { Name = "Monitors", IconUrl = "categories/monitors.png" });
-            list.Add(new ProductCategory() { Name = "Accessories", IconUrl = "categories/accessories.png" });
+            list.Add(new ProductCategory() { Name = "Laptops", IconPath = "categories/laptops.png" });
+            list.Add(new ProductCategory() { Name = "Monitors", IconPath = "categories/monitors.png" });
+            list.Add(new ProductCategory() { Name = "Accessories", IconPath = "categories/accessories.png" });
             appDbContext.ProductCategories.AddRange(list);
             await appDbContext.SaveChangesAsync();
         }
