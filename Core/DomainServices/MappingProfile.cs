@@ -11,6 +11,7 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
+        //---Product Mapping---
         CreateMap<Product, ProductForListDto>()
         .ForMember(d => d.Brand, options => options.MapFrom(s => s.Brand.Name))
         .ForMember(d => d.Category, options => options.MapFrom(s => s.Category.Name))
@@ -28,10 +29,13 @@ public class MappingProfile : Profile
         CreateMap<ProductForAddingDto, Product>();
         CreateMap<ProductForUpdatingDto, Product>();
 
+
+        //---Categories Mapping---
         CreateMap<ProductCategory, CategoryDto>()
         .ForMember(d => d.IconUrl, options => options.MapFrom<IconUrlResolver>());
 
         CreateMap<CategoryForAddingDto, ProductCategory>();
+        CreateMap<CategoryForUpdatingDto, ProductCategory>();
     }
 }
 

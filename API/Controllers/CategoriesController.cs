@@ -42,6 +42,19 @@ public class CategoriesController : ControllerBase
         return CreatedAtAction(nameof(GetCategory), new { Id = categoryId }, null);
     }
 
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateCategory(int id, [FromForm] CategoryForUpdatingDto updatedProduct, IFormFile? newIcon)
+    {
+        byte[]? newCategoryIconAsBytes = null;
+
+        if (newIcon != null)
+            newCategoryIconAsBytes = await ConvertFormFileToByteArray(newIcon);
+
+        await categoriesService.UpdateCategory(id, updatedProduct, newCategoryIconAsBytes);
+
+        return NoContent();
+    }
+
     private async Task<Byte[]> ConvertFormFileToByteArray(IFormFile formFile)
     {
         using (var memoryStream = new MemoryStream())

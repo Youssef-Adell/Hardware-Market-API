@@ -63,6 +63,29 @@ public class CategoriesService : ICategoriesService
         return categoryEntity.Id;
     }
 
+    public async Task UpdateCategory(int categoryId, CategoryForUpdatingDto updatedCategory, byte[]? newCategoryIcon)
+    {
+        //check category exsitence
+        var category = await categoriesRepository.GetCategory(categoryId);
+        if (category is null)
+            throw new NotFoundException($"Category not found.");
+
+        //map the dto to an entity
+        var categoryEntity = mapper.Map(updatedCategory, category);
+
+        //update icon if there is a new one uploaded
+        if (newCategoryIcon != null && newCategoryIcon?.Length != 0)
+        {
+            await ValidateUploadedIcon(newCategoryIcon);
+            fileService.DeleteFile(categoryEntity.IconPath);
+            categoryEntity.IconPath = await fileService.SaveFile(categoriesIconsFolder, newCategoryIcon);
+        }
+
+        categoriesRepository.UpdateCategory(categoryEntity);
+
+        await categoriesRepository.SaveChanges();
+    }
+
     private async Task ValidateUploadedIcon(byte[] icon)
     {
         //ensure that the uploaded image has a valid image type and doesnt exceed the maxSizeAllowed 
