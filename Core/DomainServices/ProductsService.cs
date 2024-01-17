@@ -32,7 +32,6 @@ public class ProductsService : IProductsService
 
     public async Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams)
     {
-        //get the products
         var pageOfProductEntities = await productsRepository.GetProducts(specsParams);
 
         var pageOfProductDtos = mapper.Map<PagedResult<Product>, PagedResult<ProductForListDto>>(pageOfProductEntities);
@@ -43,7 +42,7 @@ public class ProductsService : IProductsService
     {
         var productEntity = await productsRepository.GetProduct(id);
         if (productEntity is null)
-            throw new NotFoundException($"The product with id: {id} not found.");
+            throw new NotFoundException($"Product not found.");
 
         var productDto = mapper.Map<Product, ProductDetailsDto>(productEntity);
         return productDto;
@@ -71,7 +70,7 @@ public class ProductsService : IProductsService
     {
         var product = await productsRepository.GetProduct(productId);
         if (product is null)
-            throw new NotFoundException($"The product with id: {productId} not found.");
+            throw new NotFoundException($"Product not found.");
 
         await ValidateCategory(updatedProduct.CategoryId);
         await ValidateBrand(updatedProduct.BrandId);
@@ -134,7 +133,7 @@ public class ProductsService : IProductsService
     {
         var product = await productsRepository.GetProduct(id);
         if (product is null)
-            throw new NotFoundException($"The product with id: {id} not found.");
+            throw new NotFoundException($"Product not found.");
 
         productsRepository.DeleteProduct(product);
         await productsRepository.SaveChanges();
@@ -166,7 +165,7 @@ public class ProductsService : IProductsService
     {
         var brand = await brandsRepository.GetBrand(brandId);
         if (brand is null)
-            throw new UnprocessableEntityException($"Invalidd brand id.");
+            throw new UnprocessableEntityException($"Invalid brand id.");
     }
 
 }

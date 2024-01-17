@@ -32,7 +32,7 @@ public class CategoriesService : ICategoriesService
         var categoryEntity = await categoriesRepository.GetCategory(id);
 
         if(categoryEntity is null)
-            throw new NotFoundException($"The category with id: {id} not found.");
+            throw new NotFoundException($"Category not found.");
 
         var categoryDto = mapper.Map<ProductCategory?, CategoryDto>(categoryEntity);
 
