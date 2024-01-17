@@ -1,6 +1,7 @@
 using AutoMapper;
 using Core.DTOs.CategoryDTOs;
 using Core.Entities.ProductAggregate;
+using Core.Exceptions;
 using Core.Interfaces.IDomainServices;
 using Core.Interfaces.IRepositories;
 
@@ -25,6 +26,17 @@ public class CategoriesService : ICategoriesService
         var categoriesDtos = mapper.Map<IReadOnlyCollection<ProductCategory>, IReadOnlyCollection<CategoryDto>>(categoriesEntities);
     
         return categoriesDtos;
+    }
+
+    public async Task<CategoryDto> GetCategory(int id){
+        var categoryEntity = await categoriesRepository.GetCategory(id);
+
+        if(categoryEntity is null)
+            throw new NotFoundException($"The category with id: {id} not found.");
+
+        var categoryDto = mapper.Map<ProductCategory?, CategoryDto>(categoryEntity);
+
+        return categoryDto;
     }
 
 }

@@ -20,4 +20,11 @@ public class CategoriesController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetCategory(int id){
+        var result = await categoriesService.GetCategory(id);
+
+        return Ok(result);
+    }
 }
