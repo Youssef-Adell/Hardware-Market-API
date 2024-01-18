@@ -27,7 +27,7 @@ public class ProductsService : IProductsService
         this.fileService = fileService;
         this.mapper = mapper;
         productsImagesFolder = configuration["ResourcesStorage:ProductsImagesFolder"];
-        maxAllowedImageSizeInBytes =  int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
+        maxAllowedImageSizeInBytes = int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
     }
 
     public async Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams)
@@ -52,13 +52,17 @@ public class ProductsService : IProductsService
     {
         await ValidateCategory(productToAdd.CategoryId);
         await ValidateBrand(productToAdd.BrandId);
-        await ValidateUploadedImages(productImages);
 
-        var imagesPaths = await fileService.SaveFiles(productsImagesFolder, productImages);
-
-        //map the dto to an entity then assign the paths of the uploaded images to it
+        //map the dto to a product entity
         var productEntity = mapper.Map<ProductForAddingDto, Product>(productToAdd);
-        productEntity.Images = imagesPaths?.Select(path => new ProductImage { Path = path }).ToList();
+
+        //add uploaded images to the product (if there are any)
+        if (productImages != null && productImages.Count != 0)
+        {
+            await ValidateUploadedImages(productImages);
+            var imagesPaths = await fileService.SaveFiles(productsImagesFolder, productImages);
+            productEntity.Images = imagesPaths?.Select(path => new ProductImage { Path = path }).ToList();
+        }
 
         productsRepository.AddProduct(productEntity);
 
@@ -74,12 +78,22 @@ public class ProductsService : IProductsService
 
         await ValidateCategory(updatedProduct.CategoryId);
         await ValidateBrand(updatedProduct.BrandId);
-        await ValidateUploadedImages(imagesToAdd);
 
-        var imagesPaths = await fileService.SaveFiles(productsImagesFolder, imagesToAdd);
+        //map the dto with updated data to a product entity
+        var productEntity = mapper.Map(updatedProduct, product);
 
-        //remove the images that selected to be removed
-        if (updatedProduct?.IdsOfImagesToRemove != null)
+        //add new uploaded images to the product (if there are any)
+        if (imagesToAdd != null && imagesToAdd?.Count != 0)
+        {
+            await ValidateUploadedImages(imagesToAdd);
+            var imagesPaths = await fileService.SaveFiles(productsImagesFolder, imagesToAdd);
+
+            if (imagesPaths != null)
+                productEntity?.Images?.AddRange(imagesPaths.Select(path => new ProductImage { Path = path }));
+        }
+
+        //remove the images that selected to be removed (if there are any)
+        if (updatedProduct?.IdsOfImagesToRemove != null && updatedProduct.IdsOfImagesToRemove.Count != 0)
         {
             var imagesToRemove = product.Images?.Where(image => updatedProduct.IdsOfImagesToRemove.Contains(image.Id)).ToList();
 
@@ -88,7 +102,6 @@ public class ProductsService : IProductsService
                 productsRepository.DeleteProductImage(image);
                 fileService.DeleteFile(image.Path);
             });
-
             /*
             imagesToRemove?.ForEach(async image =>
             {
@@ -117,13 +130,6 @@ public class ProductsService : IProductsService
             and extract the async saving intoa seperate method in the repo (to reduce the no of requests to the database)
             */
         }
-
-        //map the dto to an entity then assign the paths of the uploaded images to it
-        var productEntity = mapper.Map<ProductForUpdatingDto, Product>(updatedProduct);
-        productEntity.Images = imagesPaths?.Select(path => new ProductImage { Path = path }).ToList();
-
-        //to make it recognizable by the DB to perform the update
-        productEntity.Id = productId;
 
         productsRepository.UpdateProduct(productEntity);
         await productsRepository.SaveChanges();

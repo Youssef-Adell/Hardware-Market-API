@@ -43,7 +43,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductForUpdatingDto updatedProduct, [Required] IFormFileCollection imagesToAdd)
+    public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductForUpdatingDto updatedProduct, IFormFileCollection imagesToAdd)
     {
         //Convert to list<byte[]> to make the service layer not depends on IFormFileCollection which is conisderd infrastructure details
         var productImagesAsBytes = await ConvertFormFilesToByteArrays(imagesToAdd);
