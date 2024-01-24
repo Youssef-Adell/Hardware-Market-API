@@ -1,3 +1,4 @@
+using Core.DTOs.BrandDTOs;
 using Core.Entities.ProductAggregate;
 using Core.Interfaces.IRepositories;
 using Infrastructure.Repositories.EFConfig;
@@ -17,8 +18,8 @@ public class BrandsRepository : IBrandsRepository
     public async Task<IReadOnlyCollection<ProductBrand>> GetBrands()
     {
         var brands = await appDbContext.ProductBrands
-                        .AsNoTracking()
-                        .ToListAsync();
+                            .AsNoTracking()
+                            .ToListAsync();
 
         return brands;
     }
@@ -30,5 +31,24 @@ public class BrandsRepository : IBrandsRepository
                         .FirstOrDefaultAsync(c => c.Id == id);
 
         return brand;
+    }
+
+    public void AddBrand(ProductBrand brand)
+    {
+        appDbContext.ProductBrands.Add(brand);
+    }
+
+    public void UpdateBrand(ProductBrand brand)
+    {
+        appDbContext.ProductBrands.Update(brand);
+    }
+
+    public void DeleteBrand(ProductBrand brand)
+    {
+        appDbContext.ProductBrands.Remove(brand);
+    }
+    public async Task SaveChanges()
+    {
+        await appDbContext.SaveChangesAsync();
     }
 }

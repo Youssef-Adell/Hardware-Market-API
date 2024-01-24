@@ -1,5 +1,6 @@
 using AutoMapper;
 using AutoMapper.Internal;
+using Core.DTOs.BrandDTOs;
 using Core.DTOs.CategoryDTOs;
 using Core.DTOs.ProductDTOs;
 using Core.DTOs.SpecificationDTOs;
@@ -14,33 +15,39 @@ public class MappingProfile : Profile
     {
         //---Product Mapping---
         CreateMap<Product, ProductForListDto>()
-        .ForMember(d => d.Brand, options => options.MapFrom(s => s.Brand.Name))
-        .ForMember(d => d.Category, options => options.MapFrom(s => s.Category.Name))
-        .ForMember(d => d.InStock, options => options.MapFrom(s => s.Quantity > 0))
-        .ForMember(d => d.ImageUrl, options => options.MapFrom<PreviewImageUrlResolver>());
+            .ForMember(d => d.Brand, options => options.MapFrom(s => s.Brand.Name))
+            .ForMember(d => d.Category, options => options.MapFrom(s => s.Category.Name))
+            .ForMember(d => d.InStock, options => options.MapFrom(s => s.Quantity > 0))
+            .ForMember(d => d.ImageUrl, options => options.MapFrom<PreviewImageUrlResolver>());
 
         CreateMap<PagedResult<Product>, PagedResult<ProductForListDto>>();
 
         CreateMap<Product, ProductDetailsDto>()
-        .ForMember(d => d.Brand, options => options.MapFrom(s => s.Brand.Name))
-        .ForMember(d => d.Category, options => options.MapFrom(s => s.Category.Name))
-        .ForMember(d => d.InStock, options => options.MapFrom(s => s.Quantity > 0))
-        .ForMember(d => d.Images, options => options.MapFrom<ImagesUrlsResolver>());
+            .ForMember(d => d.Brand, options => options.MapFrom(s => s.Brand.Name))
+            .ForMember(d => d.Category, options => options.MapFrom(s => s.Category.Name))
+            .ForMember(d => d.InStock, options => options.MapFrom(s => s.Quantity > 0))
+            .ForMember(d => d.Images, options => options.MapFrom<ImagesUrlsResolver>());
 
         CreateMap<ProductForAddingDto, Product>();
         CreateMap<ProductForUpdatingDto, Product>()
-        .ForMember(d => d.Brand, options => options.MapFrom(s => (object)null)) //if we didnt set the value of Brand, Category objects to null ef core will use them and ignore the new brandId and CategoryId so they wont be updated in UpdateProduct method
-        .ForMember(d => d.Category, options => options.MapFrom(s => (object)null));
+            .ForMember(d => d.Brand, options => options.MapFrom(s => (object)null)) //if we didnt set the value of Brand, Category objects to null ef core will use them and ignore the new brandId and CategoryId so they wont be updated in UpdateProduct method
+            .ForMember(d => d.Category, options => options.MapFrom(s => (object)null));
 
 
         //---Categories Mapping---
         CreateMap<ProductCategory, CategoryDto>()
-        .ForMember(d => d.IconUrl, options => options.MapFrom<IconUrlResolver>());
-
+            .ForMember(d => d.IconUrl, options => options.MapFrom<IconUrlResolver>());
         CreateMap<CategoryForAddingDto, ProductCategory>();
         CreateMap<CategoryForUpdatingDto, ProductCategory>();
+
+        //---Brands Mapping---
+        CreateMap<ProductBrand, BrandDto>()
+            .ForMember(d => d.LogoUrl, options => options.MapFrom<LogoUrlResolver>());
+        CreateMap<BrandForAddingDto, ProductBrand>();
+        CreateMap<BrandForUpdatingDto, ProductBrand>();
     }
 }
+
 
 
 // ---Resolvers---
@@ -97,6 +104,24 @@ public class IconUrlResolver : IValueResolver<ProductCategory, CategoryDto, stri
         {
             var hostUrl = new Uri(configration["ResourcesStorage:HostUrl"]);
             var iconUrl = new Uri(hostUrl, source.IconPath).ToString();
+            return iconUrl;
+        }
+
+        return null;
+    }
+}
+
+public class LogoUrlResolver : IValueResolver<ProductBrand, BrandDto, string?>
+{
+    private readonly IConfiguration configration;
+    public LogoUrlResolver(IConfiguration configration) => this.configration = configration;
+
+    public string? Resolve(ProductBrand source, BrandDto destination, string? destMember, ResolutionContext context)
+    {
+        if (!string.IsNullOrEmpty(source.LogoPath))
+        {
+            var hostUrl = new Uri(configration["ResourcesStorage:HostUrl"]);
+            var iconUrl = new Uri(hostUrl, source.LogoPath).ToString();
             return iconUrl;
         }
 
