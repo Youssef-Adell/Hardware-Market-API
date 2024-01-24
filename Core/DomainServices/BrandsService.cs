@@ -51,11 +51,9 @@ public class BrandsService : IBrandsService
     {
         await ValidateUploadedLogo(brandLogo);
 
-        var logoPath = await fileService.SaveFile(brandsLogosFolder, brandLogo);
-
-        //map the dto to an entity then assign the path of uploaded logo to it
         var brandEntity = mapper.Map<BrandForAddingDto, ProductBrand>(brandToAdd);
-        brandEntity.LogoPath = logoPath;
+
+        brandEntity.LogoPath = await fileService.SaveFile(brandsLogosFolder, brandLogo); ;
 
         brandsRepository.AddBrand(brandEntity);
 
@@ -70,7 +68,6 @@ public class BrandsService : IBrandsService
         if (brand is null)
             throw new NotFoundException($"Brand not found.");
 
-        //map the dto to an entity
         var brandEntity = mapper.Map(updatedBrand, brand);
 
         //update logo if there is a new one uploaded
