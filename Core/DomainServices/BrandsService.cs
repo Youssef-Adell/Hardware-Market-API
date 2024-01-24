@@ -63,17 +63,18 @@ public class BrandsService : IBrandsService
 
     public async Task UpdateBrand(int brandId, BrandForUpdatingDto updatedBrand, byte[]? newBrandLogo)
     {
-        //check brand exsitence
         var brand = await brandsRepository.GetBrand(brandId);
         if (brand is null)
             throw new NotFoundException($"Brand not found.");
+
+        if (newBrandLogo != null && newBrandLogo?.Length > 0)
+            await ValidateUploadedLogo(newBrandLogo);
 
         var brandEntity = mapper.Map(updatedBrand, brand);
 
         //update logo if there is a new one uploaded
         if (newBrandLogo != null && newBrandLogo?.Length != 0)
         {
-            await ValidateUploadedLogo(newBrandLogo);
             fileService.DeleteFile(brandEntity.LogoPath);
             brandEntity.LogoPath = await fileService.SaveFile(brandsLogosFolder, newBrandLogo);
         }
