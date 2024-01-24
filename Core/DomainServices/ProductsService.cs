@@ -53,15 +53,16 @@ public class ProductsService : IProductsService
         await ValidateCategory(productToAdd.CategoryId);
         await ValidateBrand(productToAdd.BrandId);
 
-        //map the dto to a product entity
+        if (productImages != null && productImages.Count > 0)
+            await ValidateUploadedImages(productImages);
+
         var productEntity = mapper.Map<ProductForAddingDto, Product>(productToAdd);
 
         //add uploaded images to the product (if there are any)
-        if (productImages != null && productImages.Count != 0)
+        if (productImages != null && productImages.Count > 0)
         {
-            await ValidateUploadedImages(productImages);
-            var imagesPaths = await fileService.SaveFiles(productsImagesFolder, productImages);
-            productEntity.Images = imagesPaths?.Select(path => new ProductImage { Path = path }).ToList();
+            var pathsOfSavedImages = await fileService.SaveFiles(productsImagesFolder, productImages);
+            productEntity.Images = pathsOfSavedImages?.Select(path => new ProductImage { Path = path }).ToList();
         }
 
         productsRepository.AddProduct(productEntity);
@@ -79,23 +80,17 @@ public class ProductsService : IProductsService
         await ValidateCategory(updatedProduct.CategoryId);
         await ValidateBrand(updatedProduct.BrandId);
 
-        //map the dto with updated data to a product entity
+        if (imagesToAdd != null && imagesToAdd?.Count > 0)
+            await ValidateUploadedImages(imagesToAdd);
+
         var productEntity = mapper.Map(updatedProduct, product);
 
-        //add new uploaded images to the product (if there are any)
-        if (imagesToAdd != null && imagesToAdd?.Count != 0)
-        {
-            await ValidateUploadedImages(imagesToAdd);
-            var imagesPaths = await fileService.SaveFiles(productsImagesFolder, imagesToAdd);
-
-            if (imagesPaths != null)
-                productEntity?.Images?.AddRange(imagesPaths.Select(path => new ProductImage { Path = path }));
-        }
-
         //remove the images that selected to be removed (if there are any)
-        if (updatedProduct?.IdsOfImagesToRemove != null && updatedProduct.IdsOfImagesToRemove.Count != 0)
+        if (updatedProduct?.IdsOfImagesToRemove != null && updatedProduct.IdsOfImagesToRemove.Count > 0)
         {
-            var imagesToRemove = product.Images?.Where(image => updatedProduct.IdsOfImagesToRemove.Contains(image.Id)).ToList();
+            var imagesToRemove = productEntity.Images?
+                                                .Where(image => updatedProduct.IdsOfImagesToRemove.Contains(image.Id))
+                                                .ToList();
 
             imagesToRemove?.ForEach(image =>
             {
@@ -129,6 +124,13 @@ public class ProductsService : IProductsService
             i used first code again and it doesnt give any errors now because i made the DeleteProductImage sync
             and extract the async saving intoa seperate method in the repo (to reduce the no of requests to the database)
             */
+        }
+
+        //add new uploaded images to the product (if there are any)
+        if (imagesToAdd != null && imagesToAdd?.Count > 0)
+        {
+            var pathsOfSavedImages = await fileService.SaveFiles(productsImagesFolder, imagesToAdd);
+            productEntity?.Images?.AddRange(pathsOfSavedImages.Select(path => new ProductImage { Path = path }));
         }
 
         productsRepository.UpdateProduct(productEntity);
