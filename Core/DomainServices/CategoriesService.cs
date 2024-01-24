@@ -51,11 +51,9 @@ public class CategoriesService : ICategoriesService
     {
         await ValidateUploadedIcon(categoryIcon);
 
-        var iconPath = await fileService.SaveFile(categoriesIconsFolder, categoryIcon);
-
-        //map the dto to an entity then assign the path of uploaded icon to it
         var categoryEntity = mapper.Map<CategoryForAddingDto, ProductCategory>(categoryToAdd);
-        categoryEntity.IconPath = iconPath;
+
+        categoryEntity.IconPath = await fileService.SaveFile(categoriesIconsFolder, categoryIcon); ;
 
         categoriesRepository.AddCategory(categoryEntity);
 
@@ -70,7 +68,6 @@ public class CategoriesService : ICategoriesService
         if (category is null)
             throw new NotFoundException($"Category not found.");
 
-        //map the dto to an entity
         var categoryEntity = mapper.Map(updatedCategory, category);
 
         //update icon if there is a new one uploaded
