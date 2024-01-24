@@ -73,7 +73,7 @@ public class BrandsService : IBrandsService
         var brandEntity = mapper.Map(updatedBrand, brand);
 
         //update logo if there is a new one uploaded
-        if (newBrandLogo != null && newBrandLogo?.Length != 0)
+        if (newBrandLogo != null && newBrandLogo?.Length > 0)
         {
             fileService.DeleteFile(brandEntity.LogoPath);
             brandEntity.LogoPath = await fileService.SaveFile(brandsLogosFolder, newBrandLogo);
@@ -86,7 +86,6 @@ public class BrandsService : IBrandsService
 
     public async Task DeleteBrand(int id)
     {
-        //check brand exsitence
         var brand = await brandsRepository.GetBrand(id);
         if (brand is null)
             throw new NotFoundException($"Brand not found.");
