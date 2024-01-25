@@ -47,4 +47,12 @@ public class ProductReviewsController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProductReview(int productId, int id, [FromQuery] string customerEmail) //customerEmail param would be removed later when adding the authentication
+    {
+        await productReviewsService.DeleteProductReview(customerEmail, productId, id);
+
+        return NoContent();
+    }
 }

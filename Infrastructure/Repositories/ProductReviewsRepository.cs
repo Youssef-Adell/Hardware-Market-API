@@ -60,6 +60,11 @@ public class ProductReviewsRepository : IProductReviewsRepository
         appDbContext.ProductReviews.Update(review);
     }
 
+    public void DeleteProductReview(ProductReview review)
+    {
+        appDbContext.ProductReviews.Remove(review);
+    }
+
     public async Task SaveChanges()
     {
         await appDbContext.SaveChangesAsync();

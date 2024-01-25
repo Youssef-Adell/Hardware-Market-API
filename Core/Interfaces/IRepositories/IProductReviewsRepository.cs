@@ -10,5 +10,6 @@ public interface IProductReviewsRepository
     Task<bool> HasCustomerReviewedProduct(int productId, string customerEmail);
     void AddProductReview(ProductReview review);
     void UpdateProductReview(ProductReview review);
+    void DeleteProductReview(ProductReview review);
     Task SaveChanges();
 }

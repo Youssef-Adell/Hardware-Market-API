@@ -82,4 +82,21 @@ public class ProductReviewsService : IProductReviewsService
         productReviewsRepository.UpdateProductReview(reviewEntity);
         await productReviewsRepository.SaveChanges();
     }
+
+    public async Task DeleteProductReview(string customerEmail, int productId, int reviewId)
+    {
+        var product = await productsRepository.GetProduct(productId);
+        if (product is null)
+            throw new NotFoundException($"Product not found.");
+
+        var review = await productReviewsRepository.GetProductReview(productId, reviewId);
+        if (review is null)
+            throw new NotFoundException($"Review not found.");
+
+        if (review.CustomerEmail != customerEmail)
+            throw new ForbiddenException("The review does not belong to the customer to delete it.");
+
+        productReviewsRepository.DeleteProductReview(review);
+        await productReviewsRepository.SaveChanges();
+    }
 }
