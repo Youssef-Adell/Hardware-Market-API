@@ -3,6 +3,7 @@ using AutoMapper.Internal;
 using Core.DTOs.BrandDTOs;
 using Core.DTOs.CategoryDTOs;
 using Core.DTOs.ProductDTOs;
+using Core.DTOs.ProductReviewDTOs;
 using Core.DTOs.SpecificationDTOs;
 using Core.Entities.ProductAggregate;
 using Microsoft.Extensions.Configuration;
@@ -45,6 +46,10 @@ public class MappingProfile : Profile
             .ForMember(d => d.LogoUrl, options => options.MapFrom<LogoUrlResolver>());
         CreateMap<BrandForAddingDto, ProductBrand>();
         CreateMap<BrandForUpdatingDto, ProductBrand>();
+
+        //---ProductReviews Mapping---
+        CreateMap<ProductReview, ProductReviewDto>();
+        CreateMap<PagedResult<ProductReview>, PagedResult<ProductReviewDto>>();
     }
 }
 

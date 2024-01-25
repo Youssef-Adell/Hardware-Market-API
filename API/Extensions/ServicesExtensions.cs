@@ -60,10 +60,12 @@ public static class ServicesExtensions
         services.AddScoped<IProductsRepository, ProductsRepository>();
         services.AddScoped<ICategoriesRepository, CategoriesRepository>();
         services.AddScoped<IBrandsRepository, BrandsRepository>();
+        services.AddScoped<IProductReviewsRepository, ProductReviewsRepository>();
 
         services.AddScoped<IProductsService, ProductsService>();
         services.AddScoped<ICategoriesService, CategoriesService>();
         services.AddScoped<IBrandsService, BrandsService>();
+        services.AddScoped<IProductReviewsService, ProductReviewsService>();
 
         services.AddScoped<IFileService, DiskFileService>();
     }

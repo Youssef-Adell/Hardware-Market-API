@@ -9,17 +9,17 @@ namespace API.Controllers;
 [Route("api/brands")]
 public class BrandsController : ControllerBase
 {
-    private readonly IBrandsService BrandsService;
+    private readonly IBrandsService brandsService;
 
-    public BrandsController(IBrandsService BrandsService)
+    public BrandsController(IBrandsService brandsService)
     {
-        this.BrandsService = BrandsService;
+        this.brandsService = brandsService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetBrands()
     {
-        var result = await BrandsService.GetBrands();
+        var result = await brandsService.GetBrands();
 
         return Ok(result);
     }
@@ -27,7 +27,7 @@ public class BrandsController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetBrand(int id)
     {
-        var result = await BrandsService.GetBrand(id);
+        var result = await brandsService.GetBrand(id);
 
         return Ok(result);
     }
@@ -37,7 +37,7 @@ public class BrandsController : ControllerBase
     {
         var BrandIconAsBytes = await ConvertFormFileToByteArray(icon);
 
-        var BrandId = await BrandsService.AddBrand(BrandToAdd, BrandIconAsBytes);
+        var BrandId = await brandsService.AddBrand(BrandToAdd, BrandIconAsBytes);
 
         return CreatedAtAction(nameof(GetBrand), new { Id = BrandId }, null);
     }
@@ -50,7 +50,7 @@ public class BrandsController : ControllerBase
         if (newIcon != null)
             newBrandIconAsBytes = await ConvertFormFileToByteArray(newIcon);
 
-        await BrandsService.UpdateBrand(id, updatedProduct, newBrandIconAsBytes);
+        await brandsService.UpdateBrand(id, updatedProduct, newBrandIconAsBytes);
 
         return NoContent();
     }
@@ -58,7 +58,7 @@ public class BrandsController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteBrand(int id)
     {
-        await BrandsService.DeleteBrand(id);
+        await brandsService.DeleteBrand(id);
 
         return NoContent();
     }
