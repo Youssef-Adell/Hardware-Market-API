@@ -34,12 +34,29 @@ public class ProductReviewsRepository : IProductReviewsRepository
         return new PagedResult<ProductReview>(pagedReviewssData, specsParams.Page, specsParams.PageSize, totalReviewsForThisProduct);
     }
 
-    public async Task<ProductReview?> GetProductReview(int productId, int id)
+    public async Task<ProductReview?> GetProductReview(int productId, int reviewId)
     {
         var review = await appDbContext.ProductReviews
                         .AsNoTracking()
-                        .FirstOrDefaultAsync(r => r.Id == id && r.ProductId == productId);
+                        .FirstOrDefaultAsync(r => r.Id == reviewId && r.ProductId == productId);
 
         return review;
+    }
+
+    public void AddProductReview(ProductReview reviewToAdd)
+    {
+        appDbContext.ProductReviews.Add(reviewToAdd);
+    }
+
+    public async Task<bool> HasCustomerReviewedProduct(int productId, string customerEmail)
+    {
+        var hasReviewd = await appDbContext.ProductReviews.AnyAsync(r => r.ProductId == productId && r.CustomerEmail == customerEmail);
+
+        return hasReviewd;
+    }
+
+    public async Task SaveChanges()
+    {
+        await appDbContext.SaveChangesAsync();
     }
 }

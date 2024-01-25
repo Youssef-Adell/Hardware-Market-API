@@ -11,11 +11,13 @@ namespace Core.DomainServices;
 public class ProductReviewsService : IProductReviewsService
 {
     private readonly IProductReviewsRepository productReviewsRepository;
+    private readonly IProductsRepository productsRepository;
     private readonly IMapper mapper;
 
-    public ProductReviewsService(IProductReviewsRepository productReviewsRepository, IMapper mapper)
+    public ProductReviewsService(IProductReviewsRepository productReviewsRepository, IProductsRepository productsRepository, IMapper mapper)
     {
         this.productReviewsRepository = productReviewsRepository;
+        this.productsRepository = productsRepository;
         this.mapper = mapper;
     }
 
@@ -28,10 +30,13 @@ public class ProductReviewsService : IProductReviewsService
         return pageOfReviewstDtos;
     }
 
-    public async Task<ProductReviewDto> GetProductReview(int productId, int id)
+    public async Task<ProductReviewDto> GetProductReview(int productId, int reviewId)
     {
-        var reviewEntity = await productReviewsRepository.GetProductReview(productId, id);
+        var product = await productsRepository.GetProduct(productId);
+        if (product is null)
+            throw new NotFoundException($"Product not found.");
 
+        var reviewEntity = await productReviewsRepository.GetProductReview(productId, reviewId);
         if (reviewEntity is null)
             throw new NotFoundException($"Review not found.");
 
@@ -39,4 +44,24 @@ public class ProductReviewsService : IProductReviewsService
 
         return reviewDto;
     }
+
+    public async Task<int> AddProductReview(string customerEmail, int productId, ProductReviewForAddingDto reviewToAdd)
+    {
+        var product = await productsRepository.GetProduct(productId);
+        if (product is null)
+            throw new NotFoundException($"Product not found.");
+
+        if (await productReviewsRepository.HasCustomerReviewedProduct(productId, customerEmail))
+            throw new ConfilctException("Customer has already reviewed this product.");
+
+        var reviewEntity = mapper.Map<ProductReviewForAddingDto, ProductReview>(reviewToAdd);
+        reviewEntity.CustomerEmail = customerEmail;
+        reviewEntity.ProductId = productId;
+
+        productReviewsRepository.AddProductReview(reviewEntity);
+        await productReviewsRepository.SaveChanges();
+
+        return reviewEntity.Id;
+    }
+
 }

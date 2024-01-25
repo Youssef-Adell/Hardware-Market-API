@@ -2,6 +2,7 @@ using System.Text.Json;
 using API.Errors;
 using Azure;
 using Core.Exceptions;
+using FileSignatures.Formats;
 using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
 
@@ -28,6 +29,7 @@ public static class MidlewareExtensions
                     {
                         NotFoundException => StatusCodes.Status404NotFound,
                         UnprocessableEntityException => StatusCodes.Status422UnprocessableEntity,
+                        ConfilctException => StatusCodes.Status409Conflict,
                         _ => StatusCodes.Status500InternalServerError
                     };
 

@@ -50,6 +50,7 @@ public class MappingProfile : Profile
         //---ProductReviews Mapping---
         CreateMap<ProductReview, ProductReviewDto>();
         CreateMap<PagedResult<ProductReview>, PagedResult<ProductReviewDto>>();
+        CreateMap<ProductReviewForAddingDto, ProductReview>();
     }
 }
 

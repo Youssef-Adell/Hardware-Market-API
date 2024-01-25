@@ -1,3 +1,4 @@
+using Core.DTOs.ProductReviewDTOs;
 using Core.DTOs.SpecificationDTOs;
 using Core.Interfaces.IDomainServices;
 using Microsoft.AspNetCore.Mvc;
@@ -29,5 +30,13 @@ public class ProductReviewsController : ControllerBase
         var result = await productReviewsService.GetProductReview(productId, id);
 
         return Ok(result);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddProductReview(int productId, ProductReviewForAddingDto reviewToAdd, [FromQuery] string customerEmail)
+    {
+        var reviewId = await productReviewsService.AddProductReview(customerEmail, productId, reviewToAdd);
+
+        return CreatedAtAction(nameof(GetProductReview), new { productId = productId, id = reviewId }, null);
     }
 }
