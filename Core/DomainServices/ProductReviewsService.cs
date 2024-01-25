@@ -64,4 +64,22 @@ public class ProductReviewsService : IProductReviewsService
         return reviewEntity.Id;
     }
 
+    public async Task UpdateProductReview(string customerEmail, int productId, int reviewId, ProductReviewForUpdatingDto updatedReview)
+    {
+        var product = await productsRepository.GetProduct(productId);
+        if (product is null)
+            throw new NotFoundException($"Product not found.");
+
+        var review = await productReviewsRepository.GetProductReview(productId, reviewId);
+        if (review is null)
+            throw new NotFoundException($"Review not found.");
+
+        if (review.CustomerEmail != customerEmail)
+            throw new ForbiddenException("The review does not belong to the customer to edit it.");
+
+        var reviewEntity = mapper.Map(updatedReview, review);
+
+        productReviewsRepository.UpdateProductReview(reviewEntity);
+        await productReviewsRepository.SaveChanges();
+    }
 }

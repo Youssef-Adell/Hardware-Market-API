@@ -43,16 +43,21 @@ public class ProductReviewsRepository : IProductReviewsRepository
         return review;
     }
 
-    public void AddProductReview(ProductReview reviewToAdd)
-    {
-        appDbContext.ProductReviews.Add(reviewToAdd);
-    }
-
     public async Task<bool> HasCustomerReviewedProduct(int productId, string customerEmail)
     {
         var hasReviewd = await appDbContext.ProductReviews.AnyAsync(r => r.ProductId == productId && r.CustomerEmail == customerEmail);
 
         return hasReviewd;
+    }
+
+    public void AddProductReview(ProductReview review)
+    {
+        appDbContext.ProductReviews.Add(review);
+    }
+
+    public void UpdateProductReview(ProductReview review)
+    {
+        appDbContext.ProductReviews.Update(review);
     }
 
     public async Task SaveChanges()

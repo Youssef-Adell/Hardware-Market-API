@@ -39,4 +39,12 @@ public class ProductReviewsController : ControllerBase
 
         return CreatedAtAction(nameof(GetProductReview), new { productId = productId, id = reviewId }, null);
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateProductReview(int productId, int id, ProductReviewForUpdatingDto updatedReview, [FromQuery] string customerEmail)
+    {
+        await productReviewsService.UpdateProductReview(customerEmail, productId, id, updatedReview);
+
+        return NoContent();
+    }
 }

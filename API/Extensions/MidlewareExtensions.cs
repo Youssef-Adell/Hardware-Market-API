@@ -30,6 +30,7 @@ public static class MidlewareExtensions
                         NotFoundException => StatusCodes.Status404NotFound,
                         UnprocessableEntityException => StatusCodes.Status422UnprocessableEntity,
                         ConfilctException => StatusCodes.Status409Conflict,
+                        ForbiddenException => StatusCodes.Status403Forbidden,
                         _ => StatusCodes.Status500InternalServerError
                     };
 

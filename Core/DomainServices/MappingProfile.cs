@@ -51,6 +51,7 @@ public class MappingProfile : Profile
         CreateMap<ProductReview, ProductReviewDto>();
         CreateMap<PagedResult<ProductReview>, PagedResult<ProductReviewDto>>();
         CreateMap<ProductReviewForAddingDto, ProductReview>();
+        CreateMap<ProductReviewForUpdatingDto, ProductReview>();
     }
 }
 
