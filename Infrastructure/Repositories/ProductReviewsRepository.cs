@@ -34,4 +34,12 @@ public class ProductReviewsRepository : IProductReviewsRepository
         return new PagedResult<ProductReview>(pagedReviewssData, specsParams.Page, specsParams.PageSize, totalReviewsForThisProduct);
     }
 
+    public async Task<ProductReview?> GetProductReview(int productId, int id)
+    {
+        var review = await appDbContext.ProductReviews
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(r => r.Id == id && r.ProductId == productId);
+
+        return review;
+    }
 }

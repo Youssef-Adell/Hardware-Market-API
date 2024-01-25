@@ -22,4 +22,12 @@ public class ProductReviewsController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetProductReview(int productId, int id)
+    {
+        var result = await productReviewsService.GetProductReview(productId, id);
+
+        return Ok(result);
+    }
 }

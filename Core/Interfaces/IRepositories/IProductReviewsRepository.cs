@@ -6,4 +6,5 @@ namespace Core.Interfaces.IRepositories;
 public interface IProductReviewsRepository
 {
     Task<PagedResult<ProductReview>> GetProductReviews(int productId, SpecificationParameters specsParams);
+    Task<ProductReview?> GetProductReview(int productId, int id);
 }

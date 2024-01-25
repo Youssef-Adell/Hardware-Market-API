@@ -2,6 +2,7 @@ using AutoMapper;
 using Core.DTOs.ProductReviewDTOs;
 using Core.DTOs.SpecificationDTOs;
 using Core.Entities.ProductAggregate;
+using Core.Exceptions;
 using Core.Interfaces.IDomainServices;
 using Core.Interfaces.IRepositories;
 
@@ -27,4 +28,15 @@ public class ProductReviewsService : IProductReviewsService
         return pageOfReviewstDtos;
     }
 
+    public async Task<ProductReviewDto> GetProductReview(int productId, int id)
+    {
+        var reviewEntity = await productReviewsRepository.GetProductReview(productId, id);
+
+        if (reviewEntity is null)
+            throw new NotFoundException($"Review not found.");
+
+        var reviewDto = mapper.Map<ProductReview?, ProductReviewDto>(reviewEntity);
+
+        return reviewDto;
+    }
 }

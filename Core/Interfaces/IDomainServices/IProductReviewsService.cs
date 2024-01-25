@@ -6,4 +6,5 @@ namespace Core.Interfaces.IDomainServices;
 public interface IProductReviewsService
 {
     Task<PagedResult<ProductReviewDto>> GetProductReviews(int productId, SpecificationParameters specsParams);
+    Task<ProductReviewDto> GetProductReview(int productId, int id);
 }
