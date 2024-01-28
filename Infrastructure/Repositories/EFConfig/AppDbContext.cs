@@ -1,4 +1,5 @@
 using System.Reflection;
+using Core.Entities.OrderAggregate;
 using Core.Entities.ProductAggregate;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,8 @@ public class AppDbContext : DbContext
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductReview> ProductReviews { get; set; }
     public DbSet<ProductImage> ProductImages { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<Coupon> Coupons { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

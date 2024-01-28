@@ -8,6 +8,6 @@ public class ProductForListDto
     public double Price { get; init; }
     public string Brand { get; init; }
     public string Category { get; init; }
-    public bool InStock { get; init; }
+    public int Quantity { get; set; }
     public float AverageRating { get; set; }
 }

@@ -18,7 +18,6 @@ public class MappingProfile : Profile
         CreateMap<Product, ProductForListDto>()
             .ForMember(d => d.Brand, options => options.MapFrom(s => s.Brand.Name))
             .ForMember(d => d.Category, options => options.MapFrom(s => s.Category.Name))
-            .ForMember(d => d.InStock, options => options.MapFrom(s => s.Quantity > 0))
             .ForMember(d => d.ImageUrl, options => options.MapFrom<PreviewImageUrlResolver>());
 
         CreateMap<PagedResult<Product>, PagedResult<ProductForListDto>>();
@@ -26,7 +25,6 @@ public class MappingProfile : Profile
         CreateMap<Product, ProductDetailsDto>()
             .ForMember(d => d.Brand, options => options.MapFrom(s => s.Brand.Name))
             .ForMember(d => d.Category, options => options.MapFrom(s => s.Category.Name))
-            .ForMember(d => d.InStock, options => options.MapFrom(s => s.Quantity > 0))
             .ForMember(d => d.Images, options => options.MapFrom<ImagesUrlsResolver>());
 
         CreateMap<ProductForAddingDto, Product>();

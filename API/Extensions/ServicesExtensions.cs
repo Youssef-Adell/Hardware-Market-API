@@ -1,5 +1,6 @@
 using API.Errors;
 using Core.DomainServices;
+using Core.Entities.OrderAggregate;
 using Core.Interfaces.IDomainServices;
 using Core.Interfaces.IExternalServices;
 using Core.Interfaces.IRepositories;
@@ -61,11 +62,14 @@ public static class ServicesExtensions
         services.AddScoped<ICategoriesRepository, CategoriesRepository>();
         services.AddScoped<IBrandsRepository, BrandsRepository>();
         services.AddScoped<IProductReviewsRepository, ProductReviewsRepository>();
+        services.AddScoped<IOrdersRepository, OrdersRepository>();
+        services.AddScoped<ICouponsRepository, CouponsRepository>();
 
         services.AddScoped<IProductsService, ProductsService>();
         services.AddScoped<ICategoriesService, CategoriesService>();
         services.AddScoped<IBrandsService, BrandsService>();
         services.AddScoped<IProductReviewsService, ProductReviewsService>();
+        services.AddScoped<IOrdersService, OrdersService>();
 
         services.AddScoped<IFileService, DiskFileService>();
     }

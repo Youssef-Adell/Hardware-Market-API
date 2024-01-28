@@ -41,6 +41,16 @@ public class ProductsRepository : IProductsRepository
         return new PagedResult<Product>(pagedProductsData, specsParams.Page, specsParams.PageSize, totalProductsCount);
     }
 
+    public async Task<List<Product>?> GetProductsCollection(IEnumerable<int> ids)
+    {
+        var productsCollection = await appDbContext.Products.Where(p => ids.Contains(p.Id))
+                                    .Include(p => p.Images)
+                                    .AsNoTracking()
+                                    .ToListAsync();
+
+        return productsCollection;
+    }
+
     public Task<Product?> GetProduct(int id)
     {
         var product = appDbContext.Products
