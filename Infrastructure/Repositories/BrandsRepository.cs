@@ -47,8 +47,4 @@ public class BrandsRepository : IBrandsRepository
     {
         appDbContext.ProductBrands.Remove(brand);
     }
-    public async Task SaveChanges()
-    {
-        await appDbContext.SaveChangesAsync();
-    }
 }

@@ -59,11 +59,12 @@ public static class ServicesExtensions
     public static void AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IProductsRepository, ProductsRepository>();
-        services.AddScoped<ICategoriesRepository, CategoriesRepository>();
-        services.AddScoped<IBrandsRepository, BrandsRepository>();
         services.AddScoped<IProductReviewsRepository, ProductReviewsRepository>();
-        services.AddScoped<IOrdersRepository, OrdersRepository>();
+        services.AddScoped<IBrandsRepository, BrandsRepository>();
+        services.AddScoped<ICategoriesRepository, CategoriesRepository>();
         services.AddScoped<ICouponsRepository, CouponsRepository>();
+        services.AddScoped<IOrdersRepository, OrdersRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IProductsService, ProductsService>();
         services.AddScoped<ICategoriesService, CategoriesService>();

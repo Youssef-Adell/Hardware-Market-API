@@ -79,9 +79,4 @@ public class ProductsRepository : IProductsRepository
     {
         appDbContext.ProductImages.Remove(productImage);
     }
-
-    public async Task SaveChanges()
-    {
-        await appDbContext.SaveChangesAsync();
-    }
 }

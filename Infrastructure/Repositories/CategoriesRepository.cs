@@ -47,8 +47,4 @@ public class CategoriesRepository : ICategoriesRepository
     {
         appDbContext.ProductCategories.Remove(category);
     }
-    public async Task SaveChanges()
-    {
-        await appDbContext.SaveChangesAsync();
-    }
 }

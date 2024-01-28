@@ -11,5 +11,4 @@ public interface IProductReviewsRepository
     void AddProductReview(ProductReview review);
     void UpdateProductReview(ProductReview review);
     void DeleteProductReview(ProductReview review);
-    Task SaveChanges();
 }

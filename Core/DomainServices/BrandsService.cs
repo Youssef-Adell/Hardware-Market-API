@@ -11,24 +11,24 @@ namespace Core.DomainServices;
 
 public class BrandsService : IBrandsService
 {
-    private readonly IBrandsRepository brandsRepository;
+    private readonly IUnitOfWork unitOfWork;
     private readonly IFileService fileService;
     private readonly IMapper mapper;
     private readonly string brandsLogosFolder;
     private readonly int maxAllowedImageSizeInBytes;
 
-    public BrandsService(IBrandsRepository brandsRepository, IFileService fileService, IConfiguration configuration, IMapper mapper)
+    public BrandsService(IUnitOfWork unitOfWork, IFileService fileService, IConfiguration configuration, IMapper mapper)
     {
-        this.brandsRepository = brandsRepository;
+        this.unitOfWork = unitOfWork;
         this.fileService = fileService;
         this.mapper = mapper;
-        brandsLogosFolder = configuration["ResourcesStorage:BrandsLogosFolder"];
-        maxAllowedImageSizeInBytes = int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
+        this.brandsLogosFolder = configuration["ResourcesStorage:BrandsLogosFolder"];
+        this.maxAllowedImageSizeInBytes = int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
     }
 
     public async Task<IReadOnlyCollection<BrandDto>> GetBrands()
     {
-        var brandsEntities = await brandsRepository.GetBrands();
+        var brandsEntities = await unitOfWork.Brands.GetBrands();
 
         var brandsDtos = mapper.Map<IReadOnlyCollection<ProductBrand>, IReadOnlyCollection<BrandDto>>(brandsEntities);
 
@@ -37,7 +37,7 @@ public class BrandsService : IBrandsService
 
     public async Task<BrandDto> GetBrand(int id)
     {
-        var brandEntity = await brandsRepository.GetBrand(id);
+        var brandEntity = await unitOfWork.Brands.GetBrand(id);
 
         if (brandEntity is null)
             throw new NotFoundException($"Brand not found.");
@@ -55,15 +55,15 @@ public class BrandsService : IBrandsService
 
         brandEntity.LogoPath = await fileService.SaveFile(brandsLogosFolder, brandLogo); ;
 
-        brandsRepository.AddBrand(brandEntity);
+        unitOfWork.Brands.AddBrand(brandEntity);
 
-        await brandsRepository.SaveChanges();
+        await unitOfWork.SaveChanges();
         return brandEntity.Id;
     }
 
     public async Task UpdateBrand(int brandId, BrandForUpdatingDto updatedBrand, byte[]? newBrandLogo)
     {
-        var brand = await brandsRepository.GetBrand(brandId);
+        var brand = await unitOfWork.Brands.GetBrand(brandId);
         if (brand is null)
             throw new NotFoundException($"Brand not found.");
 
@@ -79,19 +79,20 @@ public class BrandsService : IBrandsService
             brandEntity.LogoPath = await fileService.SaveFile(brandsLogosFolder, newBrandLogo);
         }
 
-        brandsRepository.UpdateBrand(brandEntity);
+        unitOfWork.Brands.UpdateBrand(brandEntity);
 
-        await brandsRepository.SaveChanges();
+        await unitOfWork.SaveChanges();
     }
 
     public async Task DeleteBrand(int id)
     {
-        var brand = await brandsRepository.GetBrand(id);
+        var brand = await unitOfWork.Brands.GetBrand(id);
         if (brand is null)
             throw new NotFoundException($"Brand not found.");
 
-        brandsRepository.DeleteBrand(brand);
-        await brandsRepository.SaveChanges();
+        unitOfWork.Brands.DeleteBrand(brand);
+
+        await unitOfWork.SaveChanges();
 
         fileService.DeleteFile(brand.LogoPath);
     }

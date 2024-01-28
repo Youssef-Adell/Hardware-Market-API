@@ -10,5 +10,4 @@ public interface ICategoriesRepository
     void AddCategory(ProductCategory category);
     void UpdateCategory(ProductCategory category);
     void DeleteCategory(ProductCategory category);
-    Task SaveChanges();
 }

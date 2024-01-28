@@ -11,24 +11,25 @@ namespace Core.DomainServices;
 
 public class CategoriesService : ICategoriesService
 {
-    private readonly ICategoriesRepository categoriesRepository;
+    private readonly IUnitOfWork unitOfWork;
+
     private readonly IFileService fileService;
     private readonly IMapper mapper;
     private readonly string categoriesIconsFolder;
     private readonly int maxAllowedImageSizeInBytes;
 
-    public CategoriesService(ICategoriesRepository categoriesRepository, IFileService fileService, IConfiguration configuration, IMapper mapper)
+    public CategoriesService(IUnitOfWork unitOfWork, IFileService fileService, IConfiguration configuration, IMapper mapper)
     {
-        this.categoriesRepository = categoriesRepository;
+        this.unitOfWork = unitOfWork;
         this.fileService = fileService;
         this.mapper = mapper;
-        categoriesIconsFolder = configuration["ResourcesStorage:CategoriesIconsFolder"];
-        maxAllowedImageSizeInBytes = int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
+        this.categoriesIconsFolder = configuration["ResourcesStorage:CategoriesIconsFolder"];
+        this.maxAllowedImageSizeInBytes = int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
     }
 
     public async Task<IReadOnlyCollection<CategoryDto>> GetCategories()
     {
-        var categoriesEntities = await categoriesRepository.GetCategories();
+        var categoriesEntities = await unitOfWork.Categories.GetCategories();
 
         var categoriesDtos = mapper.Map<IReadOnlyCollection<ProductCategory>, IReadOnlyCollection<CategoryDto>>(categoriesEntities);
 
@@ -37,7 +38,7 @@ public class CategoriesService : ICategoriesService
 
     public async Task<CategoryDto> GetCategory(int id)
     {
-        var categoryEntity = await categoriesRepository.GetCategory(id);
+        var categoryEntity = await unitOfWork.Categories.GetCategory(id);
 
         if (categoryEntity is null)
             throw new NotFoundException($"Category not found.");
@@ -55,15 +56,16 @@ public class CategoriesService : ICategoriesService
 
         categoryEntity.IconPath = await fileService.SaveFile(categoriesIconsFolder, categoryIcon); ;
 
-        categoriesRepository.AddCategory(categoryEntity);
+        unitOfWork.Categories.AddCategory(categoryEntity);
 
-        await categoriesRepository.SaveChanges();
+        await unitOfWork.SaveChanges();
+
         return categoryEntity.Id;
     }
 
     public async Task UpdateCategory(int categoryId, CategoryForUpdatingDto updatedCategory, byte[]? newCategoryIcon)
     {
-        var category = await categoriesRepository.GetCategory(categoryId);
+        var category = await unitOfWork.Categories.GetCategory(categoryId);
         if (category is null)
             throw new NotFoundException($"Category not found.");
 
@@ -79,19 +81,20 @@ public class CategoriesService : ICategoriesService
             categoryEntity.IconPath = await fileService.SaveFile(categoriesIconsFolder, newCategoryIcon);
         }
 
-        categoriesRepository.UpdateCategory(categoryEntity);
+        unitOfWork.Categories.UpdateCategory(categoryEntity);
 
-        await categoriesRepository.SaveChanges();
+        await unitOfWork.SaveChanges();
     }
 
     public async Task DeleteCategory(int id)
     {
-        var category = await categoriesRepository.GetCategory(id);
+        var category = await unitOfWork.Categories.GetCategory(id);
         if (category is null)
             throw new NotFoundException($"Category not found.");
 
-        categoriesRepository.DeleteCategory(category);
-        await categoriesRepository.SaveChanges();
+        unitOfWork.Categories.DeleteCategory(category);
+
+        await unitOfWork.SaveChanges();
 
         fileService.DeleteFile(category.IconPath);
     }

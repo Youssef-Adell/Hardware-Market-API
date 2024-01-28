@@ -12,27 +12,24 @@ namespace Core.DomainServices;
 
 public class ProductsService : IProductsService
 {
-    private readonly IProductsRepository productsRepository;
-    private readonly ICategoriesRepository categoriesRepository;
-    private readonly IBrandsRepository brandsRepository;
+    private readonly IUnitOfWork unitOfWork;
     private readonly IFileService fileService;
     private readonly IMapper mapper;
     private readonly string productsImagesFolder;
     private readonly int maxAllowedImageSizeInBytes;
-    public ProductsService(IProductsRepository productsRepository, ICategoriesRepository categoriesRepository, IBrandsRepository brandsRepository, IFileService fileService, IMapper mapper, IConfiguration configuration)
+
+    public ProductsService(IUnitOfWork unitOfWork, IFileService fileService, IMapper mapper, IConfiguration configuration)
     {
-        this.productsRepository = productsRepository;
-        this.categoriesRepository = categoriesRepository;
-        this.brandsRepository = brandsRepository;
+        this.unitOfWork = unitOfWork;
         this.fileService = fileService;
         this.mapper = mapper;
-        productsImagesFolder = configuration["ResourcesStorage:ProductsImagesFolder"];
-        maxAllowedImageSizeInBytes = int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
+        this.productsImagesFolder = configuration["ResourcesStorage:ProductsImagesFolder"];
+        this.maxAllowedImageSizeInBytes = int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
     }
 
     public async Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams)
     {
-        var pageOfProductEntities = await productsRepository.GetProducts(specsParams);
+        var pageOfProductEntities = await unitOfWork.Products.GetProducts(specsParams);
 
         var pageOfProductDtos = mapper.Map<PagedResult<Product>, PagedResult<ProductForListDto>>(pageOfProductEntities);
         return pageOfProductDtos;
@@ -40,7 +37,7 @@ public class ProductsService : IProductsService
 
     public async Task<ProductDetailsDto> GetProduct(int id)
     {
-        var productEntity = await productsRepository.GetProduct(id);
+        var productEntity = await unitOfWork.Products.GetProduct(id);
         if (productEntity is null)
             throw new NotFoundException($"Product not found.");
 
@@ -65,15 +62,16 @@ public class ProductsService : IProductsService
             productEntity.Images = pathsOfSavedImages?.Select(path => new ProductImage { Path = path }).ToList();
         }
 
-        productsRepository.AddProduct(productEntity);
+        unitOfWork.Products.AddProduct(productEntity);
 
-        await productsRepository.SaveChanges();
+        await unitOfWork.SaveChanges();
+
         return productEntity.Id;
     }
 
     public async Task UpdateProduct(int productId, ProductForUpdatingDto updatedProduct, List<byte[]> imagesToAdd)
     {
-        var product = await productsRepository.GetProduct(productId);
+        var product = await unitOfWork.Products.GetProduct(productId);
         if (product is null)
             throw new NotFoundException($"Product not found.");
 
@@ -94,13 +92,13 @@ public class ProductsService : IProductsService
 
             imagesToRemove?.ForEach(image =>
             {
-                productsRepository.DeleteProductImage(image);
+                unitOfWork.Products.DeleteProductImage(image);
                 fileService.DeleteFile(image.Path);
             });
             /*
             imagesToRemove?.ForEach(async image =>
             {
-                await productsRepository.DeleteProductImage(image);
+                await unitOfWork.Products.DeleteProductImage(image);
                 fileService.DeleteFile(image.Path);
             });
 
@@ -116,7 +114,7 @@ public class ProductsService : IProductsService
             if (imagesToRemove != null)
                 foreach (var image in imagesToRemove)
                 {
-                    productsRepository.DeleteProductImage(image);
+                    unitOfWork.Products.DeleteProductImage(image);
                     fileService.DeleteFile(image.Path);
                 }
 
@@ -133,18 +131,20 @@ public class ProductsService : IProductsService
             productEntity?.Images?.AddRange(pathsOfSavedImages.Select(path => new ProductImage { Path = path }));
         }
 
-        productsRepository.UpdateProduct(productEntity);
-        await productsRepository.SaveChanges();
+        unitOfWork.Products.UpdateProduct(productEntity);
+
+        await unitOfWork.SaveChanges();
     }
 
     public async Task DeleteProduct(int id)
     {
-        var product = await productsRepository.GetProduct(id);
+        var product = await unitOfWork.Products.GetProduct(id);
         if (product is null)
             throw new NotFoundException($"Product not found.");
 
-        productsRepository.DeleteProduct(product);
-        await productsRepository.SaveChanges();
+        unitOfWork.Products.DeleteProduct(product);
+
+        await unitOfWork.SaveChanges();
 
         product.Images?.ForEach(image => fileService.DeleteFile(image.Path));
     }
@@ -164,14 +164,14 @@ public class ProductsService : IProductsService
 
     private async Task ValidateCategory(int categoryId)
     {
-        var category = await categoriesRepository.GetCategory(categoryId);
+        var category = await unitOfWork.Categories.GetCategory(categoryId);
         if (category is null)
             throw new UnprocessableEntityException($"Invalid category id.");
     }
 
     private async Task ValidateBrand(int brandId)
     {
-        var brand = await brandsRepository.GetBrand(brandId);
+        var brand = await unitOfWork.Brands.GetBrand(brandId);
         if (brand is null)
             throw new UnprocessableEntityException($"Invalid brand id.");
     }

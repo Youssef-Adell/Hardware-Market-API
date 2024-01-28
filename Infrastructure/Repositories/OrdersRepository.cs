@@ -17,10 +17,4 @@ public class OrdersRepository : IOrdersRepository
     {
         appDbContext.Orders.Add(order);
     }
-
-    public async Task SaveChanges()
-    {
-        await appDbContext.SaveChangesAsync();
-    }
-
 }

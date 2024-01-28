@@ -9,16 +9,11 @@ namespace Core.DomainServices;
 
 public class OrdersService : IOrdersService
 {
-    private readonly IProductsRepository productsRepository;
-    private readonly ICouponsRepository couponsRepository;
-    private readonly IOrdersRepository ordersRepository;
+    private readonly IUnitOfWork unitOfWork;
 
-
-    public OrdersService(IProductsRepository productsRepository, ICouponsRepository couponsRepository, IOrdersRepository ordersRepository)
+    public OrdersService(IUnitOfWork unitOfWork)
     {
-        this.productsRepository = productsRepository;
-        this.couponsRepository = couponsRepository;
-        this.ordersRepository = ordersRepository;
+        this.unitOfWork = unitOfWork;
     }
 
     public async Task<int> CreateOrder(string customerEmail, OrderForCreatingDto orderDto)
@@ -30,7 +25,7 @@ public class OrdersService : IOrdersService
                                                 .ToDictionary(group => group.Key, group => group.Sum(g => g.Quntity));
 
         var idsOfOrderdProducts = quntitiesOfOrderdProducts.Keys.ToList();
-        var orderedProductsEntities = await productsRepository.GetProductsCollection(idsOfOrderdProducts);
+        var orderedProductsEntities = await unitOfWork.Products.GetProductsCollection(idsOfOrderdProducts);
 
         if (orderedProductsEntities is null || orderedProductsEntities?.Count < idsOfOrderdProducts.Count)
             throw new UnprocessableEntityException("There is one or more invalid product id.");
@@ -53,7 +48,7 @@ public class OrdersService : IOrdersService
             });
 
             product.Quantity -= quntitiesOfOrderdProducts[product.Id];
-            productsRepository.UpdateProduct(product);
+            unitOfWork.Products.UpdateProduct(product);
         }
 
         // Calculate order price
@@ -62,7 +57,7 @@ public class OrdersService : IOrdersService
         double discount = 0;
         if (!string.IsNullOrEmpty(orderDto.CouponCode))
         {
-            var coupon = await couponsRepository.GetCoupon(orderDto.CouponCode);
+            var coupon = await unitOfWork.Coupons.GetCoupon(orderDto.CouponCode);
             discount = coupon?.Value ?? 0;
         }
 
@@ -80,9 +75,9 @@ public class OrdersService : IOrdersService
             Discount = discount
         };
 
-        ordersRepository.AddOrder(order);
-        await ordersRepository.SaveChanges();
-        await productsRepository.SaveChanges(); //doesnt has meaning because the changes already saved in the previous line (so refactor to unit of work later)
+        unitOfWork.Orders.AddOrder(order);
+
+        await unitOfWork.SaveChanges();
 
         return order.Id;
     }

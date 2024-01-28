@@ -64,9 +64,4 @@ public class ProductReviewsRepository : IProductReviewsRepository
     {
         appDbContext.ProductReviews.Remove(review);
     }
-
-    public async Task SaveChanges()
-    {
-        await appDbContext.SaveChangesAsync();
-    }
 }

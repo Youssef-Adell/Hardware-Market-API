@@ -12,5 +12,4 @@ public interface IProductsRepository
     void UpdateProduct(Product product);
     void DeleteProduct(Product product);
     void DeleteProductImage(ProductImage productImage);
-    Task SaveChanges();
 }
