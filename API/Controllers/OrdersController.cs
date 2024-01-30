@@ -25,11 +25,19 @@ public class OrdersController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetOrder(int id)
+    {
+        var result = await ordersService.GetOrder(id);
+
+        return Ok(result);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateOrder(OrderForCreatingDto order, [FromQuery] string customerEmail)
     {
         var orderId = await ordersService.CreateOrder(customerEmail, order);
 
-        return Ok();
+        return CreatedAtAction(nameof(GetOrder), new { id = orderId }, null);
     }
 }

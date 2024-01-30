@@ -29,6 +29,16 @@ public class OrdersService : IOrdersService
         return pageOfOrderstDtos;
     }
 
+    public async Task<OrderDetailsDto> GetOrder(int id)
+    {
+        var orderEntity = await unitOfWork.Orders.GetOrder(id);
+        if (orderEntity is null)
+            throw new NotFoundException($"Order not found.");
+
+        var orderDto = mapper.Map<Order, OrderDetailsDto>(orderEntity);
+        return orderDto;
+    }
+
     public async Task<int> CreateOrder(string customerEmail, OrderForCreatingDto orderDto)
     {
         // Get total ordered quntity for each product to avoid problems if consumer enter two order items for the same product

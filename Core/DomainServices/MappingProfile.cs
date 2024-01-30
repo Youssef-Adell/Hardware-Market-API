@@ -9,6 +9,7 @@ using Core.DTOs.SpecificationDTOs;
 using Core.Entities.OrderAggregate;
 using Core.Entities.ProductAggregate;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Core.DomainServices;
 
@@ -56,7 +57,9 @@ public class MappingProfile : Profile
         //---Orders Mapping---
         CreateMap<Order, OrderForAdminListDto>();
         CreateMap<PagedResult<Order>, PagedResult<OrderForAdminListDto>>();
-
+        CreateMap<OrderItem, OrderItemDto>()
+            .ForMember(d => d.ImageUrl, Options => Options.MapFrom<OrderItemUrlResolver>());
+        CreateMap<Order, OrderDetailsDto>();
     }
 }
 
@@ -135,6 +138,24 @@ public class LogoUrlResolver : IValueResolver<ProductBrand, BrandDto, string?>
             var hostUrl = new Uri(configration["ResourcesStorage:HostUrl"]);
             var iconUrl = new Uri(hostUrl, source.LogoPath).ToString();
             return iconUrl;
+        }
+
+        return null;
+    }
+}
+
+public class OrderItemUrlResolver : IValueResolver<OrderItem, OrderItemDto, string?>
+{
+    private readonly IConfiguration configration;
+    public OrderItemUrlResolver(IConfiguration configration) => this.configration = configration;
+
+    public string? Resolve(OrderItem source, OrderItemDto destination, string? destMember, ResolutionContext context)
+    {
+        if (!string.IsNullOrEmpty(source.ImagePath))
+        {
+            var hostUrl = new Uri(configration["ResourcesStorage:HostUrl"]);
+            var imageUrl = new Uri(hostUrl, source.ImagePath).ToString();
+            return imageUrl;
         }
 
         return null;

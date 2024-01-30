@@ -24,6 +24,7 @@ public class OrdersRepository : IOrdersRepository
                             //filter (Short circuit if no value)
                             .Where(p => specsParams.Status == null || p.Status == specsParams.Status);
 
+
         //sort and paginate the above query then execute it
         var pagedOrdersData = await query
                             .Sort(specsParams.SortBy, specsParams.SortDirection)
@@ -36,6 +37,15 @@ public class OrdersRepository : IOrdersRepository
 
         //return page of products with pagination metadata
         return new PagedResult<Order>(pagedOrdersData, specsParams.Page, specsParams.PageSize, totalOrdersCount);
+    }
+
+    public async Task<Order?> GetOrder(int id)
+    {
+        var order = await appDbContext.Orders.AsNoTracking()
+                                            .Include(o => o.OrderItems)
+                                            .FirstOrDefaultAsync(o => o.Id == id);
+
+        return order;
     }
 
     public void AddOrder(Order order)
