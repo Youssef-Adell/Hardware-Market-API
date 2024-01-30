@@ -39,6 +39,17 @@ public class OrdersService : IOrdersService
         return orderDto;
     }
 
+    public async Task<OrderDetailsDto> GetCustomerOrder(string customerEmail, int orderId)
+    {
+        //this method is for customer view to allow logged-in customer to get its orders only unlike the GetOrder method which is for admin view and allow admin to get any order
+        var order = await GetOrder(orderId);
+
+        if (order.CustomerEmail != customerEmail)
+            throw new ForbiddenException("You are not authorized to get this order.");
+
+        return order;
+    }
+
     public async Task<int> CreateOrder(string customerEmail, OrderForCreatingDto orderDto)
     {
         // Get total ordered quntity for each product to avoid problems if consumer enter two order items for the same product

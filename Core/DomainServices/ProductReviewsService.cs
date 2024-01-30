@@ -51,7 +51,7 @@ public class ProductReviewsService : IProductReviewsService
             throw new NotFoundException($"Product not found.");
 
         if (await unitOfWork.ProductReviews.HasCustomerReviewedProduct(productId, customerEmail))
-            throw new ConfilctException("Customer has already reviewed this product.");
+            throw new ConfilctException("You already reviewed this product.");
 
         var reviewEntity = mapper.Map<ProductReviewForAddingDto, ProductReview>(reviewToAdd);
         reviewEntity.CustomerEmail = customerEmail;
@@ -75,7 +75,7 @@ public class ProductReviewsService : IProductReviewsService
             throw new NotFoundException($"Review not found.");
 
         if (review.CustomerEmail != customerEmail)
-            throw new ForbiddenException("The review does not belong to the customer to edit it.");
+            throw new ForbiddenException("You are not authorized to edit this review.");
 
         var reviewEntity = mapper.Map(updatedReview, review);
 
@@ -95,7 +95,7 @@ public class ProductReviewsService : IProductReviewsService
             throw new NotFoundException($"Review not found.");
 
         if (review.CustomerEmail != customerEmail)
-            throw new ForbiddenException("The review does not belong to the customer to delete it.");
+            throw new ForbiddenException("You are not authorized to delete this review.");
 
         unitOfWork.ProductReviews.DeleteProductReview(review);
 
