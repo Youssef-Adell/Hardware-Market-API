@@ -60,6 +60,8 @@ public class MappingProfile : Profile
         CreateMap<OrderItem, OrderItemDto>()
             .ForMember(d => d.ImageUrl, Options => Options.MapFrom<OrderItemUrlResolver>());
         CreateMap<Order, OrderDetailsDto>();
+        CreateMap<Order, OrderForCustomerListDto>();
+        CreateMap<PagedResult<Order>, PagedResult<OrderForCustomerListDto>>();
     }
 }
 

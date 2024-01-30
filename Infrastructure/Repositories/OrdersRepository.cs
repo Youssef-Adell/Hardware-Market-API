@@ -39,6 +39,25 @@ public class OrdersRepository : IOrdersRepository
         return new PagedResult<Order>(pagedOrdersData, specsParams.Page, specsParams.PageSize, totalOrdersCount);
     }
 
+    public async Task<PagedResult<Order>> GetCustomerOrders(string customerEmail, SpecificationParameters specsParams)
+    {
+        //build a query of filtered orders
+        var query = appDbContext.Orders.Where(o => o.CustomerEmail == customerEmail);
+
+        //sort and paginate the above query then execute it
+        var pagedOrdersData = await query
+                            .Sort(specsParams.SortBy, specsParams.SortDirection)
+                            .Paginate(specsParams.Page, specsParams.PageSize)
+                            .AsNoTracking() //to enhance the performance
+                            .ToListAsync();
+
+        //Get total count of filterd orders to pass it to the pagedResult to make it able to calculate the total pages and return it to the user
+        var totalOrdersCount = await query.CountAsync();
+
+        //return page of products with pagination metadata
+        return new PagedResult<Order>(pagedOrdersData, specsParams.Page, specsParams.PageSize, totalOrdersCount);
+    }
+
     public async Task<Order?> GetOrder(int id)
     {
         var order = await appDbContext.Orders.AsNoTracking()

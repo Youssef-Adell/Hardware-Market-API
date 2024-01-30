@@ -5,7 +5,8 @@ namespace Core.Interfaces.IRepositories;
 
 public interface IOrdersRepository
 {
-    void AddOrder(Order order);
     Task<PagedResult<Order>> GetOrders(OrdersSpecificationParameters specsParams);
+    Task<PagedResult<Order>> GetCustomerOrders(string customerEmail, SpecificationParameters specsParams);
     Task<Order?> GetOrder(int id);
+    void AddOrder(Order order);
 }

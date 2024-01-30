@@ -39,6 +39,15 @@ public class OrdersService : IOrdersService
         return orderDto;
     }
 
+    public async Task<PagedResult<OrderForCustomerListDto>> GetCustomerOrders(string customerEmail, SpecificationParameters specsParams)
+    {
+        var pageOfOrdersEntities = await unitOfWork.Orders.GetCustomerOrders(customerEmail, specsParams);
+
+        var pageOfOrderstDtos = mapper.Map<PagedResult<Order>, PagedResult<OrderForCustomerListDto>>(pageOfOrdersEntities);
+
+        return pageOfOrderstDtos;
+    }
+
     public async Task<OrderDetailsDto> GetCustomerOrder(string customerEmail, int orderId)
     {
         //this method is for customer view to allow logged-in customer to get its orders only unlike the GetOrder method which is for admin view and allow admin to get any order
@@ -115,5 +124,4 @@ public class OrdersService : IOrdersService
 
         return order.Id;
     }
-
 }
