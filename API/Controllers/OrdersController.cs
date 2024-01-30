@@ -1,5 +1,4 @@
-using Core.DTOs.OrderDTOs;
-using Core.DTOs.SpecificationDTOs;
+using Core.DTOs.QueryParametersDTOs;
 using Core.Interfaces.IDomainServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,9 +17,9 @@ public class OrdersController : ControllerBase
 
 
     [HttpGet]
-    public async Task<IActionResult> GetOrders([FromQuery] OrdersSpecificationParameters specsParams)
+    public async Task<IActionResult> GetOrders([FromQuery] OrderQueryParameters queryParams)
     {
-        var result = await ordersService.GetOrders(specsParams);
+        var result = await ordersService.GetOrders(queryParams);
 
         return Ok(result);
     }

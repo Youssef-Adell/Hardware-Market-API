@@ -1,4 +1,4 @@
-using Core.DTOs.SpecificationDTOs;
+using Core.DTOs.QueryParametersDTOs;
 using Core.Entities.OrderAggregate;
 using Core.Interfaces.IRepositories;
 using Infrastructure.Repositories.EFConfig;
@@ -15,20 +15,20 @@ public class OrdersRepository : IOrdersRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<PagedResult<Order>> GetOrders(OrdersSpecificationParameters specsParams)
+    public async Task<PagedResult<Order>> GetOrders(OrderQueryParameters queryParams)
     {
         //build a query of filtered orders
         var query = appDbContext.Orders
                             //search (Short Circuit if no value in search)
-                            .Where(p => string.IsNullOrEmpty(specsParams.Search) || p.CustomerEmail.ToLower() == specsParams.Search.ToLower())
+                            .Where(p => string.IsNullOrEmpty(queryParams.Search) || p.CustomerEmail.ToLower() == queryParams.Search.ToLower())
                             //filter (Short circuit if no value)
-                            .Where(p => specsParams.Status == null || p.Status == specsParams.Status);
+                            .Where(p => queryParams.Status == null || p.Status == queryParams.Status);
 
 
         //sort and paginate the above query then execute it
         var pagedOrdersData = await query
-                            .Sort(specsParams.SortBy, specsParams.SortDirection)
-                            .Paginate(specsParams.Page, specsParams.PageSize)
+                            .Sort(queryParams.SortBy, queryParams.SortDirection)
+                            .Paginate(queryParams.Page, queryParams.PageSize)
                             .AsNoTracking() //to enhance the performance
                             .ToListAsync();
 
@@ -36,18 +36,17 @@ public class OrdersRepository : IOrdersRepository
         var totalOrdersCount = await query.CountAsync();
 
         //return page of products with pagination metadata
-        return new PagedResult<Order>(pagedOrdersData, specsParams.Page, specsParams.PageSize, totalOrdersCount);
+        return new PagedResult<Order>(pagedOrdersData, queryParams.Page, queryParams.PageSize, totalOrdersCount);
     }
 
-    public async Task<PagedResult<Order>> GetCustomerOrders(string customerEmail, SpecificationParameters specsParams)
+    public async Task<PagedResult<Order>> GetCustomerOrders(string customerEmail, PaginationQueryParameters queryParams)
     {
         //build a query of filtered orders
         var query = appDbContext.Orders.Where(o => o.CustomerEmail == customerEmail);
 
         //sort and paginate the above query then execute it
         var pagedOrdersData = await query
-                            .Sort(specsParams.SortBy, specsParams.SortDirection)
-                            .Paginate(specsParams.Page, specsParams.PageSize)
+                            .Paginate(queryParams.Page, queryParams.PageSize)
                             .AsNoTracking() //to enhance the performance
                             .ToListAsync();
 
@@ -55,7 +54,7 @@ public class OrdersRepository : IOrdersRepository
         var totalOrdersCount = await query.CountAsync();
 
         //return page of products with pagination metadata
-        return new PagedResult<Order>(pagedOrdersData, specsParams.Page, specsParams.PageSize, totalOrdersCount);
+        return new PagedResult<Order>(pagedOrdersData, queryParams.Page, queryParams.PageSize, totalOrdersCount);
     }
 
     public async Task<Order?> GetOrder(int id)

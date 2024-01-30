@@ -1,6 +1,6 @@
 using AutoMapper;
 using Core.DTOs.OrderDTOs;
-using Core.DTOs.SpecificationDTOs;
+using Core.DTOs.QueryParametersDTOs;
 using Core.Entities.OrderAggregate;
 using Core.Exceptions;
 using Core.Interfaces.IDomainServices;
@@ -13,18 +13,26 @@ public class OrdersService : IOrdersService
     private readonly IUnitOfWork unitOfWork;
     private readonly IMapper mapper;
 
-
     public OrdersService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         this.unitOfWork = unitOfWork;
         this.mapper = mapper;
     }
 
-    public async Task<PagedResult<OrderForAdminListDto>> GetOrders(OrdersSpecificationParameters specsParams)
+    public async Task<PagedResult<OrderForAdminListDto>> GetOrders(OrderQueryParameters queryParams)
     {
-        var pageOfOrdersEntities = await unitOfWork.Orders.GetOrders(specsParams);
+        var pageOfOrdersEntities = await unitOfWork.Orders.GetOrders(queryParams);
 
         var pageOfOrderstDtos = mapper.Map<PagedResult<Order>, PagedResult<OrderForAdminListDto>>(pageOfOrdersEntities);
+
+        return pageOfOrderstDtos;
+    }
+
+    public async Task<PagedResult<OrderForCustomerListDto>> GetCustomerOrders(string customerEmail, PaginationQueryParameters queryParams)
+    {
+        var pageOfOrdersEntities = await unitOfWork.Orders.GetCustomerOrders(customerEmail, queryParams);
+
+        var pageOfOrderstDtos = mapper.Map<PagedResult<Order>, PagedResult<OrderForCustomerListDto>>(pageOfOrdersEntities);
 
         return pageOfOrderstDtos;
     }
@@ -37,15 +45,6 @@ public class OrdersService : IOrdersService
 
         var orderDto = mapper.Map<Order, OrderDetailsDto>(orderEntity);
         return orderDto;
-    }
-
-    public async Task<PagedResult<OrderForCustomerListDto>> GetCustomerOrders(string customerEmail, SpecificationParameters specsParams)
-    {
-        var pageOfOrdersEntities = await unitOfWork.Orders.GetCustomerOrders(customerEmail, specsParams);
-
-        var pageOfOrderstDtos = mapper.Map<PagedResult<Order>, PagedResult<OrderForCustomerListDto>>(pageOfOrdersEntities);
-
-        return pageOfOrderstDtos;
     }
 
     public async Task<OrderDetailsDto> GetCustomerOrder(string customerEmail, int orderId)

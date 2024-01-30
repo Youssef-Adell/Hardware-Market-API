@@ -1,8 +1,6 @@
 using System.Text.Json;
 using API.Errors;
-using Azure;
 using Core.Exceptions;
-using FileSignatures.Formats;
 using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
 

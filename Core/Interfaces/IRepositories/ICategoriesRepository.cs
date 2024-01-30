@@ -1,4 +1,3 @@
-using Core.DTOs.CategoryDTOs;
 using Core.Entities.ProductAggregate;
 
 namespace Core.Interfaces.IRepositories;

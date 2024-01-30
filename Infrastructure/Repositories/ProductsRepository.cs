@@ -1,4 +1,4 @@
-using Core.DTOs.SpecificationDTOs;
+using Core.DTOs.QueryParametersDTOs;
 using Core.Entities.ProductAggregate;
 using Core.Interfaces.IRepositories;
 using Infrastructure.Repositories.EFConfig;
@@ -16,21 +16,21 @@ public class ProductsRepository : IProductsRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<PagedResult<Product>> GetProducts(ProductsSpecificationParameters specsParams)
+    public async Task<PagedResult<Product>> GetProducts(ProductQueryParameters queryParams)
     {
         //build a query of filtered products
         var query = appDbContext.Products.Include(p => p.Brand).Include(p => p.Category).Include(p => p.Images)
                             //search (Short Circuit if no value in search)
-                            .Where(p => string.IsNullOrEmpty(specsParams.Search) || p.Name.ToLower().Contains(specsParams.Search.ToLower()))
+                            .Where(p => string.IsNullOrEmpty(queryParams.Search) || p.Name.ToLower().Contains(queryParams.Search.ToLower()))
                             //filter (Short circuit if no value for categoryId & brandId)
-                            .Where(p => p.Price >= specsParams.MinPrice && p.Price <= specsParams.MaxPrice)
-                            .Where(p => specsParams.CategoryId == null || specsParams.CategoryId == p.CategoryId)
-                            .Where(p => specsParams.BrandId == null || specsParams.BrandId.Contains(p.BrandId));
+                            .Where(p => p.Price >= queryParams.MinPrice && p.Price <= queryParams.MaxPrice)
+                            .Where(p => queryParams.CategoryId == null || queryParams.CategoryId == p.CategoryId)
+                            .Where(p => queryParams.BrandId == null || queryParams.BrandId.Contains(p.BrandId));
 
         //sort and paginate the above query then execute it
         var pagedProductsData = await query
-                            .Sort(specsParams.SortBy, specsParams.SortDirection)
-                            .Paginate(specsParams.Page, specsParams.PageSize)
+                            .Sort(queryParams.SortBy, queryParams.SortDirection)
+                            .Paginate(queryParams.Page, queryParams.PageSize)
                             .AsNoTracking() //to enhance the performance
                             .ToListAsync();
 
@@ -38,7 +38,7 @@ public class ProductsRepository : IProductsRepository
         var totalProductsCount = await query.CountAsync();
 
         //return page of products with pagination metadata
-        return new PagedResult<Product>(pagedProductsData, specsParams.Page, specsParams.PageSize, totalProductsCount);
+        return new PagedResult<Product>(pagedProductsData, queryParams.Page, queryParams.PageSize, totalProductsCount);
     }
 
     public async Task<List<Product>?> GetProductsCollection(IEnumerable<int> ids)

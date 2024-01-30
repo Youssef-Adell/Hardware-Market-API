@@ -1,5 +1,5 @@
 using Core.DTOs.ProductReviewDTOs;
-using Core.DTOs.SpecificationDTOs;
+using Core.DTOs.QueryParametersDTOs;
 using Core.Interfaces.IDomainServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,9 +17,9 @@ public class ProductReviewsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetProductReviews(int productId, [FromQuery] SpecificationParameters specsParams)
+    public async Task<IActionResult> GetProductReviews(int productId, [FromQuery] PaginationQueryParameters queryParams)
     {
-        var result = await productReviewsService.GetProductReviews(productId, specsParams);
+        var result = await productReviewsService.GetProductReviews(productId, queryParams);
 
         return Ok(result);
     }

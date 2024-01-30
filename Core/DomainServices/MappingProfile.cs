@@ -1,15 +1,13 @@
 using AutoMapper;
-using AutoMapper.Internal;
 using Core.DTOs.BrandDTOs;
 using Core.DTOs.CategoryDTOs;
 using Core.DTOs.OrderDTOs;
 using Core.DTOs.ProductDTOs;
 using Core.DTOs.ProductReviewDTOs;
-using Core.DTOs.SpecificationDTOs;
+using Core.DTOs.QueryParametersDTOs;
 using Core.Entities.OrderAggregate;
 using Core.Entities.ProductAggregate;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace Core.DomainServices;
 

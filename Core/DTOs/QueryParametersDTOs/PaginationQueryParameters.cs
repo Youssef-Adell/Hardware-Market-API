@@ -1,6 +1,6 @@
-namespace Core.DTOs.SpecificationDTOs;
+namespace Core.DTOs.QueryParametersDTOs;
 
-public class SpecificationParameters
+public class PaginationQueryParameters
 {
     private const int MaxPageSize = 50;
     private int _page = 1;
@@ -16,6 +16,4 @@ public class SpecificationParameters
         get => _pageSize;
         set => _pageSize = (value <= MaxPageSize && value > 0) ? value : MaxPageSize;
     }
-    public string? SortBy { get; set; }
-    public string? SortDirection { get; set; }
 }

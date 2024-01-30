@@ -1,6 +1,5 @@
 using System.Linq.Dynamic.Core;
 using Core.Entities;
-using Core.Exceptions;
 
 namespace Infrastructure.Repositories;
 

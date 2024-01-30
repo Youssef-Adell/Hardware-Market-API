@@ -1,4 +1,4 @@
-namespace Core.DTOs.SpecificationDTOs;
+namespace Core.DTOs.QueryParametersDTOs;
 
 public class PagedResult<T>
 {

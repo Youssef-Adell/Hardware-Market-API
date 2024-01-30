@@ -1,6 +1,6 @@
 using AutoMapper;
 using Core.DTOs.ProductReviewDTOs;
-using Core.DTOs.SpecificationDTOs;
+using Core.DTOs.QueryParametersDTOs;
 using Core.Entities.ProductAggregate;
 using Core.Exceptions;
 using Core.Interfaces.IDomainServices;
@@ -20,9 +20,9 @@ public class ProductReviewsService : IProductReviewsService
         this.mapper = mapper;
     }
 
-    public async Task<PagedResult<ProductReviewDto>> GetProductReviews(int productId, SpecificationParameters specsParams)
+    public async Task<PagedResult<ProductReviewDto>> GetProductReviews(int productId, PaginationQueryParameters queryParams)
     {
-        var pageOfReviewsEntities = await unitOfWork.ProductReviews.GetProductReviews(productId, specsParams);
+        var pageOfReviewsEntities = await unitOfWork.ProductReviews.GetProductReviews(productId, queryParams);
 
         var pageOfReviewstDtos = mapper.Map<PagedResult<ProductReview>, PagedResult<ProductReviewDto>>(pageOfReviewsEntities);
 

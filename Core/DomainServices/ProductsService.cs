@@ -1,6 +1,6 @@
 using AutoMapper;
 using Core.DTOs.ProductDTOs;
-using Core.DTOs.SpecificationDTOs;
+using Core.DTOs.QueryParametersDTOs;
 using Core.Entities.ProductAggregate;
 using Core.Exceptions;
 using Core.Interfaces.IDomainServices;
@@ -27,9 +27,9 @@ public class ProductsService : IProductsService
         this.maxAllowedImageSizeInBytes = int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
     }
 
-    public async Task<PagedResult<ProductForListDto>> GetProducts(ProductsSpecificationParameters specsParams)
+    public async Task<PagedResult<ProductForListDto>> GetProducts(ProductQueryParameters queryParams)
     {
-        var pageOfProductEntities = await unitOfWork.Products.GetProducts(specsParams);
+        var pageOfProductEntities = await unitOfWork.Products.GetProducts(queryParams);
 
         var pageOfProductDtos = mapper.Map<PagedResult<Product>, PagedResult<ProductForListDto>>(pageOfProductEntities);
         return pageOfProductDtos;

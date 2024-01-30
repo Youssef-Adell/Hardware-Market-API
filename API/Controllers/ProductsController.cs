@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Core.DTOs.ProductDTOs;
-using Core.DTOs.SpecificationDTOs;
+using Core.DTOs.QueryParametersDTOs;
 using Core.Interfaces.IDomainServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,9 +18,9 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetProducts([FromQuery] ProductsSpecificationParameters specsParams)
+    public async Task<IActionResult> GetProducts([FromQuery] ProductQueryParameters queryParams)
     {
-        var result = await productsService.GetProducts(specsParams);
+        var result = await productsService.GetProducts(queryParams);
         return Ok(result);
     }
 

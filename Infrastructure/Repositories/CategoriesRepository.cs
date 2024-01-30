@@ -1,4 +1,3 @@
-using Core.DTOs.CategoryDTOs;
 using Core.Entities.ProductAggregate;
 using Core.Interfaces.IRepositories;
 using Infrastructure.Repositories.EFConfig;

@@ -1,6 +1,5 @@
 using API.Errors;
 using Core.DomainServices;
-using Core.Entities.OrderAggregate;
 using Core.Interfaces.IDomainServices;
 using Core.Interfaces.IExternalServices;
 using Core.Interfaces.IRepositories;
@@ -9,7 +8,6 @@ using FileSignatures.Formats;
 using Infrastructure.ExternalServices.FileService;
 using Infrastructure.Repositories;
 using Infrastructure.Repositories.EFConfig;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;

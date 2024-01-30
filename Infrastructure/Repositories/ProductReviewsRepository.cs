@@ -1,4 +1,4 @@
-using Core.DTOs.SpecificationDTOs;
+using Core.DTOs.QueryParametersDTOs;
 using Core.Entities.ProductAggregate;
 using Core.Interfaces.IRepositories;
 using Infrastructure.Repositories.EFConfig;
@@ -15,15 +15,14 @@ public class ProductReviewsRepository : IProductReviewsRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<PagedResult<ProductReview>> GetProductReviews(int productId, SpecificationParameters specsParams)
+    public async Task<PagedResult<ProductReview>> GetProductReviews(int productId, PaginationQueryParameters queryParams)
     {
         //build a query to get reveiws of this product
         var query = appDbContext.ProductReviews.Where(r => r.ProductId == productId);
 
         //sort and paginate the above query then execute it
         var pagedReviewssData = await query
-                            .Sort(specsParams.SortBy, specsParams.SortDirection)
-                            .Paginate(specsParams.Page, specsParams.PageSize)
+                            .Paginate(queryParams.Page, queryParams.PageSize)
                             .AsNoTracking() //to enhance the performance
                             .ToListAsync();
 
@@ -31,7 +30,7 @@ public class ProductReviewsRepository : IProductReviewsRepository
         var totalReviewsForThisProduct = await query.CountAsync();
 
         //return page of products with pagination metadata
-        return new PagedResult<ProductReview>(pagedReviewssData, specsParams.Page, specsParams.PageSize, totalReviewsForThisProduct);
+        return new PagedResult<ProductReview>(pagedReviewssData, queryParams.Page, queryParams.PageSize, totalReviewsForThisProduct);
     }
 
     public async Task<ProductReview?> GetProductReview(int productId, int reviewId)

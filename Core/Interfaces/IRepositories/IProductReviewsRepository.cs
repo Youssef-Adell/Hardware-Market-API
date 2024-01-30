@@ -1,11 +1,11 @@
-using Core.DTOs.SpecificationDTOs;
+using Core.DTOs.QueryParametersDTOs;
 using Core.Entities.ProductAggregate;
 
 namespace Core.Interfaces.IRepositories;
 
 public interface IProductReviewsRepository
 {
-    Task<PagedResult<ProductReview>> GetProductReviews(int productId, SpecificationParameters specsParams);
+    Task<PagedResult<ProductReview>> GetProductReviews(int productId, PaginationQueryParameters queryParams);
     Task<ProductReview?> GetProductReview(int productId, int reviewId);
     Task<bool> HasCustomerReviewedProduct(int productId, string customerEmail);
     void AddProductReview(ProductReview review);
