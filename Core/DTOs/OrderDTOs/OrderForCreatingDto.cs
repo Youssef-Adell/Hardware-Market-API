@@ -12,7 +12,7 @@ public class OrderForCreatingDto
 
     [Required]
     [RegularExpression(@"^01[0-9]\d{8}$", ErrorMessage = "Phone number should be in the form of 01X XXXX XXXX")]
-    public string Phone { get; set; }
+    public string CustomerPhone { get; set; }
 
     public string? CouponCode { get; set; }
 }

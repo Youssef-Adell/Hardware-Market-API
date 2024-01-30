@@ -1,4 +1,5 @@
 using Core.DTOs.OrderDTOs;
+using Core.DTOs.SpecificationDTOs;
 using Core.Interfaces.IDomainServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,14 @@ public class OrdersController : ControllerBase
         this.ordersService = ordersService;
     }
 
+
+    [HttpGet]
+    public async Task<IActionResult> GetOrders([FromQuery] OrdersSpecificationParameters specsParams)
+    {
+        var result = await ordersService.GetOrders(specsParams);
+
+        return Ok(result);
+    }
 
     [HttpPost]
     public async Task<IActionResult> CreateOrder(OrderForCreatingDto order, [FromQuery] string customerEmail)

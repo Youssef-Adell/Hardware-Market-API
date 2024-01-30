@@ -2,9 +2,11 @@ using AutoMapper;
 using AutoMapper.Internal;
 using Core.DTOs.BrandDTOs;
 using Core.DTOs.CategoryDTOs;
+using Core.DTOs.OrderDTOs;
 using Core.DTOs.ProductDTOs;
 using Core.DTOs.ProductReviewDTOs;
 using Core.DTOs.SpecificationDTOs;
+using Core.Entities.OrderAggregate;
 using Core.Entities.ProductAggregate;
 using Microsoft.Extensions.Configuration;
 
@@ -50,6 +52,11 @@ public class MappingProfile : Profile
         CreateMap<PagedResult<ProductReview>, PagedResult<ProductReviewDto>>();
         CreateMap<ProductReviewForAddingDto, ProductReview>();
         CreateMap<ProductReviewForUpdatingDto, ProductReview>();
+
+        //---Orders Mapping---
+        CreateMap<Order, OrderForAdminListDto>();
+        CreateMap<PagedResult<Order>, PagedResult<OrderForAdminListDto>>();
+
     }
 }
 

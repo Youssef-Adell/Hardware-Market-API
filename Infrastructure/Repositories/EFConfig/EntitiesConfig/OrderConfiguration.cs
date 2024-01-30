@@ -15,7 +15,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             address.Property(a => a.City).HasColumnName("City");
         });
 
-        builder.Property(o => o.OrderStatus).HasConversion(
+        builder.Property(o => o.Status).HasConversion(
             statusObj => statusObj.ToString(), //delegate to convert from OrderStatus enum to column value (string)
             statusColumn => Enum.Parse<OrderStatus>(statusColumn) //delegate to convert from column value (string) to OrderStatus enum
         );

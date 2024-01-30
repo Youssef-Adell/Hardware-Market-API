@@ -1,8 +1,9 @@
+using AutoMapper;
 using Core.DTOs.OrderDTOs;
+using Core.DTOs.SpecificationDTOs;
 using Core.Entities.OrderAggregate;
 using Core.Exceptions;
 using Core.Interfaces.IDomainServices;
-using Core.Interfaces.IExternalServices;
 using Core.Interfaces.IRepositories;
 
 namespace Core.DomainServices;
@@ -10,10 +11,22 @@ namespace Core.DomainServices;
 public class OrdersService : IOrdersService
 {
     private readonly IUnitOfWork unitOfWork;
+    private readonly IMapper mapper;
 
-    public OrdersService(IUnitOfWork unitOfWork)
+
+    public OrdersService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         this.unitOfWork = unitOfWork;
+        this.mapper = mapper;
+    }
+
+    public async Task<PagedResult<OrderForAdminListDto>> GetOrders(OrdersSpecificationParameters specsParams)
+    {
+        var pageOfOrdersEntities = await unitOfWork.Orders.GetOrders(specsParams);
+
+        var pageOfOrderstDtos = mapper.Map<PagedResult<Order>, PagedResult<OrderForAdminListDto>>(pageOfOrdersEntities);
+
+        return pageOfOrderstDtos;
     }
 
     public async Task<int> CreateOrder(string customerEmail, OrderForCreatingDto orderDto)
@@ -67,7 +80,7 @@ public class OrdersService : IOrdersService
         var order = new Order
         {
             CustomerEmail = customerEmail,
-            Phone = orderDto.Phone,
+            CustomerPhone = orderDto.CustomerPhone,
             ShippingAddress = new Address(orderDto.ShippingAddress.AddressLine, orderDto.ShippingAddress.City),
             OrderItems = orderItems,
             Subtotal = subtotal,
