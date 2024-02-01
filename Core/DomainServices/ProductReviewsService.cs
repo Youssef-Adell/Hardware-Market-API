@@ -20,7 +20,7 @@ public class ProductReviewsService : IProductReviewsService
         this.mapper = mapper;
     }
 
-    public async Task<PagedResult<ProductReviewDto>> GetProductReviews(int productId, PaginationQueryParameters queryParams)
+    public async Task<PagedResult<ProductReviewDto>> GetProductReviews(int productId, ReviewQueryParameters queryParams)
     {
         var pageOfReviewsEntities = await unitOfWork.ProductReviews.GetProductReviews(productId, queryParams);
 

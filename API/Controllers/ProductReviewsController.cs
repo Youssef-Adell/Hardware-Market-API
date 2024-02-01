@@ -17,7 +17,7 @@ public class ProductReviewsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetProductReviews(int productId, [FromQuery] PaginationQueryParameters queryParams)
+    public async Task<IActionResult> GetProductReviews(int productId, [FromQuery] ReviewQueryParameters queryParams)
     {
         var result = await productReviewsService.GetProductReviews(productId, queryParams);
 

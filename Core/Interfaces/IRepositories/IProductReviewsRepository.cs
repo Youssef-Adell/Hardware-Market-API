@@ -5,7 +5,7 @@ namespace Core.Interfaces.IRepositories;
 
 public interface IProductReviewsRepository
 {
-    Task<PagedResult<ProductReview>> GetProductReviews(int productId, PaginationQueryParameters queryParams);
+    Task<PagedResult<ProductReview>> GetProductReviews(int productId, ReviewQueryParameters queryParams);
     Task<ProductReview?> GetProductReview(int productId, int reviewId);
     Task<bool> HasCustomerReviewedProduct(int productId, string customerEmail);
     void AddProductReview(ProductReview review);

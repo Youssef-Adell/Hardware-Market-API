@@ -15,10 +15,11 @@ public class ProductReviewsRepository : IProductReviewsRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<PagedResult<ProductReview>> GetProductReviews(int productId, PaginationQueryParameters queryParams)
+    public async Task<PagedResult<ProductReview>> GetProductReviews(int productId, ReviewQueryParameters queryParams)
     {
         //build a query to get reveiws of this product
-        var query = appDbContext.ProductReviews.Where(r => r.ProductId == productId);
+        var query = appDbContext.ProductReviews.Where(r => r.ProductId == productId)
+                                                .Where(r => queryParams.CustomerEmail == null || r.CustomerEmail == queryParams.CustomerEmail);
 
         //sort and paginate the above query then execute it
         var pagedReviewssData = await query
