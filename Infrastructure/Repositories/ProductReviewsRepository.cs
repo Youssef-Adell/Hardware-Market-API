@@ -22,6 +22,7 @@ public class ProductReviewsRepository : IProductReviewsRepository
 
         //sort and paginate the above query then execute it
         var pagedReviewssData = await query
+                            .Sort("Id", SortDirection.Descending) //to put the latest created reviews at the top
                             .Paginate(queryParams.Page, queryParams.PageSize)
                             .AsNoTracking() //to enhance the performance
                             .ToListAsync();

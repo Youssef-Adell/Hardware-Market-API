@@ -27,7 +27,7 @@ public class OrdersRepository : IOrdersRepository
 
         //sort and paginate the above query then execute it
         var pagedOrdersData = await query
-                            .Sort(queryParams.SortBy, queryParams.SortDirection)
+                            .Sort("Id", SortDirection.Descending) //to put the latest created orders at the top
                             .Paginate(queryParams.Page, queryParams.PageSize)
                             .AsNoTracking() //to enhance the performance
                             .ToListAsync();
@@ -46,6 +46,7 @@ public class OrdersRepository : IOrdersRepository
 
         //sort and paginate the above query then execute it
         var pagedOrdersData = await query
+                            .Sort("Id", SortDirection.Descending) //to put the latest created orders at the top
                             .Paginate(queryParams.Page, queryParams.PageSize)
                             .AsNoTracking() //to enhance the performance
                             .ToListAsync();

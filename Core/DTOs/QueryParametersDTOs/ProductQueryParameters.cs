@@ -5,7 +5,7 @@ namespace Core.DTOs.QueryParametersDTOs;
 public class ProductQueryParameters : PaginationQueryParameters, IValidatableObject
 {
     public string? SortBy { get; set; }
-    public string? SortDirection { get; set; }
+    public SortDirection? SortDirection { get; set; }
     public String? Search { get; set; }
     public uint MinPrice { get; set; } = 0;
     public uint MaxPrice { get; set; } = int.MaxValue;

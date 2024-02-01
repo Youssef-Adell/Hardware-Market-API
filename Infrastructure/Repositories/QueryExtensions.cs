@@ -1,4 +1,5 @@
 using System.Linq.Dynamic.Core;
+using Core.DTOs.QueryParametersDTOs;
 using Core.Entities;
 
 namespace Infrastructure.Repositories;
@@ -11,27 +12,24 @@ public static class QueryExtensions
                     .Take(pageSize);
     }
 
-    public static IQueryable<T> Sort<T>(this IQueryable<T> query, string? property, string? direction) where T : EntityBase
+    public static IQueryable<T> Sort<T>(this IQueryable<T> query, string? property, SortDirection? direction) where T : EntityBase // to ensure that type T is an entity stored in the database
     {
-        if (!string.IsNullOrEmpty(direction) && direction.StartsWith("desc", StringComparison.InvariantCultureIgnoreCase))
-            direction = "desc";
-        else
-            direction = "asc";
-
         if (!string.IsNullOrEmpty(property))
         {
             try
             {
+                if (direction is null)
+                    direction = SortDirection.Ascending;
+
                 return query.OrderBy($"{property} {direction}");
             }
             catch
             {
-                //if the user enters invalid property to sort with, the excption will be thrown but i will suprress it using this catch
-                //then i will sort normally by id and ignore the propety he entered
+                //if the user enters invalid property to sort with, the excption will be thrown but i will suprress it using this catch and reuturn the query without sorting
             }
         }
 
-        return query.OrderBy($"Id {direction}"); // now we ensure that all types T is entity and has property called Id thanks to EntityBase
+        return query;
     }
 
 }

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using API.Errors;
 using Core.DomainServices;
 using Core.Interfaces.IDomainServices;
@@ -18,7 +19,9 @@ public static class ServicesExtensions
 {
     public static void AddWebServices(this IServiceCollection services)
     {
-        services.AddControllers();
+        services.AddControllers()
+                .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
+
         //Modify the default behaviour of APIControllerAttribute and return a customized error response instead of the default one
         services.Configure<ApiBehaviorOptions>(options =>
         {
