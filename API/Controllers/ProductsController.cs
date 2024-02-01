@@ -61,6 +61,14 @@ public class ProductsController : ControllerBase
         return NoContent();
     }
 
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> UpdateProductQuntity(int id, ProductQuntityDto quntity)
+    {
+        await productsService.UpdateProductQuntity(id, quntity);
+
+        return NoContent();
+    }
+
     [NonAction]
     private async Task<List<Byte[]>> ConvertFormFilesToByteArrays(IFormFileCollection formFiles)
     {

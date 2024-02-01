@@ -10,4 +10,6 @@ public interface IProductsService
     Task<int> AddProduct(ProductForAddingDto productToAdd, List<byte[]> productImages);
     Task UpdateProduct(int productId, ProductForUpdatingDto updatedProduct, List<byte[]> imagesToAdd);
     Task DeleteProduct(int id);
+    Task UpdateProductQuntity(int id, ProductQuntityDto newQuntityDto);
+
 }

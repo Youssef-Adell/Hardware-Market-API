@@ -149,6 +149,20 @@ public class ProductsService : IProductsService
         product.Images?.ForEach(image => fileService.DeleteFile(image.Path));
     }
 
+    public async Task UpdateProductQuntity(int id, ProductQuntityDto newQuntityDto)
+    {
+        var product = await unitOfWork.Products.GetProduct(id);
+        if (product is null)
+            throw new NotFoundException($"Product not found.");
+
+        product.Quantity = newQuntityDto.Quantity;
+
+        unitOfWork.Products.UpdateProduct(product);
+
+        await unitOfWork.SaveChanges();
+    }
+
+
     private async Task ValidateUploadedImages(List<byte[]> images)
     {
         //ensure that all images has a valid image type and doesnt exceed the maxSizeAllowed 
