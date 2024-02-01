@@ -71,4 +71,9 @@ public class OrdersRepository : IOrdersRepository
     {
         appDbContext.Orders.Add(order);
     }
+
+    public void UpdateOrder(Order order)
+    {
+        appDbContext.Orders.Update(order);
+    }
 }

@@ -123,4 +123,16 @@ public class OrdersService : IOrdersService
 
         return order.Id;
     }
+
+    public async Task UpdateOrderStatus(int id, OrderStatusDto newStatusDto)
+    {
+        var order = await unitOfWork.Orders.GetOrder(id);
+        if (order is null)
+            throw new NotFoundException($"Order not found.");
+
+        order.Status = newStatusDto.Status;
+
+        unitOfWork.Orders.UpdateOrder(order);
+        await unitOfWork.SaveChanges();
+    }
 }

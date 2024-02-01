@@ -10,4 +10,5 @@ public interface IOrdersService
     Task<OrderDetailsDto> GetOrder(int id); //for admin view
     Task<OrderDetailsDto> GetCustomerOrder(string customerEmail, int orderId); //for customer view
     Task<int> CreateOrder(string customerEmail, OrderForCreatingDto orderDto);
+    Task UpdateOrderStatus(int id, OrderStatusDto newStatusDto);
 }

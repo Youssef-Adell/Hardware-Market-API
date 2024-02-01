@@ -1,4 +1,6 @@
+using Core.DTOs.OrderDTOs;
 using Core.DTOs.QueryParametersDTOs;
+using Core.Entities.OrderAggregate;
 using Core.Interfaces.IDomainServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,5 +32,13 @@ public class OrdersController : ControllerBase
         var result = await ordersService.GetOrder(id);
 
         return Ok(result);
+    }
+
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> UpdateOrderStatus(int id, OrderStatusDto status)
+    {
+        await ordersService.UpdateOrderStatus(id, status);
+
+        return NoContent();
     }
 }

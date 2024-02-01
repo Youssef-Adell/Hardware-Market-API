@@ -9,4 +9,5 @@ public interface IOrdersRepository
     Task<PagedResult<Order>> GetCustomerOrders(string customerEmail, PaginationQueryParameters queryParams);
     Task<Order?> GetOrder(int id);
     void AddOrder(Order order);
+    void UpdateOrder(Order order);
 }
