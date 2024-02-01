@@ -32,7 +32,7 @@ public static class ServicesExtensions
                     .SelectMany(stateEntry => stateEntry.Errors)
                     .Select(error => error.ErrorMessage);
 
-                var response = new ValidationErrorResponse(details: validationErrors);
+                var response = new ErrorResponse(errors: validationErrors);
 
                 return new BadRequestObjectResult(response);
             };

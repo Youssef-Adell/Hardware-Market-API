@@ -33,14 +33,17 @@ public static class MidlewareExtensions
                     };
 
                     // Build Response Body
+                    var errors = new List<string>() { context.Response.StatusCode == StatusCodes.Status500InternalServerError ? "Internal server error." : errorFeature.Error.Message };
+
                     var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
                     var bodyInJson = JsonSerializer.Serialize(
                         new ErrorResponse(
-                            context.Response.StatusCode,
-                            context.Response.StatusCode == StatusCodes.Status500InternalServerError ? "Internal server error." : errorFeature.Error.Message
+                            errors,
+                            context.Response.StatusCode
                         ),
                         jsonOptions
                     );
+
                     await context.Response.WriteAsync(bodyInJson);
                 }
 
