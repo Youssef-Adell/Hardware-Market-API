@@ -17,9 +17,17 @@ public class ProductReviewsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetProductReviews(int productId, [FromQuery] ReviewQueryParameters queryParams)
+    public async Task<IActionResult> GetProductReviews(int productId, [FromQuery] PaginationQueryParameters queryParams)
     {
         var result = await productReviewsService.GetProductReviews(productId, queryParams);
+
+        return Ok(result);
+    }
+
+    [HttpGet("current")]
+    public async Task<IActionResult> GetProductReviews(int productId, string customerEmail)
+    {
+        var result = await productReviewsService.GetProductReview(productId, customerEmail);
 
         return Ok(result);
     }

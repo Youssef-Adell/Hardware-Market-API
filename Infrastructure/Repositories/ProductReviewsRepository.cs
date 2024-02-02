@@ -15,11 +15,10 @@ public class ProductReviewsRepository : IProductReviewsRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<PagedResult<ProductReview>> GetProductReviews(int productId, ReviewQueryParameters queryParams)
+    public async Task<PagedResult<ProductReview>> GetProductReviews(int productId, PaginationQueryParameters queryParams)
     {
         //build a query to get reveiws of this product
-        var query = appDbContext.ProductReviews.Where(r => r.ProductId == productId)
-                                                .Where(r => queryParams.CustomerEmail == null || r.CustomerEmail == queryParams.CustomerEmail);
+        var query = appDbContext.ProductReviews.Where(r => r.ProductId == productId);
 
         //sort and paginate the above query then execute it
         var pagedReviewssData = await query
@@ -40,6 +39,15 @@ public class ProductReviewsRepository : IProductReviewsRepository
         var review = await appDbContext.ProductReviews
                         .AsNoTracking()
                         .FirstOrDefaultAsync(r => r.Id == reviewId && r.ProductId == productId);
+
+        return review;
+    }
+
+    public async Task<ProductReview?> GetProductReview(int productId, string customerEmail)
+    {
+        var review = await appDbContext.ProductReviews
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(r => r.CustomerEmail == customerEmail && r.ProductId == productId);
 
         return review;
     }

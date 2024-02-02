@@ -20,7 +20,7 @@ public class ProductReviewsService : IProductReviewsService
         this.mapper = mapper;
     }
 
-    public async Task<PagedResult<ProductReviewDto>> GetProductReviews(int productId, ReviewQueryParameters queryParams)
+    public async Task<PagedResult<ProductReviewDto>> GetProductReviews(int productId, PaginationQueryParameters queryParams)
     {
         var pageOfReviewsEntities = await unitOfWork.ProductReviews.GetProductReviews(productId, queryParams);
 
@@ -38,6 +38,21 @@ public class ProductReviewsService : IProductReviewsService
         var reviewEntity = await unitOfWork.ProductReviews.GetProductReview(productId, reviewId);
         if (reviewEntity is null)
             throw new NotFoundException($"Review not found.");
+
+        var reviewDto = mapper.Map<ProductReview?, ProductReviewDto>(reviewEntity);
+
+        return reviewDto;
+    }
+
+    public async Task<ProductReviewDto> GetProductReview(int productId, string customerEmail)
+    {
+        var product = await unitOfWork.Products.GetProduct(productId);
+        if (product is null)
+            throw new NotFoundException($"Product not found.");
+
+        var reviewEntity = await unitOfWork.ProductReviews.GetProductReview(productId, customerEmail);
+        if (reviewEntity is null)
+            throw new NotFoundException($"The current customer has no review for this product.");
 
         var reviewDto = mapper.Map<ProductReview?, ProductReviewDto>(reviewEntity);
 
