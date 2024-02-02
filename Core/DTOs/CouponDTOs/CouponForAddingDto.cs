@@ -8,7 +8,7 @@ public class CouponForAddingDto
     public string Code { get; set; }
 
     [Required]
-    [Range(1, 99, ErrorMessage = "DiscountPercentage must be >= 1% and <= 99%.")]
+    [Range(1, 99, ErrorMessage = "DiscountPercentage must be between 1 and 99.")]
     public double DiscountPercentage { get; set; }
 
     [Required]
