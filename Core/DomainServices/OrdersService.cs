@@ -75,9 +75,9 @@ public class OrdersService : IOrdersService
         // Create order items
         var orderItems = new List<OrderItem>();
 
-        foreach (var product in orderedProductsEntities)
+        orderedProductsEntities?.ForEach(product =>
         {
-            if (quntitiesOfOrderdProducts[product.Id] > product.Quantity)
+            if (product.Quantity < quntitiesOfOrderdProducts[product.Id])
                 throw new UnprocessableEntityException($"Insufficient stock of '{product.Name}' product.");
 
             orderItems.Add(new OrderItem
@@ -91,18 +91,10 @@ public class OrdersService : IOrdersService
 
             product.Quantity -= quntitiesOfOrderdProducts[product.Id];
             unitOfWork.Products.UpdateProduct(product);
-        }
+        });
 
         // Calculate order price
         var subtotal = orderItems.Sum(i => i.Quntity * i.Price);
-
-        double discount = 0;
-        if (!string.IsNullOrEmpty(orderDto.CouponCode))
-        {
-            var coupon = await unitOfWork.Coupons.GetCoupon(orderDto.CouponCode);
-            discount = coupon?.Value ?? 0;
-        }
-
         double shippingCosts = 50.0; //it is fixed now regardless of the shipping address (may be changed later)
 
         // Create the order
@@ -113,12 +105,13 @@ public class OrdersService : IOrdersService
             ShippingAddress = new Address(orderDto.ShippingAddress.AddressLine, orderDto.ShippingAddress.City),
             OrderItems = orderItems,
             Subtotal = subtotal,
-            ShippingCosts = shippingCosts,
-            Discount = discount
+            ShippingCosts = shippingCosts
         };
 
-        unitOfWork.Orders.AddOrder(order);
+        if (!string.IsNullOrEmpty(orderDto.CouponCode))
+            await ApplyCouponDiscount(order, orderDto.CouponCode);
 
+        unitOfWork.Orders.AddOrder(order);
         await unitOfWork.SaveChanges();
 
         return order.Id;
@@ -134,5 +127,19 @@ public class OrdersService : IOrdersService
 
         unitOfWork.Orders.UpdateOrder(order);
         await unitOfWork.SaveChanges();
+    }
+
+    private async Task ApplyCouponDiscount(Order order, string couponCode)
+    {
+        var coupon = await unitOfWork.Coupons.GetCoupon(couponCode);
+
+        if (coupon is null || order.Subtotal < coupon.MinPurchaseAmount)
+        {
+            order.Discount = 0;
+            return;
+        }
+
+        var discount = order.Total * (coupon.DiscountPercentage / 100);
+        order.Discount = (discount <= coupon.MaxDiscountAmount) ? discount : coupon.MaxDiscountAmount;
     }
 }

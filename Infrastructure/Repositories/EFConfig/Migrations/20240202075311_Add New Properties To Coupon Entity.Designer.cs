@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Repositories.EfConfig.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240202025719_Add New Properties To Coupon Entity")]
+    [Migration("20240202075311_Add New Properties To Coupon Entity")]
     partial class AddNewPropertiesToCouponEntity
     {
         /// <inheritdoc />
@@ -37,14 +37,16 @@ namespace Infrastructure.Repositories.EfConfig.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("DiscountPercentage")
+                        .HasColumnType("float");
+
                     b.Property<DateTime>("ExpirationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("MaxDiscountAmount")
+                        .HasColumnType("float");
 
-                    b.Property<double>("Value")
+                    b.Property<double>("MinPurchaseAmount")
                         .HasColumnType("float");
 
                     b.HasKey("Id");

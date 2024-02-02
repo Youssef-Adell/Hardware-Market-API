@@ -34,14 +34,16 @@ namespace Infrastructure.Repositories.EFConfig.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("DiscountPercentage")
+                        .HasColumnType("float");
+
                     b.Property<DateTime>("ExpirationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("MaxDiscountAmount")
+                        .HasColumnType("float");
 
-                    b.Property<double>("Value")
+                    b.Property<double>("MinPurchaseAmount")
                         .HasColumnType("float");
 
                     b.HasKey("Id");

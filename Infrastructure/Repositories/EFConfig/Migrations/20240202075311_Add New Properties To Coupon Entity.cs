@@ -11,6 +11,18 @@ namespace Infrastructure.Repositories.EfConfig.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.RenameColumn(
+                name: "Value",
+                table: "Coupons",
+                newName: "MinPurchaseAmount");
+
+            migrationBuilder.AddColumn<double>(
+                name: "DiscountPercentage",
+                table: "Coupons",
+                type: "float",
+                nullable: false,
+                defaultValue: 0.0);
+
             migrationBuilder.AddColumn<DateTime>(
                 name: "ExpirationDate",
                 table: "Coupons",
@@ -18,24 +30,33 @@ namespace Infrastructure.Repositories.EfConfig.Migrations
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
 
-            migrationBuilder.AddColumn<string>(
-                name: "Type",
+            migrationBuilder.AddColumn<double>(
+                name: "MaxDiscountAmount",
                 table: "Coupons",
-                type: "nvarchar(max)",
+                type: "float",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: 0.0);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
+                name: "DiscountPercentage",
+                table: "Coupons");
+
+            migrationBuilder.DropColumn(
                 name: "ExpirationDate",
                 table: "Coupons");
 
             migrationBuilder.DropColumn(
-                name: "Type",
+                name: "MaxDiscountAmount",
                 table: "Coupons");
+
+            migrationBuilder.RenameColumn(
+                name: "MinPurchaseAmount",
+                table: "Coupons",
+                newName: "Value");
         }
     }
 }
