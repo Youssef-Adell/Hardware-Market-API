@@ -2,12 +2,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Core.DTOs.CouponDTOs;
 
-public class CouponForUpdatingDto : IValidatableObject
+public class CouponForUpdatingDto
 {
     public string Code { get; set; }
 
     [Required]
-    [Range(1, int.MaxValue, ErrorMessage = "DiscountPercentage must be > 0.")]
+    [Range(1, 99, ErrorMessage = "DiscountPercentage must be >= 1% and <= 99%.")]
     public double DiscountPercentage { get; set; }
 
     [Required]
@@ -19,11 +19,4 @@ public class CouponForUpdatingDto : IValidatableObject
     public double MinPurchaseAmount { get; set; }
 
     public DateTime ExpirationDate { get; set; }
-
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-    {
-        if (MinPurchaseAmount <= MaxDiscountAmount)
-            yield return new ValidationResult("MinPurchaseAmount must be > MaxDiscountAmount.");
-    }
-
 }
