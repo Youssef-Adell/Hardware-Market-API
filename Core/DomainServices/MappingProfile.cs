@@ -54,7 +54,8 @@ public class MappingProfile : Profile
         CreateMap<ProductReviewForUpdatingDto, ProductReview>();
 
         //---Orders Mapping---
-        CreateMap<Order, OrderForAdminListDto>();
+        CreateMap<Order, OrderForAdminListDto>()
+        .ForMember(d => d.City, options => options.MapFrom(s => s.ShippingAddress.City));
         CreateMap<PagedResult<Order>, PagedResult<OrderForAdminListDto>>();
         CreateMap<OrderItem, OrderItemDto>()
             .ForMember(d => d.ImageUrl, Options => Options.MapFrom<OrderItemUrlResolver>());
