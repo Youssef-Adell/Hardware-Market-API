@@ -133,13 +133,13 @@ public class OrdersService : IOrdersService
     {
         var coupon = await unitOfWork.Coupons.GetCoupon(couponCode);
 
-        if (coupon is null || order.Subtotal < coupon.MinPurchaseAmount)
+        if (coupon is null || !coupon.IsValid || order.Subtotal < coupon.MinPurchaseAmount)
         {
             order.Discount = 0;
             return;
         }
 
-        var discount = order.Total * (coupon.DiscountPercentage / 100);
+        var discount = order.Subtotal * (coupon.DiscountPercentage / 100); //we are applying the discount on subtotal not total
         order.Discount = (discount <= coupon.MaxDiscountAmount) ? discount : coupon.MaxDiscountAmount;
     }
 }
