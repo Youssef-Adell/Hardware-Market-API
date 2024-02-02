@@ -14,13 +14,45 @@ public class CouponsRepository : ICouponsRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<Coupon?> GetCoupon(string code)
+    public async Task<IReadOnlyCollection<Coupon>> GetCoupons()
+    {
+        var coupons = await appDbContext.Coupons
+                            .AsNoTracking()
+                            .ToListAsync();
+
+        return coupons;
+    }
+
+    public async Task<Coupon?> GetCoupon(int id)
     {
         var coupon = await appDbContext.Coupons
                             .AsNoTracking()
-                            .FirstOrDefaultAsync(c => c.Code == code);
+                            .FirstOrDefaultAsync(c => c.Id == id);
 
         return coupon;
     }
 
+    public async Task<Coupon?> GetCoupon(string code)
+    {
+        var coupon = await appDbContext.Coupons
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(c => c.Code.ToLower() == code.ToLower());
+
+        return coupon;
+    }
+
+    public void AddCoupon(Coupon Coupon)
+    {
+        appDbContext.Coupons.Add(Coupon);
+    }
+
+    public void UpdateCoupon(Coupon Coupon)
+    {
+        appDbContext.Coupons.Update(Coupon);
+    }
+
+    public void DeleteCoupon(Coupon Coupon)
+    {
+        appDbContext.Coupons.Remove(Coupon);
+    }
 }

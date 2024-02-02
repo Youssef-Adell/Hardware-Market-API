@@ -16,3 +16,22 @@ public class OrderForCreatingDto
 
     public string? CouponCode { get; set; }
 }
+
+public class OrderItemForCreatingDto
+{
+    [Required]
+    public int ProductId { get; set; }
+
+    [Required]
+    [Range(1, int.MaxValue, ErrorMessage = "Quntity cant be less than 1.")]
+    public int Quntity { get; set; }
+}
+
+public class AddressDto
+{
+    [Required]
+    public string AddressLine { get; set; }
+
+    [Required]
+    public string City { get; set; }
+}

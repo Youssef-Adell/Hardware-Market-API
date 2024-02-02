@@ -1,6 +1,7 @@
 using AutoMapper;
 using Core.DTOs.BrandDTOs;
 using Core.DTOs.CategoryDTOs;
+using Core.DTOs.CouponDTOs;
 using Core.DTOs.OrderDTOs;
 using Core.DTOs.ProductDTOs;
 using Core.DTOs.ProductReviewDTOs;
@@ -60,6 +61,11 @@ public class MappingProfile : Profile
         CreateMap<Order, OrderDetailsDto>();
         CreateMap<Order, OrderForCustomerListDto>();
         CreateMap<PagedResult<Order>, PagedResult<OrderForCustomerListDto>>();
+
+        //---Coupons Mapping---
+        CreateMap<Coupon, CouponDto>();
+        CreateMap<CouponForAddingDto, Coupon>();
+        CreateMap<CouponForUpdatingDto, Coupon>();
     }
 }
 

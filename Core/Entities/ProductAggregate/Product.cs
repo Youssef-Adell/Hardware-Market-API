@@ -1,7 +1,8 @@
 namespace Core.Entities.ProductAggregate;
 
-public class Product : EntityBase
+public class Product
 {
+    public int Id { get; set; }
     public string Name { get; set; }
     public List<ProductImage> Images { get; set; }
     public string? Description { get; set; }

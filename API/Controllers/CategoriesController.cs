@@ -43,14 +43,14 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateCategory(int id, [FromForm] CategoryForUpdatingDto updatedProduct, IFormFile? newIcon)
+    public async Task<IActionResult> UpdateCategory(int id, [FromForm] CategoryForUpdatingDto updatedCategory, IFormFile? newIcon)
     {
         byte[]? newCategoryIconAsBytes = null;
 
         if (newIcon != null)
             newCategoryIconAsBytes = await ConvertFormFileToByteArray(newIcon);
 
-        await categoriesService.UpdateCategory(id, updatedProduct, newCategoryIconAsBytes);
+        await categoriesService.UpdateCategory(id, updatedCategory, newCategoryIconAsBytes);
 
         return NoContent();
     }

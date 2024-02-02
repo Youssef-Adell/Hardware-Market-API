@@ -1,6 +1,5 @@
 using Core.DTOs.OrderDTOs;
 using Core.DTOs.QueryParametersDTOs;
-using Core.Entities.OrderAggregate;
 using Core.Interfaces.IDomainServices;
 using Microsoft.AspNetCore.Mvc;
 

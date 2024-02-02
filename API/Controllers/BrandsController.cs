@@ -43,14 +43,14 @@ public class BrandsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateBrand(int id, [FromForm] BrandForUpdatingDto updatedProduct, IFormFile? newIcon)
+    public async Task<IActionResult> UpdateBrand(int id, [FromForm] BrandForUpdatingDto updatedBrand, IFormFile? newIcon)
     {
         byte[]? newBrandIconAsBytes = null;
 
         if (newIcon != null)
             newBrandIconAsBytes = await ConvertFormFileToByteArray(newIcon);
 
-        await brandsService.UpdateBrand(id, updatedProduct, newBrandIconAsBytes);
+        await brandsService.UpdateBrand(id, updatedBrand, newBrandIconAsBytes);
 
         return NoContent();
     }

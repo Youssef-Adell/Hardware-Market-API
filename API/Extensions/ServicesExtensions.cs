@@ -72,6 +72,7 @@ public static class ServicesExtensions
         services.AddScoped<IBrandsService, BrandsService>();
         services.AddScoped<IProductReviewsService, ProductReviewsService>();
         services.AddScoped<IOrdersService, OrdersService>();
+        services.AddScoped<ICouponsService, CouponsService>();
 
         services.AddScoped<IFileService, DiskFileService>();
     }

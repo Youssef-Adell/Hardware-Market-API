@@ -6,13 +6,13 @@ namespace Infrastructure.Repositories;
 
 public static class QueryExtensions
 {
-    public static IQueryable<T> Paginate<T>(this IQueryable<T> query, int pageNumber, int pageSize) where T : EntityBase
+    public static IQueryable<T> Paginate<T>(this IQueryable<T> query, int pageNumber, int pageSize)
     {
         return query.Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize);
     }
 
-    public static IQueryable<T> Sort<T>(this IQueryable<T> query, string? property, SortDirection? direction) where T : EntityBase // to ensure that type T is an entity stored in the database
+    public static IQueryable<T> Sort<T>(this IQueryable<T> query, string? property, SortDirection? direction)
     {
         if (!string.IsNullOrEmpty(property))
         {

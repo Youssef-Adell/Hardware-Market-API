@@ -1,7 +1,8 @@
 namespace Core.Entities.OrderAggregate;
 
-public class Order : EntityBase
+public class Order
 {
+    public int Id { get; set; }
     public List<OrderItem> OrderItems { get; set; }
     public string CustomerEmail { get; set; }
     public string CustomerPhone { get; set; }
