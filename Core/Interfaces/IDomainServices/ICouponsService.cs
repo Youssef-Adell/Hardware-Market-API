@@ -11,4 +11,5 @@ public interface ICouponsService
     Task<int> AddCoupon(CouponForAddingDto couponToAdd);
     Task UpdateCoupon(int id, CouponForUpdatingDto updatedCoupon);
     Task DeleteCoupon(int id);
+    Task<double> CalculateCouponDiscount(double subtotalAmount, string couponCode);
 }

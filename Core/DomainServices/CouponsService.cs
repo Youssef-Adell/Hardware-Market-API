@@ -89,4 +89,19 @@ public class CouponsService : ICouponsService
 
         await unitOfWork.SaveChanges();
     }
+
+    public async Task<double> CalculateCouponDiscount(double subtotalAmount, string couponCode)
+    {
+        var coupon = await unitOfWork.Coupons.GetCoupon(couponCode);
+
+        if (coupon is null || !coupon.IsValid || subtotalAmount < coupon.MinPurchaseAmount)
+            return 0;
+
+        var discount = subtotalAmount * (coupon.DiscountPercentage / 100); //we are applying the discount on subtotal not total
+
+        var finalDiscount = (discount <= coupon.MaxDiscountAmount) ? discount : coupon.MaxDiscountAmount;
+
+        return finalDiscount;
+    }
+
 }

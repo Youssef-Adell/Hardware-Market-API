@@ -11,11 +11,13 @@ namespace Core.DomainServices;
 public class OrdersService : IOrdersService
 {
     private readonly IUnitOfWork unitOfWork;
+    private readonly ICouponsService couponsService;
     private readonly IMapper mapper;
 
-    public OrdersService(IUnitOfWork unitOfWork, IMapper mapper)
+    public OrdersService(IUnitOfWork unitOfWork, ICouponsService couponsService, IMapper mapper)
     {
         this.unitOfWork = unitOfWork;
+        this.couponsService = couponsService;
         this.mapper = mapper;
     }
 
@@ -108,8 +110,9 @@ public class OrdersService : IOrdersService
             ShippingCosts = shippingCosts
         };
 
+        //apply the discount (if there is any)
         if (!string.IsNullOrEmpty(orderDto.CouponCode))
-            await ApplyCouponDiscount(order, orderDto.CouponCode);
+            order.Discount = await couponsService.CalculateCouponDiscount(order.Subtotal, orderDto.CouponCode);
 
         unitOfWork.Orders.AddOrder(order);
         await unitOfWork.SaveChanges();
@@ -127,19 +130,5 @@ public class OrdersService : IOrdersService
 
         unitOfWork.Orders.UpdateOrder(order);
         await unitOfWork.SaveChanges();
-    }
-
-    private async Task ApplyCouponDiscount(Order order, string couponCode)
-    {
-        var coupon = await unitOfWork.Coupons.GetCoupon(couponCode);
-
-        if (coupon is null || !coupon.IsValid || order.Subtotal < coupon.MinPurchaseAmount)
-        {
-            order.Discount = 0;
-            return;
-        }
-
-        var discount = order.Subtotal * (coupon.DiscountPercentage / 100); //we are applying the discount on subtotal not total
-        order.Discount = (discount <= coupon.MaxDiscountAmount) ? discount : coupon.MaxDiscountAmount;
     }
 }
