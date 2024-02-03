@@ -4,7 +4,7 @@ public enum OrderStatus
 {
     Pending,
     Failed,
-    OnHold,
+    Received,
     InProgress,
     Completed,
     Canceled

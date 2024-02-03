@@ -57,8 +57,7 @@ public class MappingProfile : Profile
         CreateMap<Order, OrderForAdminListDto>()
         .ForMember(d => d.City, options => options.MapFrom(s => s.ShippingAddress.City));
         CreateMap<PagedResult<Order>, PagedResult<OrderForAdminListDto>>();
-        CreateMap<OrderItem, OrderItemDto>()
-            .ForMember(d => d.ImageUrl, Options => Options.MapFrom<OrderItemUrlResolver>());
+        CreateMap<OrderItem, OrderItemDto>();
         CreateMap<Order, OrderDetailsDto>();
         CreateMap<Order, OrderForCustomerListDto>();
         CreateMap<PagedResult<Order>, PagedResult<OrderForCustomerListDto>>();
@@ -145,24 +144,6 @@ public class LogoUrlResolver : IValueResolver<ProductBrand, BrandDto, string?>
             var hostUrl = new Uri(configration["ResourcesStorage:HostUrl"]);
             var iconUrl = new Uri(hostUrl, source.LogoPath).ToString();
             return iconUrl;
-        }
-
-        return null;
-    }
-}
-
-public class OrderItemUrlResolver : IValueResolver<OrderItem, OrderItemDto, string?>
-{
-    private readonly IConfiguration configration;
-    public OrderItemUrlResolver(IConfiguration configration) => this.configration = configration;
-
-    public string? Resolve(OrderItem source, OrderItemDto destination, string? destMember, ResolutionContext context)
-    {
-        if (!string.IsNullOrEmpty(source.ImagePath))
-        {
-            var hostUrl = new Uri(configration["ResourcesStorage:HostUrl"]);
-            var imageUrl = new Uri(hostUrl, source.ImagePath).ToString();
-            return imageUrl;
         }
 
         return null;

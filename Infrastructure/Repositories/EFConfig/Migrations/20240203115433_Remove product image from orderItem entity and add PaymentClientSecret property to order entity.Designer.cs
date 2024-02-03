@@ -4,16 +4,19 @@ using Infrastructure.Repositories.EFConfig;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Infrastructure.Repositories.EFConfig.Migrations
+namespace Infrastructure.Repositories.EfConfig.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240203115433_Remove product image from orderItem entity and add PaymentClientSecret property to order entity")]
+    partial class RemoveproductimagefromorderItementityandaddPaymentClientSecretpropertytoorderentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

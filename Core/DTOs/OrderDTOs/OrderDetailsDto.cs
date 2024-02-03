@@ -14,6 +14,7 @@ public class OrderDetailsDto
     public double Subtotal { get; set; }
     public double Discount { get; set; }
     public double ShippingCosts { get; set; }
+    public string PaymentClientSecret { get; set; }
     public double Total { get; set; }
 }
 

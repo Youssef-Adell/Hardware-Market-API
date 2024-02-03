@@ -5,6 +5,8 @@ using Core.Entities.OrderAggregate;
 using Core.Exceptions;
 using Core.Interfaces.IDomainServices;
 using Core.Interfaces.IRepositories;
+using Stripe;
+using Address = Core.Entities.OrderAggregate.Address;
 
 namespace Core.DomainServices;
 
@@ -86,7 +88,6 @@ public class OrdersService : IOrdersService
             {
                 ProductId = product.Id,
                 ProductName = product.Name,
-                ImagePath = product.Images.First().Path, // but image may be deleted if the product deleted!! (to be fixed later)
                 Price = product.Price,
                 Quntity = quntitiesOfOrderdProducts[product.Id]
             });
@@ -117,18 +118,58 @@ public class OrdersService : IOrdersService
         unitOfWork.Orders.AddOrder(order);
         await unitOfWork.SaveChanges();
 
+        await CreatePaymentIntent(order);
+
         return order.Id;
     }
 
-    public async Task UpdateOrderStatus(int id, OrderStatusDto newStatusDto)
+    public async Task UpdateOrderStatus(int id, OrderStatus newOrderStatus)
     {
         var order = await unitOfWork.Orders.GetOrder(id);
         if (order is null)
             throw new NotFoundException($"Order not found.");
 
-        order.Status = newStatusDto.Status;
+        //return quntity back to the products if the order failed or canceled
+        if (newOrderStatus == OrderStatus.Failed || newOrderStatus == OrderStatus.Canceled)
+        {
+            var productsOrderdQuntity = order.OrderItems.ToDictionary(item => item.ProductId, item => item.Quntity);
+
+            var productOrderdIds = productsOrderdQuntity.Keys.ToList();
+
+            var productEntities = await unitOfWork.Products.GetProductsCollection(productOrderdIds);
+
+            productEntities?.ForEach(product =>
+            {
+                product.Quantity += productsOrderdQuntity[product.Id];
+                unitOfWork.Products.UpdateProduct(product);
+            });
+        }
+
+        order.Status = newOrderStatus;
 
         unitOfWork.Orders.UpdateOrder(order);
         await unitOfWork.SaveChanges();
     }
+
+    private async Task CreatePaymentIntent(Order order)
+    {
+        StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
+
+        var options = new PaymentIntentCreateOptions
+        {
+            Amount = (long)order.Total * 100,
+            Currency = "egp",
+            PaymentMethodTypes = new List<string> { "card" },
+            Metadata = new Dictionary<string, string> { { "orderId", order.Id.ToString() } }
+        };
+
+        var service = new PaymentIntentService();
+        var paymentIntent = await service.CreateAsync(options);
+
+        order.PaymentClientSecret = paymentIntent.ClientSecret;
+
+        unitOfWork.Orders.UpdateOrder(order);
+        await unitOfWork.SaveChanges();
+    }
+
 }
