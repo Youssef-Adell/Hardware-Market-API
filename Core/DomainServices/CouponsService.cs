@@ -53,9 +53,9 @@ public class CouponsService : ICouponsService
 
     public async Task<int> AddCoupon(CouponForAddingDto couponToAdd)
     {
-        var coupon = await unitOfWork.Coupons.GetCoupon(couponToAdd.Code);
-        if (coupon != null)
-            throw new UnprocessableEntityException("This id has been used by another coupon");
+        var couponExists = await unitOfWork.Coupons.CouponExists(couponToAdd.Code);
+        if (couponExists)
+            throw new ConfilctException($"The coupon code {couponToAdd.Code} is already in use by another coupon.");
 
         var couponEntity = mapper.Map<CouponForAddingDto, Coupon>(couponToAdd);
 

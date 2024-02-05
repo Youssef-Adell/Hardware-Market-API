@@ -60,6 +60,13 @@ public class ProductsRepository : IProductsRepository
         return product;
     }
 
+    public async Task<bool> ProductExists(int id)
+    {
+        var exists = await appDbContext.Products.AnyAsync(product => product.Id == id);
+
+        return exists;
+    }
+
     public void AddProduct(Product product)
     {
         appDbContext.Products.Add(product);

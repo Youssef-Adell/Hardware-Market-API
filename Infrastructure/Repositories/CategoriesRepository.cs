@@ -32,6 +32,13 @@ public class CategoriesRepository : ICategoriesRepository
         return category;
     }
 
+    public async Task<bool> CategoryExists(int id)
+    {
+        var exists = await appDbContext.ProductCategories.AnyAsync(category => category.Id == id);
+
+        return exists;
+    }
+
     public void AddCategory(ProductCategory category)
     {
         appDbContext.ProductCategories.Add(category);

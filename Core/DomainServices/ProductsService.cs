@@ -178,15 +178,15 @@ public class ProductsService : IProductsService
 
     private async Task ValidateCategory(int categoryId)
     {
-        var category = await unitOfWork.Categories.GetCategory(categoryId);
-        if (category is null)
+        var categoryExists = await unitOfWork.Categories.CategoryExists(categoryId);
+        if (!categoryExists)
             throw new UnprocessableEntityException($"Invalid category id.");
     }
 
     private async Task ValidateBrand(int brandId)
     {
-        var brand = await unitOfWork.Brands.GetBrand(brandId);
-        if (brand is null)
+        var BrandExists = await unitOfWork.Brands.BrandExists(brandId);
+        if (!BrandExists)
             throw new UnprocessableEntityException($"Invalid brand id.");
     }
 

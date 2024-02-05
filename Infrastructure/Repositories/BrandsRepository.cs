@@ -32,6 +32,13 @@ public class BrandsRepository : IBrandsRepository
         return brand;
     }
 
+    public async Task<bool> BrandExists(int id)
+    {
+        var exists = await appDbContext.ProductBrands.AnyAsync(brand => brand.Id == id);
+
+        return exists;
+    }
+
     public void AddBrand(ProductBrand brand)
     {
         appDbContext.ProductBrands.Add(brand);

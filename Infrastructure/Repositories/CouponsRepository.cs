@@ -41,6 +41,13 @@ public class CouponsRepository : ICouponsRepository
         return coupon;
     }
 
+    public async Task<bool> CouponExists(string code)
+    {
+        var exists = await appDbContext.Coupons.AnyAsync(coupon => coupon.Code == code);
+
+        return exists;
+    }
+
     public void AddCoupon(Coupon Coupon)
     {
         appDbContext.Coupons.Add(Coupon);
