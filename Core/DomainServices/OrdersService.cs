@@ -6,7 +6,7 @@ using Core.Exceptions;
 using Core.Interfaces.IDomainServices;
 using Core.Interfaces.IRepositories;
 using Stripe;
-using Address = Core.Entities.OrderAggregate.Address;
+using Address = Core.Entities.OrderAggregate.ShippingAddress;
 
 namespace Core.DomainServices;
 
@@ -23,35 +23,35 @@ public class OrdersService : IOrdersService
         this.mapper = mapper;
     }
 
-    public async Task<PagedResult<OrderForAdminListDto>> GetOrders(OrderQueryParameters queryParams)
+    public async Task<PagedResult<OrderForAdminListResponse>> GetOrders(OrderQueryParameters queryParams)
     {
         var pageOfOrdersEntities = await unitOfWork.Orders.GetOrders(queryParams);
 
-        var pageOfOrderstDtos = mapper.Map<PagedResult<Order>, PagedResult<OrderForAdminListDto>>(pageOfOrdersEntities);
+        var pageOfOrderstDtos = mapper.Map<PagedResult<Order>, PagedResult<OrderForAdminListResponse>>(pageOfOrdersEntities);
 
         return pageOfOrderstDtos;
     }
 
-    public async Task<PagedResult<OrderForCustomerListDto>> GetCustomerOrders(string customerEmail, PaginationQueryParameters queryParams)
+    public async Task<PagedResult<OrderForCustomerListResponse>> GetCustomerOrders(string customerEmail, PaginationQueryParameters queryParams)
     {
         var pageOfOrdersEntities = await unitOfWork.Orders.GetCustomerOrders(customerEmail, queryParams);
 
-        var pageOfOrderstDtos = mapper.Map<PagedResult<Order>, PagedResult<OrderForCustomerListDto>>(pageOfOrdersEntities);
+        var pageOfOrderstDtos = mapper.Map<PagedResult<Order>, PagedResult<OrderForCustomerListResponse>>(pageOfOrdersEntities);
 
         return pageOfOrderstDtos;
     }
 
-    public async Task<OrderDetailsDto> GetOrder(int id)
+    public async Task<OrderResponse> GetOrder(Guid id)
     {
         var orderEntity = await unitOfWork.Orders.GetOrder(id);
         if (orderEntity is null)
             throw new NotFoundException($"Order not found.");
 
-        var orderDto = mapper.Map<Order, OrderDetailsDto>(orderEntity);
+        var orderDto = mapper.Map<Order, OrderResponse>(orderEntity);
         return orderDto;
     }
 
-    public async Task<OrderDetailsDto> GetCustomerOrder(string customerEmail, int orderId)
+    public async Task<OrderResponse> GetCustomerOrder(string customerEmail, Guid orderId)
     {
         //this method is for customer view to allow logged-in customer to get its orders only unlike the GetOrder method which is for admin view and allow admin to get any order
         var order = await GetOrder(orderId);
@@ -62,11 +62,11 @@ public class OrdersService : IOrdersService
         return order;
     }
 
-    public async Task<int> CreateOrder(string customerEmail, OrderForCreatingDto orderDto)
+    public async Task<Guid> CreateOrder(string customerEmail, OrderAddRequest orderAddRequest)
     {
         // Get total ordered quntity for each product to avoid problems if consumer enter two order items for the same product
         // for example if consumer enter ordersItems=[{productId=1, quntity=5}, {productId=1, quntity=2}], we convert it to [{key=1, value=7}]
-        var quntitiesOfOrderdProducts = orderDto.OrderItems
+        var quntitiesOfOrderdProducts = orderAddRequest.OrderLines
                                                 .GroupBy(i => i.ProductId)
                                                 .ToDictionary(group => group.Key, group => group.Sum(g => g.Quntity));
 
@@ -77,14 +77,14 @@ public class OrdersService : IOrdersService
             throw new UnprocessableEntityException("There is one or more invalid product id.");
 
         // Create order items
-        var orderItems = new List<OrderItem>();
+        var orderItems = new List<OrderLine>();
 
         orderedProductsEntities?.ForEach(product =>
         {
             if (product.Quantity < quntitiesOfOrderdProducts[product.Id])
                 throw new UnprocessableEntityException($"Insufficient stock of '{product.Name}' product.");
 
-            orderItems.Add(new OrderItem
+            orderItems.Add(new OrderLine
             {
                 ProductId = product.Id,
                 ProductName = product.Name,
@@ -104,16 +104,16 @@ public class OrdersService : IOrdersService
         var order = new Order
         {
             CustomerEmail = customerEmail,
-            CustomerPhone = orderDto.CustomerPhone,
-            ShippingAddress = new Address(orderDto.ShippingAddress.AddressLine, orderDto.ShippingAddress.City),
-            OrderItems = orderItems,
+            CustomerPhone = orderAddRequest.CustomerPhone,
+            ShippingAddress = new Address(orderAddRequest.ShippingAddress.AddressLine, orderAddRequest.ShippingAddress.City),
+            OrderLines = orderItems,
             Subtotal = subtotal,
             ShippingCosts = shippingCosts
         };
 
         //apply the discount (if there is any)
-        if (!string.IsNullOrEmpty(orderDto.CouponCode))
-            order.Discount = await couponsService.CalculateCouponDiscount(order.Subtotal, orderDto.CouponCode);
+        if (!string.IsNullOrEmpty(orderAddRequest.CouponCode))
+            order.Discount = await couponsService.CalculateCouponDiscount(order.Subtotal, orderAddRequest.CouponCode);
 
         unitOfWork.Orders.AddOrder(order);
         await unitOfWork.SaveChanges();
@@ -123,7 +123,7 @@ public class OrdersService : IOrdersService
         return order.Id;
     }
 
-    public async Task UpdateOrderStatus(int id, OrderStatus newOrderStatus)
+    public async Task UpdateOrderStatus(Guid id, OrderStatus newOrderStatus)
     {
         var order = await unitOfWork.Orders.GetOrder(id);
         if (order is null)
@@ -132,7 +132,7 @@ public class OrdersService : IOrdersService
         //return quntity back to the products if the order failed or canceled
         if (newOrderStatus == OrderStatus.Failed || newOrderStatus == OrderStatus.Canceled)
         {
-            var productsOrderdQuntity = order.OrderItems.ToDictionary(item => item.ProductId, item => item.Quntity);
+            var productsOrderdQuntity = order.OrderLines.ToDictionary(item => item.ProductId, item => item.Quntity);
 
             var productOrderdIds = productsOrderdQuntity.Keys.ToList();
 

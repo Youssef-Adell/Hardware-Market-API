@@ -14,43 +14,43 @@ public class BrandsRepository : IBrandsRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<IReadOnlyCollection<ProductBrand>> GetBrands()
+    public async Task<IReadOnlyCollection<Brand>> GetBrands()
     {
-        var brands = await appDbContext.ProductBrands
+        var brands = await appDbContext.Brands
                             .AsNoTracking()
                             .ToListAsync();
 
         return brands;
     }
 
-    public async Task<ProductBrand?> GetBrand(int id)
+    public async Task<Brand?> GetBrand(Guid id)
     {
-        var brand = await appDbContext.ProductBrands
+        var brand = await appDbContext.Brands
                         .AsNoTracking()
                         .FirstOrDefaultAsync(c => c.Id == id);
 
         return brand;
     }
 
-    public async Task<bool> BrandExists(int id)
+    public async Task<bool> BrandExists(Guid id)
     {
-        var exists = await appDbContext.ProductBrands.AnyAsync(brand => brand.Id == id);
+        var exists = await appDbContext.Brands.AnyAsync(brand => brand.Id == id);
 
         return exists;
     }
 
-    public void AddBrand(ProductBrand brand)
+    public void AddBrand(Brand brand)
     {
-        appDbContext.ProductBrands.Add(brand);
+        appDbContext.Brands.Add(brand);
     }
 
-    public void UpdateBrand(ProductBrand brand)
+    public void UpdateBrand(Brand brand)
     {
-        appDbContext.ProductBrands.Update(brand);
+        appDbContext.Brands.Update(brand);
     }
 
-    public void DeleteBrand(ProductBrand brand)
+    public void DeleteBrand(Brand brand)
     {
-        appDbContext.ProductBrands.Remove(brand);
+        appDbContext.Brands.Remove(brand);
     }
 }

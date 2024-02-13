@@ -4,9 +4,9 @@ namespace Core.Interfaces.IDomainServices;
 
 public interface IBrandsService
 {
-    Task<IReadOnlyCollection<BrandDto>> GetBrands();
-    Task<BrandDto> GetBrand(int id);
-    Task<int> AddBrand(BrandForAddingDto BrandToAdd, byte[] BrandLogo);
-    Task UpdateBrand(int BrandId, BrandForUpdatingDto updatedBrand, byte[]? newBrandLogo);
-    Task DeleteBrand(int id);
+    Task<IReadOnlyCollection<BrandResponse>> GetBrands();
+    Task<BrandResponse> GetBrand(Guid id);
+    Task<Guid> AddBrand(BrandAddRequest brandAddRequest, byte[] BrandLogo);
+    Task UpdateBrand(Guid id, BrandUpdateRequest brandUpdateRequest, byte[]? newBrandLogo);
+    Task DeleteBrand(Guid id);
 }

@@ -23,7 +23,7 @@ public class CouponsRepository : ICouponsRepository
         return coupons;
     }
 
-    public async Task<Coupon?> GetCoupon(int id)
+    public async Task<Coupon?> GetCoupon(Guid id)
     {
         var coupon = await appDbContext.Coupons
                             .AsNoTracking()

@@ -26,32 +26,32 @@ public class BrandsService : IBrandsService
         this.maxAllowedImageSizeInBytes = int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
     }
 
-    public async Task<IReadOnlyCollection<BrandDto>> GetBrands()
+    public async Task<IReadOnlyCollection<BrandResponse>> GetBrands()
     {
         var brandsEntities = await unitOfWork.Brands.GetBrands();
 
-        var brandsDtos = mapper.Map<IReadOnlyCollection<ProductBrand>, IReadOnlyCollection<BrandDto>>(brandsEntities);
+        var brandsDtos = mapper.Map<IReadOnlyCollection<Brand>, IReadOnlyCollection<BrandResponse>>(brandsEntities);
 
         return brandsDtos;
     }
 
-    public async Task<BrandDto> GetBrand(int id)
+    public async Task<BrandResponse> GetBrand(Guid id)
     {
         var brandEntity = await unitOfWork.Brands.GetBrand(id);
 
         if (brandEntity is null)
             throw new NotFoundException($"Brand not found.");
 
-        var brandDto = mapper.Map<ProductBrand?, BrandDto>(brandEntity);
+        var brandDto = mapper.Map<Brand?, BrandResponse>(brandEntity);
 
         return brandDto;
     }
 
-    public async Task<int> AddBrand(BrandForAddingDto brandToAdd, byte[] brandLogo)
+    public async Task<Guid> AddBrand(BrandAddRequest brandAddRequest, byte[] brandLogo)
     {
         await ValidateUploadedLogo(brandLogo);
 
-        var brandEntity = mapper.Map<BrandForAddingDto, ProductBrand>(brandToAdd);
+        var brandEntity = mapper.Map<BrandAddRequest, Brand>(brandAddRequest);
 
         brandEntity.LogoPath = await fileService.SaveFile(brandsLogosFolder, brandLogo); ;
 
@@ -61,16 +61,16 @@ public class BrandsService : IBrandsService
         return brandEntity.Id;
     }
 
-    public async Task UpdateBrand(int brandId, BrandForUpdatingDto updatedBrand, byte[]? newBrandLogo)
+    public async Task UpdateBrand(Guid id, BrandUpdateRequest brandUpdateRequest, byte[]? newBrandLogo)
     {
-        var brand = await unitOfWork.Brands.GetBrand(brandId);
+        var brand = await unitOfWork.Brands.GetBrand(id);
         if (brand is null)
             throw new NotFoundException($"Brand not found.");
 
         if (newBrandLogo != null && newBrandLogo?.Length > 0)
             await ValidateUploadedLogo(newBrandLogo);
 
-        var brandEntity = mapper.Map(updatedBrand, brand);
+        var brandEntity = mapper.Map(brandUpdateRequest, brand);
 
         //update logo if there is a new one uploaded
         if (newBrandLogo != null && newBrandLogo?.Length > 0)
@@ -84,7 +84,7 @@ public class BrandsService : IBrandsService
         await unitOfWork.SaveChanges();
     }
 
-    public async Task DeleteBrand(int id)
+    public async Task DeleteBrand(Guid id)
     {
         var brand = await unitOfWork.Brands.GetBrand(id);
         if (brand is null)

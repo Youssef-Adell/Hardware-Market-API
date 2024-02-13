@@ -9,8 +9,8 @@ public class ProductQueryParameters : PaginationQueryParameters, IValidatableObj
     public String? Search { get; set; }
     public uint MinPrice { get; set; } = 0;
     public uint MaxPrice { get; set; } = int.MaxValue;
-    public int? CategoryId { get; set; } = null;
-    public IEnumerable<int>? BrandId { get; set; } = null;
+    public Guid? CategoryId { get; set; } = null;
+    public IEnumerable<Guid>? BrandId { get; set; } = null;
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

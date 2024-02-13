@@ -2,7 +2,7 @@ namespace Core.Entities.OrderAggregate;
 
 public class Coupon
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string Code { get; set; }
     public double DiscountPercentage { get; set; } //ex: 10 means 10% discount on order subtotal
     public double MaxDiscountAmount { get; set; } //To put a limit to the discount

@@ -4,10 +4,10 @@ namespace Core.Interfaces.IRepositories;
 
 public interface IBrandsRepository
 {
-    Task<IReadOnlyCollection<ProductBrand>> GetBrands();
-    Task<ProductBrand?> GetBrand(int id);
-    Task<bool> BrandExists(int id);
-    void AddBrand(ProductBrand brand);
-    void UpdateBrand(ProductBrand brand);
-    void DeleteBrand(ProductBrand brand);
+    Task<IReadOnlyCollection<Brand>> GetBrands();
+    Task<Brand?> GetBrand(Guid id);
+    Task<bool> BrandExists(Guid id);
+    void AddBrand(Brand brand);
+    void UpdateBrand(Brand brand);
+    void DeleteBrand(Brand brand);
 }

@@ -24,47 +24,47 @@ public class ProductsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetProduct(int id)
+    [HttpGet("{id:Guid}")]
+    public async Task<IActionResult> GetProduct(Guid id)
     {
         var result = await productsService.GetProduct(id);
         return Ok(result);
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddProduct([FromForm] ProductForAddingDto productToAdd, [Required] IFormFileCollection images)
+    public async Task<IActionResult> AddProduct([FromForm] ProductAddRequest productAddRequest, [Required] IFormFileCollection images)
     {
         //Convert to list<byte[]> to make the service layer not depends on IFormFileCollection which is conisderd infrastructure details
         var productImagesAsBytes = await ConvertFormFilesToByteArrays(images);
 
-        var productId = await productsService.AddProduct(productToAdd, productImagesAsBytes);
+        var productId = await productsService.AddProduct(productAddRequest, productImagesAsBytes);
 
         return CreatedAtAction(nameof(GetProduct), new { id = productId }, null);
     }
 
-    [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductForUpdatingDto updatedProduct, IFormFileCollection imagesToAdd)
+    [HttpPut("{id:Guid}")]
+    public async Task<IActionResult> UpdateProduct(Guid id, [FromForm] ProductUpdateRequest productUpdateRequest, IFormFileCollection imagesToAdd)
     {
         //Convert to list<byte[]> to make the service layer not depends on IFormFileCollection which is conisderd infrastructure details
         var productImagesAsBytes = await ConvertFormFilesToByteArrays(imagesToAdd);
 
-        await productsService.UpdateProduct(id, updatedProduct, productImagesAsBytes);
+        await productsService.UpdateProduct(id, productUpdateRequest, productImagesAsBytes);
 
         return NoContent();
     }
 
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteProduct(int id)
+    [HttpDelete("{id:Guid}")]
+    public async Task<IActionResult> DeleteProduct(Guid id)
     {
         await productsService.DeleteProduct(id);
 
         return NoContent();
     }
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> UpdateProductQuntity(int id, ProductQuntityDto quntity)
+    [HttpPatch("{id:Guid}")]
+    public async Task<IActionResult> UpdateProductQuntity(Guid id, ProductQuntityUpdateRequest productQuntityUpdateRequest)
     {
-        await productsService.UpdateProductQuntity(id, quntity);
+        await productsService.UpdateProductQuntity(id, productQuntityUpdateRequest.Quantity);
 
         return NoContent();
     }

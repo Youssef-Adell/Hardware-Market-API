@@ -20,7 +20,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             statusColumn => Enum.Parse<OrderStatus>(statusColumn) //delegate to convert from column value (string) to OrderStatus enum
         );
 
-        builder.HasMany(o => o.OrderItems).WithOne().OnDelete(DeleteBehavior.Cascade).IsRequired();
+        builder.HasMany(o => o.OrderLines).WithOne().OnDelete(DeleteBehavior.Cascade).IsRequired();
     }
 
 }

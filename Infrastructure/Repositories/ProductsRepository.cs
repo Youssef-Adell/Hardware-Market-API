@@ -41,7 +41,7 @@ public class ProductsRepository : IProductsRepository
         return new PagedResult<Product>(pagedProductsData, queryParams.Page, queryParams.PageSize, totalProductsCount);
     }
 
-    public async Task<List<Product>?> GetProductsCollection(IEnumerable<int> ids)
+    public async Task<List<Product>?> GetProductsCollection(IEnumerable<Guid> ids)
     {
         var productsCollection = await appDbContext.Products.Where(p => ids.Contains(p.Id))
                                     .Include(p => p.Images)
@@ -51,7 +51,7 @@ public class ProductsRepository : IProductsRepository
         return productsCollection;
     }
 
-    public Task<Product?> GetProduct(int id)
+    public Task<Product?> GetProduct(Guid id)
     {
         var product = appDbContext.Products
                             .Include(p => p.Brand).Include(p => p.Category).Include(p => p.Images)
@@ -60,7 +60,7 @@ public class ProductsRepository : IProductsRepository
         return product;
     }
 
-    public async Task<bool> ProductExists(int id)
+    public async Task<bool> ProductExists(Guid id)
     {
         var exists = await appDbContext.Products.AnyAsync(product => product.Id == id);
 

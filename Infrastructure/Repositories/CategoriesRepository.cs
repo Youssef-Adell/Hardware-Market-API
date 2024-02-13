@@ -14,43 +14,43 @@ public class CategoriesRepository : ICategoriesRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<IReadOnlyCollection<ProductCategory>> GetCategories()
+    public async Task<IReadOnlyCollection<Category>> GetCategories()
     {
-        var categories = await appDbContext.ProductCategories
+        var categories = await appDbContext.Categories
                             .AsNoTracking()
                             .ToListAsync();
 
         return categories;
     }
 
-    public async Task<ProductCategory?> GetCategory(int id)
+    public async Task<Category?> GetCategory(Guid id)
     {
-        var category = await appDbContext.ProductCategories
+        var category = await appDbContext.Categories
                         .AsNoTracking()
                         .FirstOrDefaultAsync(c => c.Id == id);
 
         return category;
     }
 
-    public async Task<bool> CategoryExists(int id)
+    public async Task<bool> CategoryExists(Guid id)
     {
-        var exists = await appDbContext.ProductCategories.AnyAsync(category => category.Id == id);
+        var exists = await appDbContext.Categories.AnyAsync(category => category.Id == id);
 
         return exists;
     }
 
-    public void AddCategory(ProductCategory category)
+    public void AddCategory(Category category)
     {
-        appDbContext.ProductCategories.Add(category);
+        appDbContext.Categories.Add(category);
     }
 
-    public void UpdateCategory(ProductCategory category)
+    public void UpdateCategory(Category category)
     {
-        appDbContext.ProductCategories.Update(category);
+        appDbContext.Categories.Update(category);
     }
 
-    public void DeleteCategory(ProductCategory category)
+    public void DeleteCategory(Category category)
     {
-        appDbContext.ProductCategories.Remove(category);
+        appDbContext.Categories.Remove(category);
     }
 }

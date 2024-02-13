@@ -58,10 +58,10 @@ public class OrdersRepository : IOrdersRepository
         return new PagedResult<Order>(pagedOrdersData, queryParams.Page, queryParams.PageSize, totalOrdersCount);
     }
 
-    public async Task<Order?> GetOrder(int id)
+    public async Task<Order?> GetOrder(Guid id)
     {
         var order = await appDbContext.Orders.AsNoTracking()
-                                            .Include(o => o.OrderItems)
+                                            .Include(o => o.OrderLines)
                                             .FirstOrDefaultAsync(o => o.Id == id);
 
         return order;

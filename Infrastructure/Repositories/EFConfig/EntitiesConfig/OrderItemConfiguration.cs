@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Repositories.EFConfig.EntitiesConfig;
 
-public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
+public class OrderItemConfiguration : IEntityTypeConfiguration<OrderLine>
 {
-    public void Configure(EntityTypeBuilder<OrderItem> builder)
+    public void Configure(EntityTypeBuilder<OrderLine> builder)
     {
-        builder.ToTable("OrderItems");
+        builder.ToTable("OrderLines");
     }
 
 }

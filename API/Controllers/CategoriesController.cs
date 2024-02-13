@@ -24,8 +24,8 @@ public class CategoriesController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetCategory(int id)
+    [HttpGet("{id:Guid}")]
+    public async Task<IActionResult> GetCategory(Guid id)
     {
         var result = await categoriesService.GetCategory(id);
 
@@ -33,30 +33,30 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddCategory([FromForm] CategoryForAddingDto categoryToAdd, [Required] IFormFile icon)
+    public async Task<IActionResult> AddCategory([FromForm] CategoryAddRequest categoryAddRequest, [Required] IFormFile icon)
     {
         var categoryIconAsBytes = await ConvertFormFileToByteArray(icon);
 
-        var categoryId = await categoriesService.AddCategory(categoryToAdd, categoryIconAsBytes);
+        var categoryId = await categoriesService.AddCategory(categoryAddRequest, categoryIconAsBytes);
 
         return CreatedAtAction(nameof(GetCategory), new { Id = categoryId }, null);
     }
 
-    [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateCategory(int id, [FromForm] CategoryForUpdatingDto updatedCategory, IFormFile? newIcon)
+    [HttpPut("{id:Guid}")]
+    public async Task<IActionResult> UpdateCategory(Guid id, [FromForm] CategoryUpdateRequest categoryUpdateRequest, IFormFile? newIcon)
     {
         byte[]? newCategoryIconAsBytes = null;
 
         if (newIcon != null)
             newCategoryIconAsBytes = await ConvertFormFileToByteArray(newIcon);
 
-        await categoriesService.UpdateCategory(id, updatedCategory, newCategoryIconAsBytes);
+        await categoriesService.UpdateCategory(id, categoryUpdateRequest, newCategoryIconAsBytes);
 
         return NoContent();
     }
 
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteCategory(int id)
+    [HttpDelete("{id:Guid}")]
+    public async Task<IActionResult> DeleteCategory(Guid id)
     {
         await categoriesService.DeleteCategory(id);
 

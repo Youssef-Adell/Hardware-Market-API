@@ -5,10 +5,10 @@ namespace Core.Interfaces.IDomainServices;
 
 public interface IProductReviewsService
 {
-    Task<PagedResult<ProductReviewDto>> GetProductReviews(int productId, PaginationQueryParameters queryParams);
-    Task<ProductReviewDto> GetProductReview(int productId, int reviewId);
-    Task<ProductReviewDto> GetProductReview(int productId, string customerEmail);
-    Task<int> AddProductReview(string customerEmail, int productId, ProductReviewForAddingDto reviewToAdd);
-    Task UpdateProductReview(string customerEmail, int productId, int reviewId, ProductReviewForUpdatingDto updatedReview);
-    Task DeleteProductReview(string customerEmail, int productId, int reviewId);
+    Task<PagedResult<ProductReviewResponse>> GetProductReviews(Guid productId, PaginationQueryParameters queryParams);
+    Task<ProductReviewResponse> GetProductReview(Guid productId, Guid reviewId);
+    Task<ProductReviewResponse> GetProductReview(Guid productId, string customerEmail);
+    Task<Guid> AddProductReview(string customerEmail, Guid productId, ProductReviewAddRequest productReviewAddRequest);
+    Task UpdateProductReview(string customerEmail, Guid productId, Guid reviewId, ProductReviewUpdateRequest ProductReviewUpdateRequest);
+    Task DeleteProductReview(string customerEmail, Guid productId, Guid reviewId);
 }

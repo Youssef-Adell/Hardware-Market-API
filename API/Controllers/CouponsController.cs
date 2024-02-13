@@ -24,8 +24,8 @@ public class CouponsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetCoupon(int id)
+    [HttpGet("{id:Guid}")]
+    public async Task<IActionResult> GetCoupon(Guid id)
     {
         var result = await brandsService.GetCoupon(id);
 
@@ -41,23 +41,23 @@ public class CouponsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddCoupon(CouponForAddingDto couponToAdd)
+    public async Task<IActionResult> AddCoupon(CouponAddRequest couponAddRequest)
     {
-        var couponId = await brandsService.AddCoupon(couponToAdd);
+        var couponId = await brandsService.AddCoupon(couponAddRequest);
 
         return CreatedAtAction(nameof(GetCoupon), new { id = couponId }, null);
     }
 
-    [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateCoupon(int id, CouponForUpdatingDto updatedCoupon)
+    [HttpPut("{id:Guid}")]
+    public async Task<IActionResult> UpdateCoupon(Guid id, CouponUpdateRequest couponUpdateRequest)
     {
-        await brandsService.UpdateCoupon(id, updatedCoupon);
+        await brandsService.UpdateCoupon(id, couponUpdateRequest);
 
         return NoContent();
     }
 
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteCoupon(int id)
+    [HttpDelete("{id:Guid}")]
+    public async Task<IActionResult> DeleteCoupon(Guid id)
     {
         await brandsService.DeleteCoupon(id);
 

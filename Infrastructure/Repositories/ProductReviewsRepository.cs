@@ -15,7 +15,7 @@ public class ProductReviewsRepository : IProductReviewsRepository
         this.appDbContext = appDbContext;
     }
 
-    public async Task<PagedResult<ProductReview>> GetProductReviews(int productId, PaginationQueryParameters queryParams)
+    public async Task<PagedResult<ProductReview>> GetProductReviews(Guid productId, PaginationQueryParameters queryParams)
     {
         //build a query to get reveiws of this product
         var query = appDbContext.ProductReviews.Where(r => r.ProductId == productId);
@@ -34,7 +34,7 @@ public class ProductReviewsRepository : IProductReviewsRepository
         return new PagedResult<ProductReview>(pagedReviewssData, queryParams.Page, queryParams.PageSize, totalReviewsForThisProduct);
     }
 
-    public async Task<ProductReview?> GetProductReview(int productId, int reviewId)
+    public async Task<ProductReview?> GetProductReview(Guid productId, Guid reviewId)
     {
         var review = await appDbContext.ProductReviews
                         .AsNoTracking()
@@ -43,7 +43,7 @@ public class ProductReviewsRepository : IProductReviewsRepository
         return review;
     }
 
-    public async Task<ProductReview?> GetProductReview(int productId, string customerEmail)
+    public async Task<ProductReview?> GetProductReview(Guid productId, string customerEmail)
     {
         var review = await appDbContext.ProductReviews
                         .AsNoTracking()
@@ -52,11 +52,18 @@ public class ProductReviewsRepository : IProductReviewsRepository
         return review;
     }
 
-    public async Task<bool> HasCustomerReviewedProduct(int productId, string customerEmail)
+    public async Task<bool> HasCustomerReviewedProduct(Guid productId, string customerEmail)
     {
         var hasReviewd = await appDbContext.ProductReviews.AnyAsync(r => r.ProductId == productId && r.CustomerEmail == customerEmail);
 
         return hasReviewd;
+    }
+
+    public async Task<double> CalculateAvgRatingForProduct(Guid productId)
+    {
+        var productAvgRating = await appDbContext.ProductReviews.Where(r => r.ProductId == productId).AverageAsync(r => r.Rating);
+
+        return productAvgRating;
     }
 
     public void AddProductReview(ProductReview review)

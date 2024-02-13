@@ -27,33 +27,33 @@ public class ProductsService : IProductsService
         this.maxAllowedImageSizeInBytes = int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
     }
 
-    public async Task<PagedResult<ProductForListDto>> GetProducts(ProductQueryParameters queryParams)
+    public async Task<PagedResult<ProductForListResponse>> GetProducts(ProductQueryParameters queryParams)
     {
         var pageOfProductEntities = await unitOfWork.Products.GetProducts(queryParams);
 
-        var pageOfProductDtos = mapper.Map<PagedResult<Product>, PagedResult<ProductForListDto>>(pageOfProductEntities);
+        var pageOfProductDtos = mapper.Map<PagedResult<Product>, PagedResult<ProductForListResponse>>(pageOfProductEntities);
         return pageOfProductDtos;
     }
 
-    public async Task<ProductDetailsDto> GetProduct(int id)
+    public async Task<ProductResponse> GetProduct(Guid id)
     {
         var productEntity = await unitOfWork.Products.GetProduct(id);
         if (productEntity is null)
             throw new NotFoundException($"Product not found.");
 
-        var productDto = mapper.Map<Product, ProductDetailsDto>(productEntity);
+        var productDto = mapper.Map<Product, ProductResponse>(productEntity);
         return productDto;
     }
 
-    public async Task<int> AddProduct(ProductForAddingDto productToAdd, List<byte[]> productImages)
+    public async Task<Guid> AddProduct(ProductAddRequest productAddRequest, List<byte[]> productImages)
     {
-        await ValidateCategory(productToAdd.CategoryId);
-        await ValidateBrand(productToAdd.BrandId);
+        await ValidateCategory(productAddRequest.CategoryId);
+        await ValidateBrand(productAddRequest.BrandId);
 
         if (productImages != null && productImages.Count > 0)
             await ValidateUploadedImages(productImages);
 
-        var productEntity = mapper.Map<ProductForAddingDto, Product>(productToAdd);
+        var productEntity = mapper.Map<ProductAddRequest, Product>(productAddRequest);
 
         //add uploaded images to the product (if there are any)
         if (productImages != null && productImages.Count > 0)
@@ -69,25 +69,25 @@ public class ProductsService : IProductsService
         return productEntity.Id;
     }
 
-    public async Task UpdateProduct(int productId, ProductForUpdatingDto updatedProduct, List<byte[]> imagesToAdd)
+    public async Task UpdateProduct(Guid id, ProductUpdateRequest productUpdateRequest, List<byte[]> imagesToAdd)
     {
-        var product = await unitOfWork.Products.GetProduct(productId);
+        var product = await unitOfWork.Products.GetProduct(id);
         if (product is null)
             throw new NotFoundException($"Product not found.");
 
-        await ValidateCategory(updatedProduct.CategoryId);
-        await ValidateBrand(updatedProduct.BrandId);
+        await ValidateCategory(productUpdateRequest.CategoryId);
+        await ValidateBrand(productUpdateRequest.BrandId);
 
         if (imagesToAdd != null && imagesToAdd?.Count > 0)
             await ValidateUploadedImages(imagesToAdd);
 
-        var productEntity = mapper.Map(updatedProduct, product);
+        var productEntity = mapper.Map(productUpdateRequest, product);
 
         //remove the images that selected to be removed (if there are any)
-        if (updatedProduct?.IdsOfImagesToRemove != null && updatedProduct.IdsOfImagesToRemove.Count > 0)
+        if (productUpdateRequest?.IdsOfImagesToRemove != null && productUpdateRequest.IdsOfImagesToRemove.Count > 0)
         {
             var imagesToRemove = productEntity.Images?
-                                                .Where(image => updatedProduct.IdsOfImagesToRemove.Contains(image.Id))
+                                                .Where(image => productUpdateRequest.IdsOfImagesToRemove.Contains(image.Id))
                                                 .ToList();
 
             imagesToRemove?.ForEach(image =>
@@ -136,7 +136,7 @@ public class ProductsService : IProductsService
         await unitOfWork.SaveChanges();
     }
 
-    public async Task DeleteProduct(int id)
+    public async Task DeleteProduct(Guid id)
     {
         var product = await unitOfWork.Products.GetProduct(id);
         if (product is null)
@@ -149,13 +149,13 @@ public class ProductsService : IProductsService
         product.Images?.ForEach(image => fileService.DeleteFile(image.Path));
     }
 
-    public async Task UpdateProductQuntity(int id, ProductQuntityDto newQuntityDto)
+    public async Task UpdateProductQuntity(Guid id, int newQuntity)
     {
         var product = await unitOfWork.Products.GetProduct(id);
         if (product is null)
             throw new NotFoundException($"Product not found.");
 
-        product.Quantity = newQuntityDto.Quantity;
+        product.Quantity = newQuntity;
 
         unitOfWork.Products.UpdateProduct(product);
 
@@ -176,14 +176,14 @@ public class ProductsService : IProductsService
         }
     }
 
-    private async Task ValidateCategory(int categoryId)
+    private async Task ValidateCategory(Guid categoryId)
     {
         var categoryExists = await unitOfWork.Categories.CategoryExists(categoryId);
         if (!categoryExists)
             throw new UnprocessableEntityException($"Invalid category id.");
     }
 
-    private async Task ValidateBrand(int brandId)
+    private async Task ValidateBrand(Guid brandId)
     {
         var BrandExists = await unitOfWork.Brands.BrandExists(brandId);
         if (!BrandExists)

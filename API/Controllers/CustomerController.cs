@@ -24,8 +24,8 @@ public class CustomerController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("orders/{id}")]
-    public async Task<IActionResult> GetCustomerOrder(int id, [FromQuery] string customerEmail)
+    [HttpGet("orders/{id:Guid}")]
+    public async Task<IActionResult> GetCustomerOrder(Guid id, [FromQuery] string customerEmail)
     {
         var result = await ordersService.GetCustomerOrder(customerEmail, id);
 
@@ -33,9 +33,9 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPost("orders")]
-    public async Task<IActionResult> CreateUserOrder(OrderForCreatingDto order, [FromQuery] string customerEmail)
+    public async Task<IActionResult> CreateUserOrder(OrderAddRequest orderAddRequest, [FromQuery] string customerEmail)
     {
-        var orderId = await ordersService.CreateOrder(customerEmail, order);
+        var orderId = await ordersService.CreateOrder(customerEmail, orderAddRequest);
 
         return CreatedAtAction(nameof(GetCustomerOrder), new { id = orderId }, null);
     }

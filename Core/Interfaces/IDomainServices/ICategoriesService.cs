@@ -4,9 +4,9 @@ namespace Core.Interfaces.IDomainServices;
 
 public interface ICategoriesService
 {
-    Task<IReadOnlyCollection<CategoryDto>> GetCategories();
-    Task<CategoryDto> GetCategory(int id);
-    Task<int> AddCategory(CategoryForAddingDto categoryToAdd, byte[] categoryIcon);
-    Task UpdateCategory(int categoryId, CategoryForUpdatingDto updatedCategory, byte[]? newCategoryIcon);
-    Task DeleteCategory(int id);
+    Task<IReadOnlyCollection<CategoryResponse>> GetCategories();
+    Task<CategoryResponse> GetCategory(Guid id);
+    Task<Guid> AddCategory(CategoryAddRequest categoryAddRequest, byte[] categoryIcon);
+    Task UpdateCategory(Guid id, CategoryUpdateRequest categoryUpdateRequest, byte[]? newCategoryIcon);
+    Task DeleteCategory(Guid id);
 }

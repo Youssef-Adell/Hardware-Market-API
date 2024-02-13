@@ -24,8 +24,8 @@ public class BrandsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetBrand(int id)
+    [HttpGet("{id:Guid}")]
+    public async Task<IActionResult> GetBrand(Guid id)
     {
         var result = await brandsService.GetBrand(id);
 
@@ -33,30 +33,30 @@ public class BrandsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddBrand([FromForm] BrandForAddingDto BrandToAdd, [Required] IFormFile icon)
+    public async Task<IActionResult> AddBrand([FromForm] BrandAddRequest brandAddRequest, [Required] IFormFile icon)
     {
         var BrandIconAsBytes = await ConvertFormFileToByteArray(icon);
 
-        var BrandId = await brandsService.AddBrand(BrandToAdd, BrandIconAsBytes);
+        var BrandId = await brandsService.AddBrand(brandAddRequest, BrandIconAsBytes);
 
         return CreatedAtAction(nameof(GetBrand), new { Id = BrandId }, null);
     }
 
-    [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateBrand(int id, [FromForm] BrandForUpdatingDto updatedBrand, IFormFile? newIcon)
+    [HttpPut("{id:Guid}")]
+    public async Task<IActionResult> UpdateBrand(Guid id, [FromForm] BrandUpdateRequest brandUpdateRequest, IFormFile? newIcon)
     {
         byte[]? newBrandIconAsBytes = null;
 
         if (newIcon != null)
             newBrandIconAsBytes = await ConvertFormFileToByteArray(newIcon);
 
-        await brandsService.UpdateBrand(id, updatedBrand, newBrandIconAsBytes);
+        await brandsService.UpdateBrand(id, brandUpdateRequest, newBrandIconAsBytes);
 
         return NoContent();
     }
 
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteBrand(int id)
+    [HttpDelete("{id:Guid}")]
+    public async Task<IActionResult> DeleteBrand(Guid id)
     {
         await brandsService.DeleteBrand(id);
 

@@ -2,11 +2,11 @@ namespace Core.Entities.OrderAggregate;
 
 public class Order
 {
-    public int Id { get; set; }
-    public List<OrderItem> OrderItems { get; set; }
+    public Guid Id { get; set; }
+    public List<OrderLine> OrderLines { get; set; }
     public string CustomerEmail { get; set; }
     public string CustomerPhone { get; set; }
-    public Address ShippingAddress { get; set; }
+    public ShippingAddress ShippingAddress { get; set; }
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
     public DateTime OrderDate { get; set; } = DateTime.UtcNow;
     public double Subtotal { get; set; }

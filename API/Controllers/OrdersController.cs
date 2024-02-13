@@ -27,18 +27,18 @@ public class OrdersController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetOrder(int id)
+    [HttpGet("{id:Guid}")]
+    public async Task<IActionResult> GetOrder(Guid id)
     {
         var result = await ordersService.GetOrder(id);
 
         return Ok(result);
     }
 
-    [HttpPatch("{id}")]
-    public async Task<IActionResult> UpdateOrderStatus(int id, OrderStatusDto orderStatusDto)
+    [HttpPatch("{id:Guid}")]
+    public async Task<IActionResult> UpdateOrderStatus(Guid id, OrderStatusUpdateRequest orderStatusUpdateRequest)
     {
-        await ordersService.UpdateOrderStatus(id, orderStatusDto.Status);
+        await ordersService.UpdateOrderStatus(id, orderStatusUpdateRequest.Status);
 
         return NoContent();
     }
@@ -55,13 +55,13 @@ public class OrdersController : ControllerBase
         {
             case Events.PaymentIntentSucceeded:
                 var paymentIntent = (PaymentIntent)stripeEvent.Data.Object;
-                var orderId = int.Parse(paymentIntent.Metadata["orderId"]);
+                var orderId = Guid.Parse(paymentIntent.Metadata["orderId"]);
                 await ordersService.UpdateOrderStatus(orderId, OrderStatus.Received);
                 break;
 
             case Events.PaymentIntentPaymentFailed:
                 paymentIntent = (PaymentIntent)stripeEvent.Data.Object;
-                orderId = int.Parse(paymentIntent.Metadata["orderId"]);
+                orderId = Guid.Parse(paymentIntent.Metadata["orderId"]);
                 await ordersService.UpdateOrderStatus(orderId, OrderStatus.Failed);
                 break;
         }

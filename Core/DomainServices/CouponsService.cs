@@ -18,46 +18,46 @@ public class CouponsService : ICouponsService
         this.mapper = mapper;
     }
 
-    public async Task<IReadOnlyCollection<CouponDto>> GetCoupons()
+    public async Task<IReadOnlyCollection<CouponResponse>> GetCoupons()
     {
         var couponsEntities = await unitOfWork.Coupons.GetCoupons();
 
-        var couponsDtos = mapper.Map<IReadOnlyCollection<Coupon>, IReadOnlyCollection<CouponDto>>(couponsEntities);
+        var couponsDtos = mapper.Map<IReadOnlyCollection<Coupon>, IReadOnlyCollection<CouponResponse>>(couponsEntities);
 
         return couponsDtos;
     }
 
-    public async Task<CouponDto> GetCoupon(int id)
+    public async Task<CouponResponse> GetCoupon(Guid id)
     {
         var couponEntity = await unitOfWork.Coupons.GetCoupon(id);
 
         if (couponEntity is null)
             throw new NotFoundException($"Coupon not found.");
 
-        var couponDto = mapper.Map<Coupon?, CouponDto>(couponEntity);
+        var couponDto = mapper.Map<Coupon?, CouponResponse>(couponEntity);
 
         return couponDto;
     }
 
-    public async Task<CouponDto> GetCoupon(string code)
+    public async Task<CouponResponse> GetCoupon(string code)
     {
         var couponEntity = await unitOfWork.Coupons.GetCoupon(code);
 
         if (couponEntity is null)
             throw new NotFoundException($"Coupon not found.");
 
-        var couponDto = mapper.Map<Coupon?, CouponDto>(couponEntity);
+        var couponDto = mapper.Map<Coupon?, CouponResponse>(couponEntity);
 
         return couponDto;
     }
 
-    public async Task<int> AddCoupon(CouponForAddingDto couponToAdd)
+    public async Task<Guid> AddCoupon(CouponAddRequest couponAddRequest)
     {
-        var couponExists = await unitOfWork.Coupons.CouponExists(couponToAdd.Code);
+        var couponExists = await unitOfWork.Coupons.CouponExists(couponAddRequest.Code);
         if (couponExists)
-            throw new ConfilctException($"The coupon code {couponToAdd.Code} is already in use by another coupon.");
+            throw new ConfilctException($"The coupon code {couponAddRequest.Code} is already in use by another coupon.");
 
-        var couponEntity = mapper.Map<CouponForAddingDto, Coupon>(couponToAdd);
+        var couponEntity = mapper.Map<CouponAddRequest, Coupon>(couponAddRequest);
 
         unitOfWork.Coupons.AddCoupon(couponEntity);
 
@@ -66,20 +66,20 @@ public class CouponsService : ICouponsService
         return couponEntity.Id;
     }
 
-    public async Task UpdateCoupon(int id, CouponForUpdatingDto updatedCoupon)
+    public async Task UpdateCoupon(Guid id, CouponUpdateRequest couponUpdateRequest)
     {
         var coupon = await unitOfWork.Coupons.GetCoupon(id);
         if (coupon is null)
             throw new NotFoundException($"Coupon not found.");
 
-        var couponEntity = mapper.Map(updatedCoupon, coupon);
+        var couponEntity = mapper.Map(couponUpdateRequest, coupon);
 
         unitOfWork.Coupons.UpdateCoupon(couponEntity);
 
         await unitOfWork.SaveChanges();
     }
 
-    public async Task DeleteCoupon(int id)
+    public async Task DeleteCoupon(Guid id)
     {
         var coupon = await unitOfWork.Coupons.GetCoupon(id);
         if (coupon is null)

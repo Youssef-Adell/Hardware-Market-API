@@ -27,32 +27,32 @@ public class CategoriesService : ICategoriesService
         this.maxAllowedImageSizeInBytes = int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
     }
 
-    public async Task<IReadOnlyCollection<CategoryDto>> GetCategories()
+    public async Task<IReadOnlyCollection<CategoryResponse>> GetCategories()
     {
         var categoriesEntities = await unitOfWork.Categories.GetCategories();
 
-        var categoriesDtos = mapper.Map<IReadOnlyCollection<ProductCategory>, IReadOnlyCollection<CategoryDto>>(categoriesEntities);
+        var categoriesDtos = mapper.Map<IReadOnlyCollection<Category>, IReadOnlyCollection<CategoryResponse>>(categoriesEntities);
 
         return categoriesDtos;
     }
 
-    public async Task<CategoryDto> GetCategory(int id)
+    public async Task<CategoryResponse> GetCategory(Guid id)
     {
         var categoryEntity = await unitOfWork.Categories.GetCategory(id);
 
         if (categoryEntity is null)
             throw new NotFoundException($"Category not found.");
 
-        var categoryDto = mapper.Map<ProductCategory?, CategoryDto>(categoryEntity);
+        var categoryDto = mapper.Map<Category?, CategoryResponse>(categoryEntity);
 
         return categoryDto;
     }
 
-    public async Task<int> AddCategory(CategoryForAddingDto categoryToAdd, byte[] categoryIcon)
+    public async Task<Guid> AddCategory(CategoryAddRequest categoryAddRequest, byte[] categoryIcon)
     {
         await ValidateUploadedIcon(categoryIcon);
 
-        var categoryEntity = mapper.Map<CategoryForAddingDto, ProductCategory>(categoryToAdd);
+        var categoryEntity = mapper.Map<CategoryAddRequest, Category>(categoryAddRequest);
 
         categoryEntity.IconPath = await fileService.SaveFile(categoriesIconsFolder, categoryIcon); ;
 
@@ -63,16 +63,16 @@ public class CategoriesService : ICategoriesService
         return categoryEntity.Id;
     }
 
-    public async Task UpdateCategory(int categoryId, CategoryForUpdatingDto updatedCategory, byte[]? newCategoryIcon)
+    public async Task UpdateCategory(Guid id, CategoryUpdateRequest categoryUpdateRequest, byte[]? newCategoryIcon)
     {
-        var category = await unitOfWork.Categories.GetCategory(categoryId);
+        var category = await unitOfWork.Categories.GetCategory(id);
         if (category is null)
             throw new NotFoundException($"Category not found.");
 
         if (newCategoryIcon != null && newCategoryIcon?.Length > 0)
             await ValidateUploadedIcon(newCategoryIcon);
 
-        var categoryEntity = mapper.Map(updatedCategory, category);
+        var categoryEntity = mapper.Map(categoryUpdateRequest, category);
 
         //update icon if there is a new one uploaded
         if (newCategoryIcon != null && newCategoryIcon?.Length > 0)
@@ -86,7 +86,7 @@ public class CategoriesService : ICategoriesService
         await unitOfWork.SaveChanges();
     }
 
-    public async Task DeleteCategory(int id)
+    public async Task DeleteCategory(Guid id)
     {
         var category = await unitOfWork.Categories.GetCategory(id);
         if (category is null)

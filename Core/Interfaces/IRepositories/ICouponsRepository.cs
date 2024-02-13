@@ -5,7 +5,7 @@ namespace Core.Interfaces.IRepositories;
 public interface ICouponsRepository
 {
     Task<IReadOnlyCollection<Coupon>> GetCoupons();
-    Task<Coupon?> GetCoupon(int id);
+    Task<Coupon?> GetCoupon(Guid id);
     Task<Coupon?> GetCoupon(string code);
     Task<bool> CouponExists(string code);
     void AddCoupon(Coupon Coupon);
