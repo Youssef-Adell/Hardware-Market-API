@@ -7,6 +7,7 @@ using Core.Interfaces.IRepositories;
 using FileSignatures;
 using FileSignatures.Formats;
 using Infrastructure.ExternalServices.FileService;
+using Infrastructure.ExternalServices.PaymentService;
 using Infrastructure.Repositories;
 using Infrastructure.Repositories.EFConfig;
 using Microsoft.AspNetCore.Mvc;
@@ -75,5 +76,6 @@ public static class ServicesExtensions
         services.AddScoped<ICouponsService, CouponsService>();
 
         services.AddScoped<IFileService, DiskFileService>();
+        services.AddScoped<IPaymentService, StripePaymentService>();
     }
 }

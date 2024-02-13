@@ -3,9 +3,9 @@ namespace Core.Entities.OrderAggregate;
 public enum OrderStatus
 {
     Pending,
-    Failed,
-    Received,
+    Orderd,
     InProgress,
     Completed,
-    Canceled
+    Canceled,
+    Failed
 }

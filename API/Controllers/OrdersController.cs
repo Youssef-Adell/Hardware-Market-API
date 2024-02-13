@@ -56,7 +56,7 @@ public class OrdersController : ControllerBase
             case Events.PaymentIntentSucceeded:
                 var paymentIntent = (PaymentIntent)stripeEvent.Data.Object;
                 var orderId = Guid.Parse(paymentIntent.Metadata["orderId"]);
-                await ordersService.UpdateOrderStatus(orderId, OrderStatus.Received);
+                await ordersService.UpdateOrderStatus(orderId, OrderStatus.Orderd);
                 break;
 
             case Events.PaymentIntentPaymentFailed:
@@ -66,6 +66,6 @@ public class OrdersController : ControllerBase
                 break;
         }
 
-        return Ok();
+        return NoContent();
     }
 }

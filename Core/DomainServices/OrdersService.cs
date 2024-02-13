@@ -4,8 +4,8 @@ using Core.DTOs.QueryParametersDTOs;
 using Core.Entities.OrderAggregate;
 using Core.Exceptions;
 using Core.Interfaces.IDomainServices;
+using Core.Interfaces.IExternalServices;
 using Core.Interfaces.IRepositories;
-using Stripe;
 using Address = Core.Entities.OrderAggregate.ShippingAddress;
 
 namespace Core.DomainServices;
@@ -14,12 +14,15 @@ public class OrdersService : IOrdersService
 {
     private readonly IUnitOfWork unitOfWork;
     private readonly ICouponsService couponsService;
+    private readonly IPaymentService paymentService;
+
     private readonly IMapper mapper;
 
-    public OrdersService(IUnitOfWork unitOfWork, ICouponsService couponsService, IMapper mapper)
+    public OrdersService(IUnitOfWork unitOfWork, ICouponsService couponsService, IPaymentService paymentService, IMapper mapper)
     {
         this.unitOfWork = unitOfWork;
         this.couponsService = couponsService;
+        this.paymentService = paymentService;
         this.mapper = mapper;
     }
 
@@ -103,6 +106,7 @@ public class OrdersService : IOrdersService
         // Create the order
         var order = new Order
         {
+            Id = Guid.NewGuid(),
             CustomerEmail = customerEmail,
             CustomerPhone = orderAddRequest.CustomerPhone,
             ShippingAddress = new Address(orderAddRequest.ShippingAddress.AddressLine, orderAddRequest.ShippingAddress.City),
@@ -115,10 +119,11 @@ public class OrdersService : IOrdersService
         if (!string.IsNullOrEmpty(orderAddRequest.CouponCode))
             order.Discount = await couponsService.CalculateCouponDiscount(order.Subtotal, orderAddRequest.CouponCode);
 
+        //create a payment intent
+        order.PaymentIntentClientSecret = await paymentService.CreatePaymentIntent(order.Id, order.Total);
+
         unitOfWork.Orders.AddOrder(order);
         await unitOfWork.SaveChanges();
-
-        await CreatePaymentIntent(order);
 
         return order.Id;
     }
@@ -150,26 +155,4 @@ public class OrdersService : IOrdersService
         unitOfWork.Orders.UpdateOrder(order);
         await unitOfWork.SaveChanges();
     }
-
-    private async Task CreatePaymentIntent(Order order)
-    {
-        StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
-
-        var options = new PaymentIntentCreateOptions
-        {
-            Amount = (long)order.Total * 100,
-            Currency = "egp",
-            PaymentMethodTypes = new List<string> { "card" },
-            Metadata = new Dictionary<string, string> { { "orderId", order.Id.ToString() } }
-        };
-
-        var service = new PaymentIntentService();
-        var paymentIntent = await service.CreateAsync(options);
-
-        order.PaymentClientSecret = paymentIntent.ClientSecret;
-
-        unitOfWork.Orders.UpdateOrder(order);
-        await unitOfWork.SaveChanges();
-    }
-
 }

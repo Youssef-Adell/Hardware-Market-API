@@ -12,6 +12,6 @@ public class Order
     public double Subtotal { get; set; }
     public double Discount { get; set; }
     public double ShippingCosts { get; set; }
-    public string? PaymentClientSecret { get; set; }
+    public string PaymentIntentClientSecret { get; set; }
     public double Total => (Subtotal + ShippingCosts) - Discount;
 }
