@@ -8,6 +8,7 @@ public class ProductResponse
     public string? Description { get; set; }
     public int Quantity { get; set; }
     public double Price { get; init; }
+    public DateTime CreatedAt { get; set; }
     public string Brand { get; init; }
     public string Category { get; init; }
     public float AverageRating { get; set; }

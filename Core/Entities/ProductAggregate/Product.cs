@@ -8,6 +8,7 @@ public class Product
     public string? Description { get; set; }
     public int Quantity { get; set; }
     public double Price { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public Guid BrandId { get; set; }
     public Brand? Brand { get; set; }
     public Guid CategoryId { get; set; }
