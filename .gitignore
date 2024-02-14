@@ -3,5 +3,6 @@ obj/
 vs/
 vs-code/
 logs/
-endpoints.txt
 Images/
+notes.txt
+environment_variables.txt
