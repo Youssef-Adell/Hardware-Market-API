@@ -1,6 +1,5 @@
 using System.Linq.Dynamic.Core;
 using Core.DTOs.QueryParametersDTOs;
-using Core.Entities;
 
 namespace Infrastructure.Repositories;
 

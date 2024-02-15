@@ -1,6 +1,8 @@
 using API.Extensions;
 using Infrastructure.Repositories.EFConfig;
+using Infrastructure.ExternalServices.AuthService.EFConfig;
 using Microsoft.EntityFrameworkCore;
+using Core.Interfaces.IExternalServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,15 +15,20 @@ builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 
-// Apply Migrations that hasn't been applied and seed data
+// Apply Migrations that hasn't been applied and seed app and identity data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        var dbContext = services.GetRequiredService<AppDbContext>();
-        await dbContext.Database.MigrateAsync();
-        await dbContext.SeedAsync();
+        var identityDbContext = services.GetRequiredService<IdentityDbContext>();
+        var authService = services.GetRequiredService<IAuthService>();
+        await identityDbContext.Database.MigrateAsync();
+        await identityDbContext.SeedAsync(authService);
+
+        var appDbContext = services.GetRequiredService<AppDbContext>();
+        await appDbContext.Database.MigrateAsync();
+        await appDbContext.SeedAsync();
     }
     catch (Exception ex)
     {
@@ -42,6 +49,8 @@ if (app.Environment.IsDevelopment())
 app.UseStaticFiles();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication(); // Validates the Token came at the request's Authorization header then decode it and assign it to HttpContext.User
 
 app.UseAuthorization();
 

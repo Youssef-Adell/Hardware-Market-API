@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Core.DTOs.CouponDTOs;
 using Core.Interfaces.IDomainServices;
 using Microsoft.AspNetCore.Mvc;

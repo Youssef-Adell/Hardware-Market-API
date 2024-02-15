@@ -7,7 +7,7 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext appDbContext;
 
-    public UnitOfWork(AppDbContext appDbContext, IProductsRepository productsRepository, IProductReviewsRepository productReviewsRepository, IBrandsRepository brandsRepository, ICategoriesRepository categoriesRepository, ICouponsRepository couponsRepository, IOrdersRepository ordersRepository)
+    public UnitOfWork(AppDbContext appDbContext, IProductsRepository productsRepository, IProductReviewsRepository productReviewsRepository, IBrandsRepository brandsRepository, ICategoriesRepository categoriesRepository, ICouponsRepository couponsRepository, IOrdersRepository ordersRepository, IUsersRepository usersRepository)
     {
         this.appDbContext = appDbContext;
         Products = productsRepository;
@@ -16,6 +16,7 @@ public class UnitOfWork : IUnitOfWork
         Categories = categoriesRepository;
         Coupons = couponsRepository;
         Orders = ordersRepository;
+        Users = usersRepository;
     }
 
     public IProductsRepository Products { get; private set; }
@@ -24,6 +25,7 @@ public class UnitOfWork : IUnitOfWork
     public ICategoriesRepository Categories { get; private set; }
     public ICouponsRepository Coupons { get; private set; }
     public IOrdersRepository Orders { get; private set; }
+    public IUsersRepository Users { get; private set; }
     public async Task SaveChanges()
     {
         await appDbContext.SaveChangesAsync();

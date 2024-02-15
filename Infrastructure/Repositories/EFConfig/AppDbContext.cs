@@ -1,13 +1,14 @@
 using System.Reflection;
 using Core.Entities.OrderAggregate;
 using Core.Entities.ProductAggregate;
+using Core.Entities.UserAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.EFConfig;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions options) : base(options)
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
 
@@ -18,6 +19,7 @@ public class AppDbContext : DbContext
     public DbSet<ProductImage> ProductImages { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<Coupon> Coupons { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

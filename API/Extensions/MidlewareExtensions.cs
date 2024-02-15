@@ -29,6 +29,8 @@ public static class MidlewareExtensions
                         UnprocessableEntityException => StatusCodes.Status422UnprocessableEntity,
                         ConfilctException => StatusCodes.Status409Conflict,
                         ForbiddenException => StatusCodes.Status403Forbidden,
+                        UnauthorizedException => StatusCodes.Status401Unauthorized,
+                        BadRequestException => StatusCodes.Status400BadRequest,
                         _ => StatusCodes.Status500InternalServerError
                     };
 

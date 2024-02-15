@@ -8,5 +8,6 @@ public interface IUnitOfWork
     ICategoriesRepository Categories { get; }
     ICouponsRepository Coupons { get; }
     IOrdersRepository Orders { get; }
+    IUsersRepository Users { get; }
     Task SaveChanges();
 }

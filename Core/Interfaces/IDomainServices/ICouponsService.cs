@@ -1,5 +1,4 @@
 using Core.DTOs.CouponDTOs;
-using Core.Entities.OrderAggregate;
 
 namespace Core.Interfaces.IDomainServices;
 
