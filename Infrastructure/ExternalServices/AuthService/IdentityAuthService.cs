@@ -93,14 +93,16 @@ public class IdentityAuthService : IAuthService
         if (!account.EmailConfirmed)
             throw new ForbiddenException("The email is not confirmed.");
 
-        var accessToken = await CreateAccessToken(account);
+
+        var roles = await accountManager.GetRolesAsync(account);
+        var accessToken = await CreateAccessToken(account, roles);
 
         var loginResponse = new LoginResponse
         {
             UserId = account.OwnerId,
             UserEmail = account.Email!,
             UserName = account.UserName!,
-            UserRole = (await accountManager.GetRolesAsync(account)).First(),
+            UserRole = roles.First(),
             AccessToken = accessToken.token,
             ExpiresIn = accessToken.expiresIn,
             RefreshToken = await CreateRefreshToken(account),
@@ -115,14 +117,16 @@ public class IdentityAuthService : IAuthService
         if (account is null)
             throw new UnauthorizedException("Invalid refresh token.");
 
-        var accessToken = await CreateAccessToken(account);
+
+        var roles = await accountManager.GetRolesAsync(account);
+        var accessToken = await CreateAccessToken(account, roles);
 
         var loginResponse = new LoginResponse
         {
             UserId = account.OwnerId,
             UserEmail = account.Email!,
             UserName = account.UserName!,
-            UserRole = (await accountManager.GetRolesAsync(account)).First(),
+            UserRole = roles.First(),
             AccessToken = accessToken.token,
             ExpiresIn = accessToken.expiresIn,
             RefreshToken = await CreateRefreshToken(account),
@@ -196,6 +200,19 @@ public class IdentityAuthService : IAuthService
         }
     }
 
+    public async Task ConfirmAdminEmail(string adminEmail)
+    {
+        var adminAccount = await accountManager.FindByEmailAsync(adminEmail);
+        if (adminAccount == null)
+            return;
+
+        if (!adminAccount.EmailConfirmed)
+        {
+            var confirmationToken = await accountManager.GenerateEmailConfirmationTokenAsync(adminAccount);
+            await accountManager.ConfirmEmailAsync(adminAccount, confirmationToken);
+        }
+    }
+
 
     private async Task<string> CreateRefreshToken(Account account)
     {
@@ -217,10 +234,10 @@ public class IdentityAuthService : IAuthService
         return refreshToken;
     }
 
-    private async Task<(string token, double expiresIn)> CreateAccessToken(Account account)
+    private async Task<(string token, double expiresIn)> CreateAccessToken(Account account, IEnumerable<string> roles)
     {
         var jwtToken = new JwtSecurityToken(
-            claims: await GetClaims(account),
+            claims: await GetClaims(account, roles),
             signingCredentials: GetSigningCredentials(),
             expires: DateTime.Now.AddSeconds(Convert.ToDouble(configuration["JwtSettings:AccessTokenExpirationTimeInSec"]))
         );
@@ -231,7 +248,7 @@ public class IdentityAuthService : IAuthService
         return (token, expiresIn);
     }
 
-    private async Task<List<Claim>> GetClaims(Account account)
+    private async Task<List<Claim>> GetClaims(Account account, IEnumerable<string> roles)
     {
         //JwtRegisteredClaimNames vs ClaimTypes see this https://stackoverflow.com/questions/50012155/jwt-claim-names , https://stackoverflow.com/questions/68252520/httpcontext-user-claims-doesnt-match-jwt-token-sub-changes-to-nameidentifie, https://stackoverflow.com/questions/57998262/why-is-claimtypes-nameidentifier-not-mapping-to-sub
         var claims = new List<Claim>
@@ -240,8 +257,6 @@ public class IdentityAuthService : IAuthService
             new Claim("AccountId", account.OwnerId.ToString()),
             new Claim(ClaimTypes.NameIdentifier, account.OwnerId.ToString()),
         };
-
-        var roles = await accountManager.GetRolesAsync(account);
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 

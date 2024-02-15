@@ -25,15 +25,16 @@ public static class IdentityDbContextSeed
 
         if (!await identityDbContext.Users.AnyAsync())
         {
-            //create admin at the first running of the api if there are no admins created
+            // create admin account at the begining of api running if there is no one"
             var registerRequest = new RegisterRequest
             {
-                UserName = "Admin",
+                UserName = Environment.GetEnvironmentVariable("ADMIN_NAME"),
                 Email = Environment.GetEnvironmentVariable("ADMIN_EMAIL"),
                 Password = Environment.GetEnvironmentVariable("ADMIN_PASSWORD")
             };
 
             await authService.Register(registerRequest, "Admin");
+            await authService.ConfirmAdminEmail(registerRequest.Email);
         }
     }
 
