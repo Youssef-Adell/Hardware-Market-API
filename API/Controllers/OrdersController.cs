@@ -2,6 +2,7 @@ using Core.DTOs.OrderDTOs;
 using Core.DTOs.QueryParametersDTOs;
 using Core.Entities.OrderAggregate;
 using Core.Interfaces.IDomainServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
 
@@ -20,6 +21,7 @@ public class OrdersController : ControllerBase
 
 
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetOrders([FromQuery] OrderQueryParameters queryParams)
     {
         var result = await ordersService.GetOrders(queryParams);
@@ -28,6 +30,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpGet("{id:Guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetOrder(Guid id)
     {
         var result = await ordersService.GetOrder(id);
@@ -36,6 +39,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPatch("{id:Guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateOrderStatus(Guid id, OrderStatusUpdateRequest orderStatusUpdateRequest)
     {
         await ordersService.UpdateOrderStatus(id, orderStatusUpdateRequest.Status);

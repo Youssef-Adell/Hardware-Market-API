@@ -1,5 +1,6 @@
 using Core.DTOs.CouponDTOs;
 using Core.Interfaces.IDomainServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -40,6 +41,7 @@ public class CouponsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddCoupon(CouponAddRequest couponAddRequest)
     {
         var couponId = await brandsService.AddCoupon(couponAddRequest);
@@ -48,6 +50,7 @@ public class CouponsController : ControllerBase
     }
 
     [HttpPut("{id:Guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateCoupon(Guid id, CouponUpdateRequest couponUpdateRequest)
     {
         await brandsService.UpdateCoupon(id, couponUpdateRequest);
@@ -56,6 +59,7 @@ public class CouponsController : ControllerBase
     }
 
     [HttpDelete("{id:Guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteCoupon(Guid id)
     {
         await brandsService.DeleteCoupon(id);

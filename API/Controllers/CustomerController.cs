@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using Core.DTOs.OrderDTOs;
 using Core.DTOs.QueryParametersDTOs;
 using Core.Interfaces.IDomainServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -17,25 +19,34 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet("orders")]
-    public async Task<IActionResult> GetCustomerOrders([FromQuery] PaginationQueryParameters queryParams, string customerEmail)
+    [Authorize(Roles = "Customer")]
+    public async Task<IActionResult> GetCustomerOrders([FromQuery] PaginationQueryParameters queryParams)
     {
-        var result = await ordersService.GetCustomerOrders(customerEmail, queryParams);
+        var customerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var result = await ordersService.GetCustomerOrders(customerId, queryParams);
 
         return Ok(result);
     }
 
     [HttpGet("orders/{id:Guid}")]
-    public async Task<IActionResult> GetCustomerOrder(Guid id, [FromQuery] string customerEmail)
+    [Authorize(Roles = "Customer")]
+    public async Task<IActionResult> GetCustomerOrder(Guid id)
     {
-        var result = await ordersService.GetCustomerOrder(customerEmail, id);
+        var customerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var result = await ordersService.GetCustomerOrder(customerId, id);
 
         return Ok(result);
     }
 
     [HttpPost("orders")]
-    public async Task<IActionResult> CreateUserOrder(OrderAddRequest orderAddRequest, [FromQuery] string customerEmail)
+    [Authorize(Roles = "Customer")]
+    public async Task<IActionResult> CreateCustomerOrder(OrderAddRequest orderAddRequest)
     {
-        var orderId = await ordersService.CreateOrder(customerEmail, orderAddRequest);
+        var customerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var orderId = await ordersService.CreateOrder(customerId, orderAddRequest);
 
         return CreatedAtAction(nameof(GetCustomerOrder), new { id = orderId }, null);
     }

@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Core.DTOs.BrandDTOs;
 using Core.Interfaces.IDomainServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -33,6 +34,7 @@ public class BrandsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddBrand([FromForm] BrandAddRequest brandAddRequest, [Required] IFormFile icon)
     {
         var BrandIconAsBytes = await ConvertFormFileToByteArray(icon);
@@ -43,6 +45,7 @@ public class BrandsController : ControllerBase
     }
 
     [HttpPut("{id:Guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateBrand(Guid id, [FromForm] BrandUpdateRequest brandUpdateRequest, IFormFile? newIcon)
     {
         byte[]? newBrandIconAsBytes = null;
@@ -56,6 +59,7 @@ public class BrandsController : ControllerBase
     }
 
     [HttpDelete("{id:Guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteBrand(Guid id)
     {
         await brandsService.DeleteBrand(id);

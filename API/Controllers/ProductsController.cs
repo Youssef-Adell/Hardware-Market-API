@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Core.DTOs.ProductDTOs;
 using Core.DTOs.QueryParametersDTOs;
 using Core.Interfaces.IDomainServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -32,6 +33,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddProduct([FromForm] ProductAddRequest productAddRequest, [Required] IFormFileCollection images)
     {
         //Convert to list<byte[]> to make the service layer not depends on IFormFileCollection which is conisderd infrastructure details
@@ -43,6 +45,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id:Guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateProduct(Guid id, [FromForm] ProductUpdateRequest productUpdateRequest, IFormFileCollection imagesToAdd)
     {
         //Convert to list<byte[]> to make the service layer not depends on IFormFileCollection which is conisderd infrastructure details
@@ -54,6 +57,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpDelete("{id:Guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteProduct(Guid id)
     {
         await productsService.DeleteProduct(id);
@@ -62,6 +66,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPatch("{id:Guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateProductQuntity(Guid id, ProductQuntityUpdateRequest productQuntityUpdateRequest)
     {
         await productsService.UpdateProductQuntity(id, productQuntityUpdateRequest.Quantity);

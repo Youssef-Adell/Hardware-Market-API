@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using Core.DTOs.ProductReviewDTOs;
 using Core.DTOs.QueryParametersDTOs;
 using Core.Interfaces.IDomainServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -24,14 +26,6 @@ public class ProductReviewsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("current-customer-review")]
-    public async Task<IActionResult> GetProductReviews(Guid productId, string customerEmail)
-    {
-        var result = await productReviewsService.GetProductReview(productId, customerEmail);
-
-        return Ok(result);
-    }
-
     [HttpGet("{id:Guid}")]
     public async Task<IActionResult> GetProductReview(Guid productId, Guid id)
     {
@@ -40,26 +34,46 @@ public class ProductReviewsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> AddProductReview(Guid productId, ProductReviewAddRequest productReviewAddRequest, [FromQuery] string customerEmail)
+    [HttpGet("current-customer-review")]
+    [Authorize(Roles = "Customer")]
+    public async Task<IActionResult> GetCurrentCustomerReview(Guid productId)
     {
-        var reviewId = await productReviewsService.AddProductReview(customerEmail, productId, productReviewAddRequest);
+        var customerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var result = await productReviewsService.GetCustomerProductReview(customerId, productId);
+
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Customer")]
+    public async Task<IActionResult> AddProductReview(Guid productId, ProductReviewAddRequest productReviewAddRequest)
+    {
+        var customerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var reviewId = await productReviewsService.AddProductReview(customerId, productId, productReviewAddRequest);
 
         return CreatedAtAction(nameof(GetProductReview), new { productId = productId, id = reviewId }, null);
     }
 
     [HttpPut("{id:Guid}")]
-    public async Task<IActionResult> UpdateProductReview(Guid productId, Guid id, ProductReviewUpdateRequest productReviewUpdateRequest, [FromQuery] string customerEmail)
+    [Authorize(Roles = "Customer")]
+    public async Task<IActionResult> UpdateProductReview(Guid productId, Guid id, ProductReviewUpdateRequest productReviewUpdateRequest)
     {
-        await productReviewsService.UpdateProductReview(customerEmail, productId, id, productReviewUpdateRequest);
+        var customerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        await productReviewsService.UpdateProductReview(customerId, productId, id, productReviewUpdateRequest);
 
         return NoContent();
     }
 
     [HttpDelete("{id:Guid}")]
-    public async Task<IActionResult> DeleteProductReview(Guid productId, Guid id, [FromQuery] string customerEmail) //customerEmail param would be removed later when adding the authentication
+    [Authorize(Roles = "Customer")]
+    public async Task<IActionResult> DeleteProductReview(Guid productId, Guid id)
     {
-        await productReviewsService.DeleteProductReview(customerEmail, productId, id);
+        var customerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        await productReviewsService.DeleteProductReview(customerId, productId, id);
 
         return NoContent();
     }

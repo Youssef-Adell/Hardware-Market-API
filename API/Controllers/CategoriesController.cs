@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Core.DTOs.CategoryDTOs;
 using Core.Interfaces.IDomainServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -33,6 +34,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddCategory([FromForm] CategoryAddRequest categoryAddRequest, [Required] IFormFile icon)
     {
         var categoryIconAsBytes = await ConvertFormFileToByteArray(icon);
@@ -43,6 +45,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPut("{id:Guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateCategory(Guid id, [FromForm] CategoryUpdateRequest categoryUpdateRequest, IFormFile? newIcon)
     {
         byte[]? newCategoryIconAsBytes = null;
@@ -56,6 +59,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpDelete("{id:Guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteCategory(Guid id)
     {
         await categoriesService.DeleteCategory(id);
