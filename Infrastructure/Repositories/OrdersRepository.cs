@@ -20,7 +20,7 @@ public class OrdersRepository : IOrdersRepository
         //build a query of filtered orders
         var query = appDbContext.Orders
                             //search (Short Circuit if no value in search)
-                            .Where(p => string.IsNullOrEmpty(queryParams.Search) || p.CustomerEmail.ToLower() == queryParams.Search.ToLower())
+                            .Where(o => string.IsNullOrEmpty(queryParams.Search) || o.Customer.Email.ToLower() == queryParams.Search.ToLower())
                             //filter (Short circuit if no value)
                             .Where(p => queryParams.Status == null || p.Status == queryParams.Status);
 
@@ -39,10 +39,10 @@ public class OrdersRepository : IOrdersRepository
         return new PagedResult<Order>(pagedOrdersData, queryParams.Page, queryParams.PageSize, totalOrdersCount);
     }
 
-    public async Task<PagedResult<Order>> GetCustomerOrders(string customerEmail, PaginationQueryParameters queryParams)
+    public async Task<PagedResult<Order>> GetCustomerOrders(Guid customerId, PaginationQueryParameters queryParams)
     {
         //build a query of filtered orders
-        var query = appDbContext.Orders.Where(o => o.CustomerEmail == customerEmail);
+        var query = appDbContext.Orders.Where(o => o.CustomerId == customerId);
 
         //sort and paginate the above query then execute it
         var pagedOrdersData = await query

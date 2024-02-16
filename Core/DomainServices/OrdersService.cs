@@ -15,7 +15,6 @@ public class OrdersService : IOrdersService
     private readonly IUnitOfWork unitOfWork;
     private readonly ICouponsService couponsService;
     private readonly IPaymentService paymentService;
-
     private readonly IMapper mapper;
 
     public OrdersService(IUnitOfWork unitOfWork, ICouponsService couponsService, IPaymentService paymentService, IMapper mapper)
@@ -35,9 +34,9 @@ public class OrdersService : IOrdersService
         return pageOfOrderstDtos;
     }
 
-    public async Task<PagedResult<OrderForCustomerListResponse>> GetCustomerOrders(string customerEmail, PaginationQueryParameters queryParams)
+    public async Task<PagedResult<OrderForCustomerListResponse>> GetCustomerOrders(Guid customerId, PaginationQueryParameters queryParams)
     {
-        var pageOfOrdersEntities = await unitOfWork.Orders.GetCustomerOrders(customerEmail, queryParams);
+        var pageOfOrdersEntities = await unitOfWork.Orders.GetCustomerOrders(customerId, queryParams);
 
         var pageOfOrderstDtos = mapper.Map<PagedResult<Order>, PagedResult<OrderForCustomerListResponse>>(pageOfOrdersEntities);
 
@@ -54,18 +53,18 @@ public class OrdersService : IOrdersService
         return orderDto;
     }
 
-    public async Task<OrderResponse> GetCustomerOrder(string customerEmail, Guid orderId)
+    public async Task<OrderResponse> GetCustomerOrder(Guid customerId, Guid orderId)
     {
         //this method is for customer view to allow logged-in customer to get its orders only unlike the GetOrder method which is for admin view and allow admin to get any order
         var order = await GetOrder(orderId);
 
-        if (order.CustomerEmail != customerEmail)
+        if (order.CustomerId != customerId)
             throw new ForbiddenException("You are not authorized to get this order.");
 
         return order;
     }
 
-    public async Task<Guid> CreateOrder(string customerEmail, OrderAddRequest orderAddRequest)
+    public async Task<Guid> CreateOrder(Guid customerId, OrderAddRequest orderAddRequest)
     {
         // Get total ordered quntity for each product to avoid problems if consumer enter two order items for the same product
         // for example if consumer enter ordersItems=[{productId=1, quntity=5}, {productId=1, quntity=2}], we convert it to [{key=1, value=7}]
@@ -107,8 +106,7 @@ public class OrdersService : IOrdersService
         var order = new Order
         {
             Id = Guid.NewGuid(),
-            CustomerEmail = customerEmail,
-            CustomerPhone = orderAddRequest.CustomerPhone,
+            CustomerId = customerId,
             ShippingAddress = new Address(orderAddRequest.ShippingAddress.AddressLine, orderAddRequest.ShippingAddress.City),
             OrderLines = orderItems,
             Subtotal = subtotal,

@@ -48,13 +48,13 @@ public class ProductReviewsService : IProductReviewsService
         return reviewDto;
     }
 
-    public async Task<ProductReviewResponse> GetProductReview(Guid productId, string customerEmail)
+    public async Task<ProductReviewResponse> GetCustomerProductReview(Guid customerId, Guid productId)
     {
         var productExists = await unitOfWork.Products.ProductExists(productId);
         if (!productExists)
             throw new NotFoundException($"Product not found.");
 
-        var reviewEntity = await unitOfWork.ProductReviews.GetProductReview(productId, customerEmail);
+        var reviewEntity = await unitOfWork.ProductReviews.GetCustomerProductReview(customerId, productId);
         if (reviewEntity is null)
             throw new NotFoundException($"The current customer has no review for this product.");
 
@@ -63,17 +63,17 @@ public class ProductReviewsService : IProductReviewsService
         return reviewDto;
     }
 
-    public async Task<Guid> AddProductReview(string customerEmail, Guid productId, ProductReviewAddRequest productReviewAddRequest)
+    public async Task<Guid> AddProductReview(Guid customerId, Guid productId, ProductReviewAddRequest productReviewAddRequest)
     {
         var product = await unitOfWork.Products.GetProduct(productId);
         if (product is null)
             throw new NotFoundException($"Product not found.");
 
-        if (await unitOfWork.ProductReviews.HasCustomerReviewedProduct(productId, customerEmail))
+        if (await unitOfWork.ProductReviews.HasCustomerReviewedProduct(customerId, productId))
             throw new ConfilctException("You already reviewed this product.");
 
         var reviewEntity = mapper.Map<ProductReviewAddRequest, ProductReview>(productReviewAddRequest);
-        reviewEntity.CustomerEmail = customerEmail;
+        reviewEntity.CustomerId = customerId;
         reviewEntity.ProductId = productId;
 
         unitOfWork.ProductReviews.AddProductReview(reviewEntity);
@@ -84,7 +84,7 @@ public class ProductReviewsService : IProductReviewsService
         return reviewEntity.Id;
     }
 
-    public async Task UpdateProductReview(string customerEmail, Guid productId, Guid reviewId, ProductReviewUpdateRequest productReviewUpdateRequest)
+    public async Task UpdateProductReview(Guid customerId, Guid productId, Guid reviewId, ProductReviewUpdateRequest productReviewUpdateRequest)
     {
         var product = await unitOfWork.Products.GetProduct(productId);
         if (product is null)
@@ -94,7 +94,7 @@ public class ProductReviewsService : IProductReviewsService
         if (review is null)
             throw new NotFoundException($"Review not found.");
 
-        if (review.CustomerEmail != customerEmail)
+        if (review.CustomerId != customerId)
             throw new ForbiddenException("You are not authorized to edit this review.");
 
         var reviewEntity = mapper.Map(productReviewUpdateRequest, review);
@@ -105,7 +105,7 @@ public class ProductReviewsService : IProductReviewsService
         await UpdateProductAverageRating(product);
     }
 
-    public async Task DeleteProductReview(string customerEmail, Guid productId, Guid reviewId)
+    public async Task DeleteProductReview(Guid customerId, Guid productId, Guid reviewId)
     {
         var product = await unitOfWork.Products.GetProduct(productId);
         if (product is null)
@@ -115,7 +115,7 @@ public class ProductReviewsService : IProductReviewsService
         if (review is null)
             throw new NotFoundException($"Review not found.");
 
-        if (review.CustomerEmail != customerEmail)
+        if (review.CustomerId != customerId)
             throw new ForbiddenException("You are not authorized to delete this review.");
 
         unitOfWork.ProductReviews.DeleteProductReview(review);

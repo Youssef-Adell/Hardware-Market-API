@@ -48,17 +48,22 @@ public class MappingProfile : Profile
         CreateMap<BrandUpdateRequest, Brand>();
 
         //---ProductReviews Mapping---
-        CreateMap<ProductReview, ProductReviewResponse>();
+        CreateMap<ProductReview, ProductReviewResponse>()
+            .ForMember(d => d.CustomerName, options => options.MapFrom(s => s.Customer.Name));
         CreateMap<PagedResult<ProductReview>, PagedResult<ProductReviewResponse>>();
         CreateMap<ProductReviewAddRequest, ProductReview>();
         CreateMap<ProductReviewUpdateRequest, ProductReview>();
 
         //---Orders Mapping---
         CreateMap<Order, OrderForAdminListResponse>()
-        .ForMember(d => d.City, options => options.MapFrom(s => s.ShippingAddress.City));
+            .ForMember(d => d.CustomerName, options => options.MapFrom(s => s.Customer.Name))
+            .ForMember(d => d.CustomerEmail, options => options.MapFrom(s => s.Customer.Email))
+            .ForMember(d => d.City, options => options.MapFrom(s => s.ShippingAddress.City));
         CreateMap<PagedResult<Order>, PagedResult<OrderForAdminListResponse>>();
         CreateMap<OrderLine, OrderLineResponse>();
-        CreateMap<Order, OrderResponse>();
+        CreateMap<Order, OrderResponse>()
+            .ForMember(d => d.CustomerName, options => options.MapFrom(s => s.Customer.Name))
+            .ForMember(d => d.CustomerEmail, options => options.MapFrom(s => s.Customer.Email));
         CreateMap<Order, OrderForCustomerListResponse>();
         CreateMap<PagedResult<Order>, PagedResult<OrderForCustomerListResponse>>();
 

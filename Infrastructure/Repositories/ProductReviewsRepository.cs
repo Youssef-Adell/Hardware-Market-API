@@ -43,18 +43,18 @@ public class ProductReviewsRepository : IProductReviewsRepository
         return review;
     }
 
-    public async Task<ProductReview?> GetProductReview(Guid productId, string customerEmail)
+    public async Task<ProductReview?> GetCustomerProductReview(Guid customerId, Guid productId)
     {
         var review = await appDbContext.ProductReviews
                         .AsNoTracking()
-                        .FirstOrDefaultAsync(r => r.CustomerEmail == customerEmail && r.ProductId == productId);
+                        .FirstOrDefaultAsync(r => r.CustomerId == customerId && r.ProductId == productId);
 
         return review;
     }
 
-    public async Task<bool> HasCustomerReviewedProduct(Guid productId, string customerEmail)
+    public async Task<bool> HasCustomerReviewedProduct(Guid customerId, Guid productId)
     {
-        var hasReviewd = await appDbContext.ProductReviews.AnyAsync(r => r.ProductId == productId && r.CustomerEmail == customerEmail);
+        var hasReviewd = await appDbContext.ProductReviews.AnyAsync(r => r.ProductId == productId && r.CustomerId == customerId);
 
         return hasReviewd;
     }

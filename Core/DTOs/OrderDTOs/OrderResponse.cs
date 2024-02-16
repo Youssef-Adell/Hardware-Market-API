@@ -5,9 +5,10 @@ namespace Core.DTOs.OrderDTOs;
 public class OrderResponse
 {
     public Guid Id { get; set; }
+    public Guid CustomerId { get; set; }
+    public string? CustomerName { get; set; }
+    public string? CustomerEmail { get; set; }
     public List<OrderLineResponse> OrderLines { get; set; }
-    public string CustomerEmail { get; set; }
-    public string CustomerPhone { get; set; }
     public string ShippingAddress { get; set; }
     public OrderStatus Status { get; set; }
     public DateTime OrderDate { get; set; }
