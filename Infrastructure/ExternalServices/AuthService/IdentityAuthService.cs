@@ -95,7 +95,7 @@ public class IdentityAuthService : IAuthService
 
 
         var roles = await accountManager.GetRolesAsync(account);
-        var accessToken = await CreateAccessToken(account, roles);
+        var accessToken = CreateAccessToken(account, roles);
 
         var loginResponse = new LoginResponse
         {
@@ -105,7 +105,7 @@ public class IdentityAuthService : IAuthService
             UserRole = roles.First(),
             AccessToken = accessToken.token,
             ExpiresIn = accessToken.expiresIn,
-            RefreshToken = await CreateRefreshToken(account),
+            RefreshToken = await CreateRefreshToken(account)
         };
 
         return loginResponse;
@@ -119,7 +119,7 @@ public class IdentityAuthService : IAuthService
 
 
         var roles = await accountManager.GetRolesAsync(account);
-        var accessToken = await CreateAccessToken(account, roles);
+        var accessToken = CreateAccessToken(account, roles);
 
         var loginResponse = new LoginResponse
         {
@@ -234,10 +234,10 @@ public class IdentityAuthService : IAuthService
         return refreshToken;
     }
 
-    private async Task<(string token, double expiresIn)> CreateAccessToken(Account account, IEnumerable<string> roles)
+    private (string token, double expiresIn) CreateAccessToken(Account account, IEnumerable<string> roles)
     {
         var jwtToken = new JwtSecurityToken(
-            claims: await GetClaims(account, roles),
+            claims: GetClaims(account, roles),
             signingCredentials: GetSigningCredentials(),
             expires: DateTime.Now.AddSeconds(Convert.ToDouble(configuration["JwtSettings:AccessTokenExpirationTimeInSec"]))
         );
@@ -248,7 +248,7 @@ public class IdentityAuthService : IAuthService
         return (token, expiresIn);
     }
 
-    private async Task<List<Claim>> GetClaims(Account account, IEnumerable<string> roles)
+    private List<Claim> GetClaims(Account account, IEnumerable<string> roles)
     {
         //JwtRegisteredClaimNames vs ClaimTypes see this https://stackoverflow.com/questions/50012155/jwt-claim-names , https://stackoverflow.com/questions/68252520/httpcontext-user-claims-doesnt-match-jwt-token-sub-changes-to-nameidentifie, https://stackoverflow.com/questions/57998262/why-is-claimtypes-nameidentifier-not-mapping-to-sub
         var claims = new List<Claim>
