@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Text.Json.Serialization;
 using API.Errors;
@@ -19,7 +21,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace API.Extensions;
 
@@ -47,7 +51,51 @@ public static class ServicesExtensions
         });
 
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Tech Market API",
+                Description = "Rest API for Tech Market E-Commerce app.",
+                Version = "v1",
+                Contact = new OpenApiContact
+                {
+                    Name = "Youssef Adel",
+                    Url = new Uri("https://www.linkedin.com/in/youssef-adel-882ab2236"),
+                    Email = "YoussefAdel.Fci@gmail.com"
+                },
+            });
+
+            // makes Swagger-UI renders the "Authorize" button which when clicked brings up the Authorize dialog box
+            options.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                Description = "JWT Authorization header using the Bearer scheme."
+            });
+
+            //comment this code because it adds the lock symbol and send the authorizatuib header to all the endpoints regardless if they marked with [authorize] or not
+            // //to add lock symbol to the endpoints and send authorizatuin header with the request
+            // options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            // {
+            //     {
+            //         new OpenApiSecurityScheme
+            //         {
+            //             Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "bearerAuth" }
+            //         },
+            //         Array.Empty<string>()
+            //     }
+            // });
+
+            //to remove the lock symbol from the endpoints that doesnt has [authorize] attribute
+            options.OperationFilter<SecurityRequirementsOperationFilter>("bearerAuth"); // SecurityRequirementsOperationFilter has a constructor that accepts securitySchemaName and i can pass arguments to it via the OperationFilter method, so i passed the name of the SecurityScheme defined above (bearerAuth) otherwise it wont send the authorization header with the requests
+
+            //to make swagger shows the the docs comments and responses for the endpoints 
+            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+        });
+
     }
     public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
