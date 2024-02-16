@@ -64,7 +64,7 @@ public class OrdersService : IOrdersService
         return order;
     }
 
-    public async Task<Guid> CreateOrder(Guid customerId, OrderAddRequest orderAddRequest)
+    public async Task<OrderResponse> CreateOrder(Guid customerId, OrderAddRequest orderAddRequest)
     {
         // Get total ordered quntity for each product to avoid problems if consumer enter two order items for the same product
         // for example if consumer enter ordersItems=[{productId=1, quntity=5}, {productId=1, quntity=2}], we convert it to [{key=1, value=7}]
@@ -123,10 +123,11 @@ public class OrdersService : IOrdersService
         unitOfWork.Orders.AddOrder(order);
         await unitOfWork.SaveChanges();
 
-        return order.Id;
+        var orderDto = mapper.Map<Order, OrderResponse>(order);
+        return orderDto;
     }
 
-    public async Task UpdateOrderStatus(Guid id, OrderStatus newOrderStatus)
+    public async Task<OrderResponse> UpdateOrderStatus(Guid id, OrderStatus newOrderStatus)
     {
         var order = await unitOfWork.Orders.GetOrder(id);
         if (order is null)
@@ -152,5 +153,8 @@ public class OrdersService : IOrdersService
 
         unitOfWork.Orders.UpdateOrder(order);
         await unitOfWork.SaveChanges();
+
+        var orderDto = mapper.Map<Order, OrderResponse>(order);
+        return orderDto;
     }
 }

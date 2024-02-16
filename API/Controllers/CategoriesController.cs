@@ -39,9 +39,9 @@ public class CategoriesController : ControllerBase
     {
         var categoryIconAsBytes = await ConvertFormFileToByteArray(icon);
 
-        var categoryId = await categoriesService.AddCategory(categoryAddRequest, categoryIconAsBytes);
+        var createdCategory = await categoriesService.AddCategory(categoryAddRequest, categoryIconAsBytes);
 
-        return CreatedAtAction(nameof(GetCategory), new { Id = categoryId }, null);
+        return CreatedAtAction(nameof(GetCategory), new { Id = createdCategory.Id }, createdCategory);
     }
 
     [HttpPut("{id:Guid}")]
@@ -53,9 +53,9 @@ public class CategoriesController : ControllerBase
         if (newIcon != null)
             newCategoryIconAsBytes = await ConvertFormFileToByteArray(newIcon);
 
-        await categoriesService.UpdateCategory(id, categoryUpdateRequest, newCategoryIconAsBytes);
+        var updatedCategory = await categoriesService.UpdateCategory(id, categoryUpdateRequest, newCategoryIconAsBytes);
 
-        return NoContent();
+        return Ok(updatedCategory);
     }
 
     [HttpDelete("{id:Guid}")]

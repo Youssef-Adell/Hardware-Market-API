@@ -37,11 +37,11 @@ public class BrandsController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddBrand([FromForm] BrandAddRequest brandAddRequest, [Required] IFormFile icon)
     {
-        var BrandIconAsBytes = await ConvertFormFileToByteArray(icon);
+        var brandIconAsBytes = await ConvertFormFileToByteArray(icon);
 
-        var BrandId = await brandsService.AddBrand(brandAddRequest, BrandIconAsBytes);
+        var createdBrand = await brandsService.AddBrand(brandAddRequest, brandIconAsBytes);
 
-        return CreatedAtAction(nameof(GetBrand), new { Id = BrandId }, null);
+        return CreatedAtAction(nameof(GetBrand), new { Id = createdBrand.Id }, createdBrand);
     }
 
     [HttpPut("{id:Guid}")]
@@ -53,9 +53,9 @@ public class BrandsController : ControllerBase
         if (newIcon != null)
             newBrandIconAsBytes = await ConvertFormFileToByteArray(newIcon);
 
-        await brandsService.UpdateBrand(id, brandUpdateRequest, newBrandIconAsBytes);
+        var updatedBrand = await brandsService.UpdateBrand(id, brandUpdateRequest, newBrandIconAsBytes);
 
-        return NoContent();
+        return Ok(updatedBrand);
     }
 
     [HttpDelete("{id:Guid}")]

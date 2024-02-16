@@ -39,9 +39,9 @@ public class ProductsController : ControllerBase
         //Convert to list<byte[]> to make the service layer not depends on IFormFileCollection which is conisderd infrastructure details
         var productImagesAsBytes = await ConvertFormFilesToByteArrays(images);
 
-        var productId = await productsService.AddProduct(productAddRequest, productImagesAsBytes);
+        var createdProduct = await productsService.AddProduct(productAddRequest, productImagesAsBytes);
 
-        return CreatedAtAction(nameof(GetProduct), new { id = productId }, null);
+        return CreatedAtAction(nameof(GetProduct), new { id = createdProduct.Id }, createdProduct);
     }
 
     [HttpPut("{id:Guid}")]
@@ -51,9 +51,9 @@ public class ProductsController : ControllerBase
         //Convert to list<byte[]> to make the service layer not depends on IFormFileCollection which is conisderd infrastructure details
         var productImagesAsBytes = await ConvertFormFilesToByteArrays(imagesToAdd);
 
-        await productsService.UpdateProduct(id, productUpdateRequest, productImagesAsBytes);
+        var UpdateProduct = await productsService.UpdateProduct(id, productUpdateRequest, productImagesAsBytes);
 
-        return NoContent();
+        return Ok(UpdateProduct);
     }
 
     [HttpDelete("{id:Guid}")]
@@ -69,9 +69,9 @@ public class ProductsController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateProductQuntity(Guid id, ProductQuntityUpdateRequest productQuntityUpdateRequest)
     {
-        await productsService.UpdateProductQuntity(id, productQuntityUpdateRequest.Quantity);
+        var updatedProduct = await productsService.UpdateProductQuntity(id, productQuntityUpdateRequest.Quantity);
 
-        return NoContent();
+        return Ok(updatedProduct);
     }
 
     [NonAction]

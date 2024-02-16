@@ -63,7 +63,7 @@ public class ProductReviewsService : IProductReviewsService
         return reviewDto;
     }
 
-    public async Task<Guid> AddProductReview(Guid customerId, Guid productId, ProductReviewAddRequest productReviewAddRequest)
+    public async Task<ProductReviewResponse> AddProductReview(Guid customerId, Guid productId, ProductReviewAddRequest productReviewAddRequest)
     {
         var product = await unitOfWork.Products.GetProduct(productId);
         if (product is null)
@@ -81,10 +81,12 @@ public class ProductReviewsService : IProductReviewsService
 
         await UpdateProductAverageRating(product);
 
-        return reviewEntity.Id;
+        var reviewDto = mapper.Map<ProductReview?, ProductReviewResponse>(reviewEntity);
+
+        return reviewDto;
     }
 
-    public async Task UpdateProductReview(Guid customerId, Guid productId, Guid reviewId, ProductReviewUpdateRequest productReviewUpdateRequest)
+    public async Task<ProductReviewResponse> UpdateProductReview(Guid customerId, Guid productId, Guid reviewId, ProductReviewUpdateRequest productReviewUpdateRequest)
     {
         var product = await unitOfWork.Products.GetProduct(productId);
         if (product is null)
@@ -103,6 +105,10 @@ public class ProductReviewsService : IProductReviewsService
         await unitOfWork.SaveChanges();
 
         await UpdateProductAverageRating(product);
+
+        var reviewDto = mapper.Map<ProductReview?, ProductReviewResponse>(reviewEntity);
+
+        return reviewDto;
     }
 
     public async Task DeleteProductReview(Guid customerId, Guid productId, Guid reviewId)

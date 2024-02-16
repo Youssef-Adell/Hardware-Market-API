@@ -44,18 +44,18 @@ public class CouponsController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddCoupon(CouponAddRequest couponAddRequest)
     {
-        var couponId = await brandsService.AddCoupon(couponAddRequest);
+        var createdCoupon = await brandsService.AddCoupon(couponAddRequest);
 
-        return CreatedAtAction(nameof(GetCoupon), new { id = couponId }, null);
+        return CreatedAtAction(nameof(GetCoupon), new { id = createdCoupon.Id }, createdCoupon);
     }
 
     [HttpPut("{id:Guid}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateCoupon(Guid id, CouponUpdateRequest couponUpdateRequest)
     {
-        await brandsService.UpdateCoupon(id, couponUpdateRequest);
+        var updatedCoupon = await brandsService.UpdateCoupon(id, couponUpdateRequest);
 
-        return NoContent();
+        return Ok(updatedCoupon);
     }
 
     [HttpDelete("{id:Guid}")]

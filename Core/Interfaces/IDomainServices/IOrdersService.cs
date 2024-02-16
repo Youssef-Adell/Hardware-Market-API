@@ -10,6 +10,6 @@ public interface IOrdersService
     Task<PagedResult<OrderForCustomerListResponse>> GetCustomerOrders(Guid customerId, PaginationQueryParameters queryParams); //for customer view
     Task<OrderResponse> GetOrder(Guid id); //for admin view
     Task<OrderResponse> GetCustomerOrder(Guid customerId, Guid orderId); //for customer view
-    Task<Guid> CreateOrder(Guid customerId, OrderAddRequest orderAddRequest);
-    Task UpdateOrderStatus(Guid id, OrderStatus newOrderStatus);
+    Task<OrderResponse> CreateOrder(Guid customerId, OrderAddRequest orderAddRequest);
+    Task<OrderResponse> UpdateOrderStatus(Guid id, OrderStatus newOrderStatus);
 }

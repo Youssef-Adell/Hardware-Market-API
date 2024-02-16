@@ -46,8 +46,8 @@ public class CustomerController : ControllerBase
     {
         var customerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var orderId = await ordersService.CreateOrder(customerId, orderAddRequest);
+        var createdOrder = await ordersService.CreateOrder(customerId, orderAddRequest);
 
-        return CreatedAtAction(nameof(GetCustomerOrder), new { id = orderId }, null);
+        return CreatedAtAction(nameof(GetCustomerOrder), new { id = createdOrder.Id }, createdOrder);
     }
 }

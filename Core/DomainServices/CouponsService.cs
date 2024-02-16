@@ -51,7 +51,7 @@ public class CouponsService : ICouponsService
         return couponDto;
     }
 
-    public async Task<Guid> AddCoupon(CouponAddRequest couponAddRequest)
+    public async Task<CouponResponse> AddCoupon(CouponAddRequest couponAddRequest)
     {
         var couponExists = await unitOfWork.Coupons.CouponExists(couponAddRequest.Code);
         if (couponExists)
@@ -63,10 +63,12 @@ public class CouponsService : ICouponsService
 
         await unitOfWork.SaveChanges();
 
-        return couponEntity.Id;
+        var couponDto = mapper.Map<Coupon, CouponResponse>(couponEntity);
+
+        return couponDto;
     }
 
-    public async Task UpdateCoupon(Guid id, CouponUpdateRequest couponUpdateRequest)
+    public async Task<CouponResponse> UpdateCoupon(Guid id, CouponUpdateRequest couponUpdateRequest)
     {
         var coupon = await unitOfWork.Coupons.GetCoupon(id);
         if (coupon is null)
@@ -76,7 +78,9 @@ public class CouponsService : ICouponsService
 
         unitOfWork.Coupons.UpdateCoupon(couponEntity);
 
-        await unitOfWork.SaveChanges();
+        var couponDto = mapper.Map<Coupon, CouponResponse>(couponEntity);
+
+        return couponDto;
     }
 
     public async Task DeleteCoupon(Guid id)

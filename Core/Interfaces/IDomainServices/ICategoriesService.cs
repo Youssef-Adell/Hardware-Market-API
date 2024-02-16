@@ -6,7 +6,7 @@ public interface ICategoriesService
 {
     Task<IReadOnlyCollection<CategoryResponse>> GetCategories();
     Task<CategoryResponse> GetCategory(Guid id);
-    Task<Guid> AddCategory(CategoryAddRequest categoryAddRequest, byte[] categoryIcon);
-    Task UpdateCategory(Guid id, CategoryUpdateRequest categoryUpdateRequest, byte[]? newCategoryIcon);
+    Task<CategoryResponse> AddCategory(CategoryAddRequest categoryAddRequest, byte[] categoryIcon);
+    Task<CategoryResponse> UpdateCategory(Guid id, CategoryUpdateRequest categoryUpdateRequest, byte[]? newCategoryIcon);
     Task DeleteCategory(Guid id);
 }

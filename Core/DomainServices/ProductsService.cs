@@ -45,7 +45,7 @@ public class ProductsService : IProductsService
         return productDto;
     }
 
-    public async Task<Guid> AddProduct(ProductAddRequest productAddRequest, List<byte[]> productImages)
+    public async Task<ProductResponse> AddProduct(ProductAddRequest productAddRequest, List<byte[]> productImages)
     {
         await ValidateCategory(productAddRequest.CategoryId);
         await ValidateBrand(productAddRequest.BrandId);
@@ -66,10 +66,11 @@ public class ProductsService : IProductsService
 
         await unitOfWork.SaveChanges();
 
-        return productEntity.Id;
+        var productDto = mapper.Map<Product, ProductResponse>(productEntity);
+        return productDto;
     }
 
-    public async Task UpdateProduct(Guid id, ProductUpdateRequest productUpdateRequest, List<byte[]> imagesToAdd)
+    public async Task<ProductResponse> UpdateProduct(Guid id, ProductUpdateRequest productUpdateRequest, List<byte[]> imagesToAdd)
     {
         var product = await unitOfWork.Products.GetProduct(id);
         if (product is null)
@@ -134,6 +135,9 @@ public class ProductsService : IProductsService
         unitOfWork.Products.UpdateProduct(productEntity);
 
         await unitOfWork.SaveChanges();
+
+        var productDto = mapper.Map<Product, ProductResponse>(productEntity);
+        return productDto;
     }
 
     public async Task DeleteProduct(Guid id)
@@ -149,7 +153,7 @@ public class ProductsService : IProductsService
         product.Images?.ForEach(image => fileService.DeleteFile(image.Path));
     }
 
-    public async Task UpdateProductQuntity(Guid id, int newQuntity)
+    public async Task<ProductResponse> UpdateProductQuntity(Guid id, int newQuntity)
     {
         var product = await unitOfWork.Products.GetProduct(id);
         if (product is null)
@@ -160,6 +164,9 @@ public class ProductsService : IProductsService
         unitOfWork.Products.UpdateProduct(product);
 
         await unitOfWork.SaveChanges();
+
+        var productDto = mapper.Map<Product, ProductResponse>(product);
+        return productDto;
     }
 
 

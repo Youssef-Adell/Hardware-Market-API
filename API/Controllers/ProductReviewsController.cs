@@ -51,9 +51,9 @@ public class ProductReviewsController : ControllerBase
     {
         var customerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var reviewId = await productReviewsService.AddProductReview(customerId, productId, productReviewAddRequest);
+        var createdReview = await productReviewsService.AddProductReview(customerId, productId, productReviewAddRequest);
 
-        return CreatedAtAction(nameof(GetProductReview), new { productId = productId, id = reviewId }, null);
+        return CreatedAtAction(nameof(GetProductReview), new { productId = productId, id = createdReview.Id }, createdReview);
     }
 
     [HttpPut("{id:Guid}")]
@@ -62,9 +62,9 @@ public class ProductReviewsController : ControllerBase
     {
         var customerId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        await productReviewsService.UpdateProductReview(customerId, productId, id, productReviewUpdateRequest);
+        var updatedReview = await productReviewsService.UpdateProductReview(customerId, productId, id, productReviewUpdateRequest);
 
-        return NoContent();
+        return Ok(updatedReview);
     }
 
     [HttpDelete("{id:Guid}")]

@@ -42,9 +42,9 @@ public class OrdersController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateOrderStatus(Guid id, OrderStatusUpdateRequest orderStatusUpdateRequest)
     {
-        await ordersService.UpdateOrderStatus(id, orderStatusUpdateRequest.Status);
+        var updatedOrder = await ordersService.UpdateOrderStatus(id, orderStatusUpdateRequest.Status);
 
-        return NoContent();
+        return Ok(updatedOrder);
     }
 
     [ApiExplorerSettings(IgnoreApi = true)]

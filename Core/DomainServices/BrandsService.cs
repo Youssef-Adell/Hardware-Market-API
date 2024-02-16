@@ -47,7 +47,7 @@ public class BrandsService : IBrandsService
         return brandDto;
     }
 
-    public async Task<Guid> AddBrand(BrandAddRequest brandAddRequest, byte[] brandLogo)
+    public async Task<BrandResponse> AddBrand(BrandAddRequest brandAddRequest, byte[] brandLogo)
     {
         await ValidateUploadedLogo(brandLogo);
 
@@ -58,10 +58,13 @@ public class BrandsService : IBrandsService
         unitOfWork.Brands.AddBrand(brandEntity);
 
         await unitOfWork.SaveChanges();
-        return brandEntity.Id;
+
+        var brandDto = mapper.Map<Brand, BrandResponse>(brandEntity);
+
+        return brandDto;
     }
 
-    public async Task UpdateBrand(Guid id, BrandUpdateRequest brandUpdateRequest, byte[]? newBrandLogo)
+    public async Task<BrandResponse> UpdateBrand(Guid id, BrandUpdateRequest brandUpdateRequest, byte[]? newBrandLogo)
     {
         var brand = await unitOfWork.Brands.GetBrand(id);
         if (brand is null)
@@ -82,6 +85,10 @@ public class BrandsService : IBrandsService
         unitOfWork.Brands.UpdateBrand(brandEntity);
 
         await unitOfWork.SaveChanges();
+
+        var brandDto = mapper.Map<Brand, BrandResponse>(brandEntity);
+
+        return brandDto;
     }
 
     public async Task DeleteBrand(Guid id)

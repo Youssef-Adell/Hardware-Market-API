@@ -12,7 +12,6 @@ namespace Core.DomainServices;
 public class CategoriesService : ICategoriesService
 {
     private readonly IUnitOfWork unitOfWork;
-
     private readonly IFileService fileService;
     private readonly IMapper mapper;
     private readonly string categoriesIconsFolder;
@@ -26,6 +25,7 @@ public class CategoriesService : ICategoriesService
         this.categoriesIconsFolder = configuration["ResourcesStorage:CategoriesIconsFolder"];
         this.maxAllowedImageSizeInBytes = int.Parse(configuration["ResourcesStorage:MaxAllowedImageSizeInBytes"]);
     }
+
 
     public async Task<IReadOnlyCollection<CategoryResponse>> GetCategories()
     {
@@ -48,7 +48,7 @@ public class CategoriesService : ICategoriesService
         return categoryDto;
     }
 
-    public async Task<Guid> AddCategory(CategoryAddRequest categoryAddRequest, byte[] categoryIcon)
+    public async Task<CategoryResponse> AddCategory(CategoryAddRequest categoryAddRequest, byte[] categoryIcon)
     {
         await ValidateUploadedIcon(categoryIcon);
 
@@ -60,10 +60,12 @@ public class CategoriesService : ICategoriesService
 
         await unitOfWork.SaveChanges();
 
-        return categoryEntity.Id;
+        var categoryDto = mapper.Map<Category, CategoryResponse>(categoryEntity);
+
+        return categoryDto;
     }
 
-    public async Task UpdateCategory(Guid id, CategoryUpdateRequest categoryUpdateRequest, byte[]? newCategoryIcon)
+    public async Task<CategoryResponse> UpdateCategory(Guid id, CategoryUpdateRequest categoryUpdateRequest, byte[]? newCategoryIcon)
     {
         var category = await unitOfWork.Categories.GetCategory(id);
         if (category is null)
@@ -84,6 +86,10 @@ public class CategoriesService : ICategoriesService
         unitOfWork.Categories.UpdateCategory(categoryEntity);
 
         await unitOfWork.SaveChanges();
+
+        var categoryDto = mapper.Map<Category, CategoryResponse>(categoryEntity);
+
+        return categoryDto;
     }
 
     public async Task DeleteCategory(Guid id)
