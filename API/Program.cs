@@ -43,7 +43,13 @@ app.ConfigureExceptionHandlerMiddleware();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        //To serve the SwaggerUI at the app's root (https://localhost:<port>/)
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+        options.RoutePrefix = string.Empty;
+    }
+    );
 }
 
 app.UseStaticFiles();
