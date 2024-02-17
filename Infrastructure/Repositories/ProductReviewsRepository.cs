@@ -63,9 +63,10 @@ public class ProductReviewsRepository : IProductReviewsRepository
 
     public async Task<double> CalculateAvgRatingForProduct(Guid productId)
     {
-        var productAvgRating = await appDbContext.ProductReviews.Where(r => r.ProductId == productId).AverageAsync(r => r.Rating);
-
-        return productAvgRating;
+        if (await appDbContext.ProductReviews.AnyAsync(r => r.ProductId == productId))
+            return await appDbContext.ProductReviews.Where(r => r.ProductId == productId).AverageAsync(r => r.Rating);
+        else
+            return 0;
     }
 
     public void AddProductReview(ProductReview review)
