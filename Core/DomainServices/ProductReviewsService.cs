@@ -59,6 +59,7 @@ public class ProductReviewsService : IProductReviewsService
 
         var reviewEntity = mapper.Map<ProductReviewAddRequest, ProductReview>(productReviewAddRequest);
         reviewEntity.CustomerId = customerId;
+        reviewEntity.Customer = (await unitOfWork.Users.GetUser(customerId))!;
         reviewEntity.ProductId = productId;
 
         unitOfWork.ProductReviews.AddProductReview(reviewEntity);

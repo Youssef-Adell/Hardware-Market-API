@@ -107,6 +107,7 @@ public class OrdersService : IOrdersService
         {
             Id = Guid.NewGuid(),
             CustomerId = customerId,
+            Customer = (await unitOfWork.Users.GetUser(customerId))!,
             ShippingAddress = new Address(orderAddRequest.ShippingAddress.AddressLine, orderAddRequest.ShippingAddress.City),
             OrderLines = orderItems,
             Subtotal = subtotal,
