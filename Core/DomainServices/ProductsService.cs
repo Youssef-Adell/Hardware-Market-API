@@ -47,8 +47,13 @@ public class ProductsService : IProductsService
 
     public async Task<ProductResponse> AddProduct(ProductAddRequest productAddRequest, List<byte[]> productImages)
     {
-        await ValidateCategory(productAddRequest.CategoryId);
-        await ValidateBrand(productAddRequest.BrandId);
+        var category = await unitOfWork.Categories.GetCategory(productAddRequest.CategoryId);
+        if (category is null)
+            throw new UnprocessableEntityException($"Invalid category id.");
+
+        var brand = await unitOfWork.Brands.GetBrand(productAddRequest.BrandId);
+        if (brand is null)
+            throw new UnprocessableEntityException($"Invalid brand id.");
 
         if (productImages != null && productImages.Count > 0)
             await ValidateUploadedImages(productImages);
@@ -66,6 +71,8 @@ public class ProductsService : IProductsService
 
         await unitOfWork.SaveChanges();
 
+        productEntity.Category = category;
+        productEntity.Brand = brand;
         var productDto = mapper.Map<Product, ProductResponse>(productEntity);
         return productDto;
     }
@@ -76,8 +83,14 @@ public class ProductsService : IProductsService
         if (product is null)
             throw new NotFoundException($"Product not found.");
 
-        await ValidateCategory(productUpdateRequest.CategoryId);
-        await ValidateBrand(productUpdateRequest.BrandId);
+        var category = await unitOfWork.Categories.GetCategory(productUpdateRequest.CategoryId);
+        if (category is null)
+            throw new UnprocessableEntityException($"Invalid category id.");
+
+        var brand = await unitOfWork.Brands.GetBrand(productUpdateRequest.BrandId);
+        if (brand is null)
+            throw new UnprocessableEntityException($"Invalid brand id.");
+
 
         if (imagesToAdd != null && imagesToAdd?.Count > 0)
             await ValidateUploadedImages(imagesToAdd);
@@ -136,6 +149,8 @@ public class ProductsService : IProductsService
 
         await unitOfWork.SaveChanges();
 
+        productEntity.Category = category;
+        productEntity.Brand = brand;
         var productDto = mapper.Map<Product, ProductResponse>(productEntity);
         return productDto;
     }
@@ -181,20 +196,6 @@ public class ProductsService : IProductsService
             if (fileService.IsFileSizeExceedsLimit(image, maxAllowedImageSizeInBytes))
                 throw new UnprocessableEntityException($"One or more images exceed the maximum allowed size of {maxAllowedImageSizeInBytes / 1024} KB.");
         }
-    }
-
-    private async Task ValidateCategory(Guid categoryId)
-    {
-        var categoryExists = await unitOfWork.Categories.CategoryExists(categoryId);
-        if (!categoryExists)
-            throw new UnprocessableEntityException($"Invalid category id.");
-    }
-
-    private async Task ValidateBrand(Guid brandId)
-    {
-        var BrandExists = await unitOfWork.Brands.BrandExists(brandId);
-        if (!BrandExists)
-            throw new UnprocessableEntityException($"Invalid brand id.");
     }
 
 }

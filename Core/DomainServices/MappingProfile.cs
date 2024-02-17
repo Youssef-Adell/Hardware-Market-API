@@ -30,9 +30,7 @@ public class MappingProfile : Profile
             .ForMember(d => d.Images, options => options.MapFrom<ImagesUrlsResolver>());
 
         CreateMap<ProductAddRequest, Product>();
-        CreateMap<ProductUpdateRequest, Product>()
-            .ForMember(d => d.Brand, options => options.MapFrom(s => (object)null)) //if we didnt set the value of Brand, Category objects to null ef core will use them and ignore the new brandId and CategoryId so they wont be updated in UpdateProduct method
-            .ForMember(d => d.Category, options => options.MapFrom(s => (object)null));
+        CreateMap<ProductUpdateRequest, Product>();
 
 
         //---Categories Mapping---
