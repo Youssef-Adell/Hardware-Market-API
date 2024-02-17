@@ -18,7 +18,7 @@ public class ProductReviewsRepository : IProductReviewsRepository
     public async Task<PagedResult<ProductReview>> GetProductReviews(Guid productId, PaginationQueryParameters queryParams)
     {
         //build a query to get reveiws of this product
-        var query = appDbContext.ProductReviews.Where(r => r.ProductId == productId);
+        var query = appDbContext.ProductReviews.Where(r => r.ProductId == productId).Include(r => r.Customer);
 
         //sort and paginate the above query then execute it
         var pagedReviewssData = await query
@@ -37,6 +37,7 @@ public class ProductReviewsRepository : IProductReviewsRepository
     public async Task<ProductReview?> GetProductReview(Guid productId, Guid reviewId)
     {
         var review = await appDbContext.ProductReviews
+                        .Include(r => r.Customer)
                         .AsNoTracking()
                         .FirstOrDefaultAsync(r => r.Id == reviewId && r.ProductId == productId);
 
@@ -46,6 +47,7 @@ public class ProductReviewsRepository : IProductReviewsRepository
     public async Task<ProductReview?> GetCustomerProductReview(Guid customerId, Guid productId)
     {
         var review = await appDbContext.ProductReviews
+                        .Include(r => r.Customer)
                         .AsNoTracking()
                         .FirstOrDefaultAsync(r => r.CustomerId == customerId && r.ProductId == productId);
 
