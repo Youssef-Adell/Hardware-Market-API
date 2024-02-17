@@ -33,21 +33,6 @@ public class ProductReviewsService : IProductReviewsService
         return pageOfReviewstDtos;
     }
 
-    public async Task<ProductReviewResponse> GetProductReview(Guid productId, Guid reviewId)
-    {
-        var productExists = await unitOfWork.Products.ProductExists(productId);
-        if (!productExists)
-            throw new NotFoundException($"Product not found.");
-
-        var reviewEntity = await unitOfWork.ProductReviews.GetProductReview(productId, reviewId);
-        if (reviewEntity is null)
-            throw new NotFoundException($"Review not found.");
-
-        var reviewDto = mapper.Map<ProductReview?, ProductReviewResponse>(reviewEntity);
-
-        return reviewDto;
-    }
-
     public async Task<ProductReviewResponse> GetCustomerProductReview(Guid customerId, Guid productId)
     {
         var productExists = await unitOfWork.Products.ProductExists(productId);
@@ -56,7 +41,7 @@ public class ProductReviewsService : IProductReviewsService
 
         var reviewEntity = await unitOfWork.ProductReviews.GetCustomerProductReview(customerId, productId);
         if (reviewEntity is null)
-            throw new NotFoundException($"The current customer has no review for this product.");
+            throw new NotFoundException($"You don't have a review for this product.");
 
         var reviewDto = mapper.Map<ProductReview?, ProductReviewResponse>(reviewEntity);
 
@@ -86,18 +71,15 @@ public class ProductReviewsService : IProductReviewsService
         return reviewDto;
     }
 
-    public async Task<ProductReviewResponse> UpdateProductReview(Guid customerId, Guid productId, Guid reviewId, ProductReviewUpdateRequest productReviewUpdateRequest)
+    public async Task<ProductReviewResponse> UpdateCustomerProductReview(Guid customerId, Guid productId, ProductReviewUpdateRequest productReviewUpdateRequest)
     {
         var product = await unitOfWork.Products.GetProduct(productId);
         if (product is null)
             throw new NotFoundException($"Product not found.");
 
-        var review = await unitOfWork.ProductReviews.GetProductReview(productId, reviewId);
+        var review = await unitOfWork.ProductReviews.GetCustomerProductReview(customerId, productId);
         if (review is null)
-            throw new NotFoundException($"Review not found.");
-
-        if (review.CustomerId != customerId)
-            throw new ForbiddenException("You are not authorized to edit this review.");
+            throw new NotFoundException($"You don't have a review for this product to update.");
 
         var reviewEntity = mapper.Map(productReviewUpdateRequest, review);
 
@@ -111,18 +93,15 @@ public class ProductReviewsService : IProductReviewsService
         return reviewDto;
     }
 
-    public async Task DeleteProductReview(Guid customerId, Guid productId, Guid reviewId)
+    public async Task DeleteCustomerProductReview(Guid customerId, Guid productId)
     {
         var product = await unitOfWork.Products.GetProduct(productId);
         if (product is null)
             throw new NotFoundException($"Product not found.");
 
-        var review = await unitOfWork.ProductReviews.GetProductReview(productId, reviewId);
+        var review = await unitOfWork.ProductReviews.GetCustomerProductReview(customerId, productId);
         if (review is null)
-            throw new NotFoundException($"Review not found.");
-
-        if (review.CustomerId != customerId)
-            throw new ForbiddenException("You are not authorized to delete this review.");
+            throw new NotFoundException($"You don't have a review for this product to delete.");
 
         unitOfWork.ProductReviews.DeleteProductReview(review);
         await unitOfWork.SaveChanges();

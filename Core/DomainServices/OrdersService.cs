@@ -59,7 +59,7 @@ public class OrdersService : IOrdersService
         var order = await GetOrder(orderId);
 
         if (order.CustomerId != customerId)
-            throw new ForbiddenException("You are not authorized to get this order.");
+            throw new NotFoundException("Order not found.");
 
         return order;
     }
@@ -76,7 +76,7 @@ public class OrdersService : IOrdersService
         var orderedProductsEntities = await unitOfWork.Products.GetProductsCollection(idsOfOrderdProducts);
 
         if (orderedProductsEntities is null || orderedProductsEntities?.Count < idsOfOrderdProducts.Count)
-            throw new UnprocessableEntityException("There is one or more invalid product id.");
+            throw new UnprocessableEntityException($"There is insufficient stock of one or more product.");
 
         // Create order items
         var orderItems = new List<OrderLine>();
@@ -84,7 +84,7 @@ public class OrdersService : IOrdersService
         orderedProductsEntities?.ForEach(product =>
         {
             if (product.Quantity < quntitiesOfOrderdProducts[product.Id])
-                throw new UnprocessableEntityException($"Insufficient stock of '{product.Name}' product.");
+                throw new UnprocessableEntityException($"There is Insufficient stock of '{product.Name}'.");
 
             orderItems.Add(new OrderLine
             {

@@ -15,8 +15,8 @@ public class OrderResponse
     public double Subtotal { get; set; }
     public double Discount { get; set; }
     public double ShippingCosts { get; set; }
-    public string PaymentIntentClientSecret { get; set; }
     public double Total { get; set; }
+    public string PaymentIntentClientSecret { get; set; }
 }
 
 public class OrderLineResponse

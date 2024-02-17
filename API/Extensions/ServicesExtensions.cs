@@ -89,7 +89,7 @@ public static class ServicesExtensions
             // });
 
             //to remove the lock symbol from the endpoints that doesnt has [authorize] attribute
-            options.OperationFilter<SecurityRequirementsOperationFilter>("bearerAuth"); // SecurityRequirementsOperationFilter has a constructor that accepts securitySchemaName and i can pass arguments to it via the OperationFilter method, so i passed the name of the SecurityScheme defined above (bearerAuth) otherwise it wont send the authorization header with the requests
+            options.OperationFilter<SecurityRequirementsOperationFilter>(false, "bearerAuth"); // SecurityRequirementsOperationFilter has a constructor that accepts securitySchemaName and i can pass arguments to it via the OperationFilter method, so i passed the name of the SecurityScheme defined above (bearerAuth) otherwise it wont send the authorization header with the requests
 
             //to make swagger shows the the docs comments and responses for the endpoints 
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
