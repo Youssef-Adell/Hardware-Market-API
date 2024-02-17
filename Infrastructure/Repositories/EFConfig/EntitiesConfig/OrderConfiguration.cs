@@ -22,9 +22,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         builder.HasMany(o => o.OrderLines).WithOne().OnDelete(DeleteBehavior.Cascade).IsRequired();
 
-        //if the customer deleted his orders wont be deleted and the customerId wil be assigned to null instead
-        //note that you may run into NullReferenceException issues because this so try to make your code protective (to do later)
-        builder.HasOne(o => o.Customer).WithMany().OnDelete(DeleteBehavior.ClientSetNull);
+        builder.HasOne(o => o.Customer).WithMany().OnDelete(DeleteBehavior.Cascade).IsRequired();
     }
 
 }

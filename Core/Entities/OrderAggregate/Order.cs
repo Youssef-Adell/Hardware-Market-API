@@ -5,8 +5,8 @@ namespace Core.Entities.OrderAggregate;
 public class Order
 {
     public Guid Id { get; set; }
-    public Guid? CustomerId { get; set; }
-    public User? Customer { get; set; }
+    public Guid CustomerId { get; set; }
+    public User Customer { get; set; }
     public List<OrderLine> OrderLines { get; set; }
     public ShippingAddress ShippingAddress { get; set; }
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
