@@ -55,8 +55,8 @@ public static class ServicesExtensions
         {
             options.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "Tech Market API",
-                Description = "Rest API for Tech Market E-Commerce app.",
+                Title = "Hardware Market API",
+                Description = "Rest API for Hardware Market E-Commerce app.",
                 Version = "v1",
                 Contact = new OpenApiContact
                 {
