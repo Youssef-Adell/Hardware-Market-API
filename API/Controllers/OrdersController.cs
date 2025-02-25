@@ -86,13 +86,13 @@ public class OrdersController : ControllerBase
 
         switch (stripeEvent.Type)
         {
-            case Events.PaymentIntentSucceeded:
+            case EventTypes.PaymentIntentSucceeded:
                 var paymentIntent = (PaymentIntent)stripeEvent.Data.Object;
                 var orderId = Guid.Parse(paymentIntent.Metadata["orderId"]);
                 await ordersService.UpdateOrderStatus(orderId, OrderStatus.Orderd);
                 break;
 
-            case Events.PaymentIntentPaymentFailed:
+            case EventTypes.PaymentIntentPaymentFailed:
                 paymentIntent = (PaymentIntent)stripeEvent.Data.Object;
                 orderId = Guid.Parse(paymentIntent.Metadata["orderId"]);
                 await ordersService.UpdateOrderStatus(orderId, OrderStatus.Failed);
