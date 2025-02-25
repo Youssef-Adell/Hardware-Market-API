@@ -6,3 +6,5 @@ logs/
 notes.txt
 environment_variables.txt
 DatabaseBackups/
+*.env
+!*.env.example
