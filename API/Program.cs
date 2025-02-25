@@ -21,14 +21,14 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
+        var appDbContext = services.GetRequiredService<AppDbContext>();
+        await appDbContext.Database.MigrateAsync();
+        await appDbContext.SeedAsync();
+
         var identityDbContext = services.GetRequiredService<IdentityDbContext>();
         var authService = services.GetRequiredService<IAuthService>();
         await identityDbContext.Database.MigrateAsync();
         await identityDbContext.SeedAsync(authService);
-
-        var appDbContext = services.GetRequiredService<AppDbContext>();
-        await appDbContext.Database.MigrateAsync();
-        await appDbContext.SeedAsync();
     }
     catch (Exception ex)
     {

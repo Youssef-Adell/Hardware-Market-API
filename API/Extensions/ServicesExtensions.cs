@@ -61,7 +61,7 @@ public static class ServicesExtensions
                 Contact = new OpenApiContact
                 {
                     Name = "Youssef Adel",
-                    Url = new Uri("https://www.linkedin.com/in/youssef-adel-882ab2236"),
+                    Url = new Uri("https://www.linkedin.com/in/youssef-adell/"),
                     Email = "YoussefAdel.Fci@gmail.com"
                 },
             });
