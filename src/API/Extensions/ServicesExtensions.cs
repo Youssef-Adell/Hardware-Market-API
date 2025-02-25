@@ -100,7 +100,7 @@ public static class ServicesExtensions
     public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         //---app database---
-        services.AddDbContext<AppDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("AppDb")));
+        services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Environment.GetEnvironmentVariable("AppDbConnectionString")));
 
         //---mapper---
         services.AddAutoMapper(typeof(MappingProfile));
@@ -113,7 +113,7 @@ public static class ServicesExtensions
         services.AddSingleton<IFileFormatInspector>(new FileFormatInspector(recognisedFormats));
 
         //---identity---
-        services.AddDbContext<IdentityDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("AuthDb")));
+        services.AddDbContext<IdentityDbContext>(options => options.UseSqlServer(Environment.GetEnvironmentVariable("AuthDbConnectionString")));
         // Identity (Add and configure Services To Manage, Create and Validate Users)
         services.AddIdentity<Account, IdentityRole>(options =>
         {
